@@ -5,7 +5,7 @@ const { add_validation } = require("../../util/validation");
 
 module.exports = {
   Mutation: {
-    add_item: async (_, { name, amount, id }) => {
+    add_item: async (_, { name, id }) => {
       // Input validation
       const { errors, valid } = add_validation(name);
       if (!valid) throw new UserInputError("Item Addition Error", errors);
@@ -43,7 +43,7 @@ module.exports = {
         ...updated_list._doc,
       };
     },
-    remove_item: async (_, { name, amount, id }) => {
+    remove_item: async (_, { name, id }) => {
       // finds the list in the database
       const list = await List.findById(id);
       if (!list) throw new Error("List not found");
@@ -56,11 +56,8 @@ module.exports = {
         }
       }
 
-      // subtracts the amount and removes it from teh database if there are none left in the list
-      list.items[index].amount -= amount;
-      if (list.items[index].amount <= 0) list.items.splice(index, 1);
-
-      // updates the database
+      // removes the item and updates database
+      list.items.splice(index, 1);
       const updated_list = await list.save();
 
       return {

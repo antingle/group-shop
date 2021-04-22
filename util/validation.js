@@ -1,4 +1,5 @@
 const List = require("../models/list");
+const User = require("../models/user");
 
 module.exports.create_validation = (list_name, name) => {
   const errors = {};
@@ -48,3 +49,4 @@ module.exports.add_validation = (item) => {
     valid: Object.keys(errors).length < 1,
   };
 };
+
