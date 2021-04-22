@@ -15,10 +15,11 @@ module.exports = gql`
   }
 
   type Query {
-    get_list: List!
+    get_list(id: ID): List!
   }
   type Mutation {
     create_list(name: String): List!
     join_list(name: String, code: String): List!
+    leave_list(name: String, id: ID): String!
   }
 `;

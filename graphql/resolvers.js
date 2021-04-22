@@ -5,7 +5,21 @@ const { create_validation, join_validation } = require("../util/validation");
 
 module.exports = {
   Query: {
-    get_list: () => {},
+    get_list: async (_, { id }) => {
+      /*
+       * 1) Find the list in the database
+       * 2) Return it
+       */
+
+      // Get the list from the database and check to see if it exists
+      const list = await List.findById(id);
+      if (!list) throw new Error("List not found");
+
+      return {
+        id: list._id,
+        ...list._doc,
+      };
+    },
   },
   Mutation: {
     create_list: async (_, { name }) => {
@@ -41,21 +55,44 @@ module.exports = {
     join_list: async (_, { name, code }) => {
       /*
        * 1) Input validation
-       * 2) Verify existence in database
-       * 3) Add new name to the members in list
-       * 4) Update the database
+       * 2) Update the list of memebrs in the database
        */
+
+      // Input validation
       const { errors, valid } = await join_validation(name, code);
       if (!valid) throw new UserInputError("Join Error", errors);
 
+      // Update the database with the new member
       const list = await List.findOne({ code });
       list.members.push(name);
-      const res = await list.save();
+      const updated_list = await list.save();
 
       return {
-        id: res._id,
-        ...res._doc,
+        id: updated_list._id,
+        ...updated_list._doc,
       };
+    },
+    leave_list: async (_, { name, id }) => {
+      /*
+       * 1) Find the list in the database
+       * 2) Remove the name from the members array
+       * 3) Update the database
+       */
+
+      // finds the list and makes sure it still exists
+      const list = await List.findById(id);
+      if (!list) throw new Error("List not found");
+
+      // removes the member from the members array
+      const index = list.members.indexOf(name);
+      list.members.splice(index, 1);
+
+      // updates the list in the database
+      await list.save().catch((err) => {
+        throw new Error("Unable to leave list", err);
+      });
+
+      return "Successfully left the list";
     },
   },
 };
