@@ -1,11 +1,38 @@
-const List = require("../models/list");
+const bcrypt = require("bcryptjs");
+
 const User = require("../models/user");
 
-module.exports.create_validation = (list_name, name) => {
+const regEx = /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/;
+
+module.exports.validate_registration_info = async (
+  email,
+  password,
+  confirm_password,
+  screen_name
+) => {
   const errors = {};
 
-  if (name === "") errors.list_name = "List name must not be empty";
-  if (name === "") errors.name = "Name must not be empty";
+  // email validation
+  if (email.trim() === "") errors.email = "Email must not be empty";
+  else if (!email.match(regEx)) errors.email = "Must be a valid email";
+  else {
+    const user = await User.findOne({ email });
+    if (user) errors.email = "There is already a user with that email";
+  }
+
+  // password validation
+  if (password === "") errors.password = "Pasword must not be empty";
+  else if (password.length < 8) errors.password = "Password is too short";
+
+  // confirm password validation
+  if (confirm_password === "")
+    errors.confirm_password = "Confirm password must not be empty";
+  else if (confirm_password != password)
+    errors.confirm_password = "Passwords do not match";
+
+  // screen name validation
+  if (screen_name.trim() === "")
+    errors.screen_name = "Screen name must not be empty";
 
   return {
     errors,
@@ -13,23 +40,24 @@ module.exports.create_validation = (list_name, name) => {
   };
 };
 
-module.exports.join_validation = async (name, code) => {
+module.exports.validate_login_info = async (email, password) => {
   const errors = {};
 
-  if (name === "") errors.name = "Name must not be empty";
-
-  if (code === "") errors.code = "Code must not be empty";
-  else if (code.length != 4) errors.code = "Incorrect code format";
+  // email validation
+  if (email.trim() === "") errors.email = "Email must not be empty";
+  else if (!email.match(regEx)) errors.email = "Email must be valid";
   else {
-    const list = await List.findOne({ code });
-    if (!list) errors.code = "List not found";
-    else {
-      for (let i = 0; i < list.members.length; i++) {
-        if (list.members[i] === name) {
-          errors.code = "Name must be unique";
-          break;
-        }
-      }
+    var user = await User.findOne({ email });
+    if (!user) errors.email = "Email is not registered";
+  }
+
+  // password validation
+  if (password === "") errors.password = "Password must not be empty";
+  else if (password.length < 8) errors.password = "Password is not long enough";
+  else {
+    if (user) {
+      const matched = await bcrypt.compare(password, user.password);
+      if (!matched) errors.password = "Password is incorrect";
     }
   }
 
@@ -38,15 +66,3 @@ module.exports.join_validation = async (name, code) => {
     valid: Object.keys(errors).length < 1,
   };
 };
-
-module.exports.add_validation = (item) => {
-  const errors = {};
-
-  if (item === "") errors.name = "Item name must not be empty";
-
-  return {
-    errors,
-    valid: Object.keys(errors).length < 1,
-  };
-};
-
