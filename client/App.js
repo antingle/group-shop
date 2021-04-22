@@ -8,6 +8,9 @@ import ListScreen from "./screens/ListScreen";
 import NameListScreen from "./screens/NameListScreen";
 import CodeScreen from "./screens/CodeScreen";
 import GroceryListScreen from "./screens/GroceryListScreen";
+import FirstScreen from "./screens/FirstScreen";
+import CreateAccountScreen from "./screens/CreateAccountScreen";
+import SignInScreen from "./screens/SignInScreen";
 
 export default function App() {
   const Stack = createStackNavigator();
@@ -25,6 +28,9 @@ export default function App() {
             headerShown: false,
           }}
         >
+          <Stack.Screen name="firstScreen" component={FirstScreen} />
+          <Stack.Screen name="createAccount" component={CreateAccountScreen} />
+          <Stack.Screen name="signIn" component={SignInScreen} />
           <Stack.Screen name="createOrJoin" component={CreateOrJoinScreen} />
           <Stack.Screen name="nameList" component={NameListScreen} />
           <Stack.Screen name="code" component={CodeScreen} />

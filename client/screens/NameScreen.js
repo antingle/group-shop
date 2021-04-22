@@ -7,7 +7,7 @@ export default function NameScreen({ navigation }) {
 
   const handleSubmit = () => {
     console.log(name);
-    navigation.navigate("groceryList");
+    navigation.navigate("createOrJoin");
   };
 
   return (
@@ -15,11 +15,12 @@ export default function NameScreen({ navigation }) {
       <Text style={styles.heading}>What is your name?</Text>
       <TextInput
         autoFocus={true}
-        placeholder="Your Name Here"
+        placeholder="Your name here"
         style={styles.nameInput}
         autoCapitalize={"words"}
         onChangeText={setName}
-        onEndEditing={handleSubmit}
+        onSubmitEditing={handleSubmit}
+        autoCorrect={false}
       />
     </SafeAreaView>
   );

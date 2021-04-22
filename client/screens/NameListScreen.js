@@ -19,7 +19,8 @@ export default function NameListScreen({ navigation }) {
         style={styles.nameInput}
         autoCapitalize={"words"}
         onChangeText={setListName}
-        onEndEditing={handleSubmit}
+        onSubmitEditing={handleSubmit}
+        autoCorrect={false}
       />
     </SafeAreaView>
   );

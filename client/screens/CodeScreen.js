@@ -20,7 +20,7 @@ export default function CodeScreen({ navigation }) {
         style={styles.nameInput}
         autoCapitalize={"characters"}
         onChangeText={setCode}
-        onEndEditing={handleSubmit}
+        onSubmitEditing={handleSubmit}
       />
     </SafeAreaView>
   );
