@@ -6,6 +6,7 @@ const LIST_SCHEMA = new Schema({
   items: [
     {
       name: String,
+      amount: Number,
       member: String,
       purchased: Boolean,
     },

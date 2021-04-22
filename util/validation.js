@@ -1,3 +1,4 @@
+const { isObjectType } = require("graphql");
 const List = require("../models/list");
 
 module.exports.create_validation = (name) => {
@@ -30,6 +31,11 @@ module.exports.join_validation = async (name, code) => {
       }
     }
   }
+
+  return {
+    errors,
+    valid: Object.keys(errors).length < 1,
+  };
 };
 
 module.exports.add_validation = (item) => {

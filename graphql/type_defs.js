@@ -10,6 +10,7 @@ module.exports = gql`
   }
   type Item {
     name: String!
+    amount: Int!
     member: String
     purchased: String!
   }
@@ -21,8 +22,9 @@ module.exports = gql`
     create_list(name: String): List!
     join_list(name: String, code: String): List!
     leave_list(name: String, id: ID): String!
+    delete_list(id: ID): String!
 
-    add_item(name: String, id: ID): List!
-    remove_item(name: String, id: ID): List!
+    add_item(name: String, amount: Int, id: ID): List!
+    remove_item(name: String, amount: Int, id: ID): List!
   }
 `;

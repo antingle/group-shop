@@ -23,12 +23,6 @@ module.exports = {
   },
   Mutation: {
     create_list: async (_, { name }) => {
-      /*
-       * 1) Input validation
-       * 2) Generate unique code
-       * 3) Save the list to the database
-       */
-
       // Input validation
       const { errors, valid } = create_validation(name);
       if (!valid) throw new UserInputError("Create Error", errors);
@@ -53,11 +47,6 @@ module.exports = {
       };
     },
     join_list: async (_, { name, code }) => {
-      /*
-       * 1) Input validation
-       * 2) Update the list of memebrs in the database
-       */
-
       // Input validation
       const { errors, valid } = await join_validation(name, code);
       if (!valid) throw new UserInputError("Join Error", errors);
@@ -73,12 +62,6 @@ module.exports = {
       };
     },
     leave_list: async (_, { name, id }) => {
-      /*
-       * 1) Find the list in the database
-       * 2) Remove the name from the members array
-       * 3) Update the database
-       */
-
       // finds the list and makes sure it still exists
       const list = await List.findById(id);
       if (!list) throw new Error("List not found");
@@ -88,11 +71,20 @@ module.exports = {
       list.members.splice(index, 1);
 
       // updates the list in the database
-      await list.save().catch((err) => {
-        throw new Error("Unable to leave list", err);
+      const res = await list.save();
+
+      if (!res) return "Successfully left the list";
+      else return "Failed to leave list";
+    },
+    delete_list: async (_, { id }) => {
+      if (!List.findById(id)) throw new Error("List not found");
+
+      const res = await List.findByIdAndDelete(id, (err) => {
+        if (err) throw new Error("Could not delete list", err);
       });
 
-      return "Successfully left the list";
+      if (!res) return "Successfully deleted the list";
+      else return "Failed to delete the list";
     },
   },
 };
