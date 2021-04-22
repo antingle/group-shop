@@ -30,7 +30,7 @@ module.exports = {
 
       // saves the list to the database
       const list = await new List({
-        name: list_name,
+        list_name,
         code,
         members: [name],
         items: [],

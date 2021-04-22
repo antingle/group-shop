@@ -3,6 +3,7 @@ const { gql } = require("apollo-server");
 module.exports = gql`
   type List {
     id: String!
+    list_name: String!
     code: String!
     members: [String]!
     items: [Item!]
