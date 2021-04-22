@@ -1,9 +1,9 @@
-const { isObjectType } = require("graphql");
 const List = require("../models/list");
 
-module.exports.create_validation = (name) => {
+module.exports.create_validation = (list_name, name) => {
   const errors = {};
 
+  if (name === "") errors.list_name = "List name must not be empty";
   if (name === "") errors.name = "Name must not be empty";
 
   return {
