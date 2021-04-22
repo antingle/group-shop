@@ -15,7 +15,9 @@ module.exports.join_validation = async (name, code) => {
   const errors = {};
 
   if (name === "") errors.name = "Name must not be empty";
+
   if (code === "") errors.code = "Code must not be empty";
+  else if (code.length != 4) errors.code = "Incorrect code format";
   else {
     const list = await List.findOne({ code });
     if (!list) errors.code = "List not found";
@@ -28,6 +30,12 @@ module.exports.join_validation = async (name, code) => {
       }
     }
   }
+};
+
+module.exports.add_validation = (item) => {
+  const errors = {};
+
+  if (item === "") errors.name = "Item name must not be empty";
 
   return {
     errors,

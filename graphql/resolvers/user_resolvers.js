@@ -1,7 +1,7 @@
 const { UserInputError } = require("apollo-server-errors");
 
-const List = require("../models/list");
-const { create_validation, join_validation } = require("../util/validation");
+const List = require("../../models/list");
+const { create_validation, join_validation } = require("../../util/validation");
 
 module.exports = {
   Query: {

@@ -21,5 +21,8 @@ module.exports = gql`
     create_list(name: String): List!
     join_list(name: String, code: String): List!
     leave_list(name: String, id: ID): String!
+
+    add_item(name: String, id: ID): List!
+    remove_item(name: String, id: ID): List!
   }
 `;
