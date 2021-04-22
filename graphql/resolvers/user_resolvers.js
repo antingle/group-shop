@@ -6,11 +6,6 @@ const { create_validation, join_validation } = require("../../util/validation");
 module.exports = {
   Query: {
     get_list: async (_, { id }) => {
-      /*
-       * 1) Find the list in the database
-       * 2) Return it
-       */
-
       // Get the list from the database and check to see if it exists
       const list = await List.findById(id);
       if (!list) throw new Error("List not found");
@@ -22,9 +17,9 @@ module.exports = {
     },
   },
   Mutation: {
-    create_list: async (_, { name }) => {
+    create_list: async (_, { list_name, name }) => {
       // Input validation
-      const { errors, valid } = create_validation(name);
+      const { errors, valid } = create_validation(list_name, name);
       if (!valid) throw new UserInputError("Create Error", errors);
 
       // generates a unique 4-digit code
@@ -35,6 +30,7 @@ module.exports = {
 
       // saves the list to the database
       const list = await new List({
+        name: list_name,
         code,
         members: [name],
         items: [],
@@ -46,7 +42,7 @@ module.exports = {
         ...list._doc,
       };
     },
-    join_list: async (_, { name, code }) => {
+    join_list: async (_, { name, code }, { pubsub }) => {
       // Input validation
       const { errors, valid } = await join_validation(name, code);
       if (!valid) throw new UserInputError("Join Error", errors);
@@ -55,6 +51,10 @@ module.exports = {
       const list = await List.findOne({ code });
       list.members.push(name);
       const updated_list = await list.save();
+
+      pubsub.publish(code, {
+        user_added: `${name} has joined`,
+      });
 
       return {
         id: updated_list._id,
@@ -85,6 +85,11 @@ module.exports = {
 
       if (!res) return "Successfully deleted the list";
       else return "Failed to delete the list";
+    },
+  },
+  Subscription: {
+    user_added: {
+      subscribe: (_, { code }, { pubsub }) => pubsub.asyncIterator(code),
     },
   },
 };
