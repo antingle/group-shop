@@ -2,10 +2,7 @@ const { UserInputError } = require("apollo-server-errors");
 const bcrypt = require("bcryptjs");
 
 const User = require("../../models/user");
-const {
-  validate_registration_info,
-  validate_login_info,
-} = require("../../util/validation");
+const { user_validation } = require("../../util/validation");
 
 module.exports = {
   Query: {
@@ -35,7 +32,7 @@ module.exports = {
       { info: { email, password, confirm_password, screen_name } }
     ) => {
       // input validation
-      const { errors, valid } = await validate_registration_info(
+      const { errors, valid } = await user_validation.registration(
         email,
         password,
         confirm_password,
@@ -62,7 +59,7 @@ module.exports = {
     },
     login: async (_, { email, password }) => {
       // input validation
-      const { errors, valid } = await validate_login_info(email, password);
+      const { errors, valid } = await user_validation.login(email, password);
       if (!valid) throw new UserInputError("Login Error", { errors });
 
       const user = await User.findOne({ email });

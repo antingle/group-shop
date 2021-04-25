@@ -43,5 +43,9 @@ module.exports = gql`
     delete_user(id: ID!): String!
 
     #List Functionality
+    create_list(list_name: String!, id: ID!): List!
+    join_list(code: String!, id: ID!): List!
+    leave_list(listID: ID!, userID: ID!): String!
+    delete_list(id: ID!): String!
   }
 `;

@@ -4,7 +4,7 @@ const User = require("../models/user");
 
 const regEx = /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/;
 
-module.exports.validate_registration_info = async (
+module.exports.registration = async (
   email,
   password,
   confirm_password,
@@ -40,7 +40,7 @@ module.exports.validate_registration_info = async (
   };
 };
 
-module.exports.validate_login_info = async (email, password) => {
+module.exports.login = async (email, password) => {
   const errors = {};
 
   // email validation
