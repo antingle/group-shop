@@ -6,6 +6,8 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { colors } from "../colors.js";
@@ -61,7 +63,10 @@ export default function CreateAccountScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
       <Text style={styles.title}>Create Account</Text>
       <Text style={styles.heading}>Name</Text>
       <TextInput
@@ -120,7 +125,7 @@ export default function CreateAccountScreen({ navigation }) {
       <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
         <Text style={styles.createText}>Create Account</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -140,14 +145,14 @@ const styles = StyleSheet.create({
   title: {
     textAlign: "center",
     fontSize: 40,
-    fontWeight: "900",
+    fontWeight: "800",
     color: colors.green,
     marginBottom: 12,
-    marginTop: 24,
+    paddingTop: 40,
   },
   nameInput: {
     fontSize: 20,
-    paddingTop: 10,
+    paddingTop: 40,
     color: colors.dark,
   },
   createButton: {

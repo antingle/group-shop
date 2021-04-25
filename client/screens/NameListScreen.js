@@ -7,7 +7,7 @@ export default function NameListScreen({ navigation }) {
 
   const handleSubmit = () => {
     console.log(listName);
-    navigation.navigate("name");
+    navigation.navigate("groceryList");
   };
 
   return (

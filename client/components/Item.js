@@ -1,19 +1,33 @@
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { View, StyleSheet, Text, TouchableHighlight } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { colors } from "../colors.js";
 
-export default function Item({ name, isChecked }) {
+export default function Item({ name, onPress, purchased }) {
+  const checkboxRef = React.useRef();
+
+  const handlePress = async () => {
+    await onPress();
+    checkboxRef?.current.onPress();
+  };
+
   return (
-    <View style={styles.card}>
-      <BouncyCheckbox
-        text={name}
-        fillColor={colors.green}
-        iconStyle={{ borderColor: colors.green }}
-        onPress={(isChecked) => {}}
-      />
-    </View>
+    <TouchableHighlight
+      style={styles.touchable}
+      onPress={handlePress}
+      underlayColor={colors.green}
+      activeOpacity={0.6}
+    >
+      <View style={styles.card}>
+        <BouncyCheckbox
+          text={name}
+          fillColor={colors.green}
+          iconStyle={{ borderColor: colors.green }}
+          isChecked={purchased}
+          ref={checkboxRef}
+        />
+      </View>
+    </TouchableHighlight>
   );
 }
 
@@ -26,6 +40,9 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingLeft: 20,
     backgroundColor: "white",
+  },
+  touchable: {
+    borderRadius: 24,
     marginBottom: 8,
   },
   cardText: {

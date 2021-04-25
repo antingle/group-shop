@@ -7,7 +7,7 @@ export default function CodeScreen({ navigation }) {
 
   const handleSubmit = () => {
     console.log(code);
-    navigation.navigate("name");
+    navigation.navigate("groceryList");
   };
 
   return (
