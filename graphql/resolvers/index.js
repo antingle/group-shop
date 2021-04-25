@@ -1,11 +1,11 @@
-const list_resolvers = require("./list_resolvers");
-const item_resolvers = require("./item_resolvers");
 const user_resolvers = require("./user_resolvers");
+const list_resolvers = require("./list_resolvers");
+//const item_resolvers = require("./item_resolvers");
 
 module.exports = {
   Query: {
     ...user_resolvers.Query,
-    //...list_resolvers.Query,
+    ...list_resolvers.Query,
   },
   Mutation: {
     //...item_resolvers.Mutation,

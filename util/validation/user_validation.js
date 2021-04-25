@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 
-const User = require("../models/user");
+const User = require("../../models/user");
 
 const regEx = /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/;
 

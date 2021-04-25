@@ -1,6 +1,7 @@
 const { model, Schema } = require("mongoose");
 
 const LIST_SCHEMA = new Schema({
+  owner: String,
   list_name: String,
   code: String,
   members: [String],

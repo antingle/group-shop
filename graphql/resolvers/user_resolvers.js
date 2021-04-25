@@ -14,9 +14,9 @@ module.exports = {
         throw new Error("Every User Query Error", err);
       }
     },
-    get_user: async (_, { id }) => {
+    get_user: async (_, { userID }) => {
       try {
-        const user = await User.findById(id);
+        const user = await User.findById(userID);
         return {
           id: user._id,
           ...user._doc,
@@ -89,9 +89,9 @@ module.exports = {
         ...user._doc,
       };
     },
-    delete_user: async (_, { id }) => {
+    delete_user: async (_, { userID }) => {
       try {
-        await User.findByIdAndDelete(id);
+        await User.findByIdAndDelete(userID);
         return "Successfully deleted account";
       } catch (err) {
         throw new Error("Account Deletion Error", err);
