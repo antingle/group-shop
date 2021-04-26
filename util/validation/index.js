@@ -1,13 +1,9 @@
-const { creation, join } = require("./list_validation");
-const { registration, login } = require("./user_validation");
+const user_validation = require("./user_validation");
+const list_validation = require("./list_validation");
+const item_validation = require("./item_validation");
 
 module.exports = {
-  list_validation: {
-    creation,
-    join,
-  },
-  user_validation: {
-    registration,
-    login,
-  },
+  user_validation,
+  list_validation,
+  item_validation,
 };

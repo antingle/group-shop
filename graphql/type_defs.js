@@ -34,11 +34,11 @@ module.exports = gql`
   type Query {
     # User Queries
     get_every_user: [User!]
-    get_user(userID: ID!): User!
+    get_user(userID: ID!): User
 
     # List Queries
-    get_list(listID: ID!): List!
-    get_user_lists(userID: ID!): [List!]!
+    get_list(listID: ID!): List
+    get_user_lists(userID: ID!): [List!]
   }
   type Mutation {
     # User Functionality
@@ -47,10 +47,16 @@ module.exports = gql`
     create_temp_user(screen_name: String!): User!
     delete_user(userID: ID!): String!
 
-    #List Functionality
+    # List Functionality
     create_list(list_name: String!, userID: ID!): List!
     join_list(code: String!, userID: ID!): List!
     leave_list(listID: ID!, userID: ID!): String!
     delete_list(listID: ID!): String!
+
+    # Item Functionality
+    add_item(name: String!, listID: ID!): List!
+    remove_item(name: String!, listID: ID!): List!
+    claim_item(name: String!, listID: ID!, userID: ID!): List!
+    unclaim_item(name: String!, listID: ID!, userID: ID!): List!
   }
 `;
