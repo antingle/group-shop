@@ -61,12 +61,7 @@ module.exports = gql`
     # Item Functionality
     add_item(name: String!, listID: ID!): List!
     remove_item(listID: ID!, itemID: ID!): List!
-
-    # Is there a way to make these a toggle?
     claim_item(listID: ID!, itemID: ID!, options: item_params): List!
     purchase_item(listID: ID!, itemID: ID!, method: String): List!
-
-    # Future Implementation
-    # claim_and_purchase(name: String!, listID: ID!, userID: ID!): List!
   }
 `;
