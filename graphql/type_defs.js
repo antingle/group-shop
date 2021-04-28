@@ -19,6 +19,7 @@ module.exports = gql`
     created: String!
   }
   type Item {
+    id: ID!
     name: String!
     member: String
     purchased: Boolean!
@@ -29,6 +30,10 @@ module.exports = gql`
     password: String!
     confirm_password: String!
     screen_name: String!
+  }
+  input item_params {
+    method: String
+    userID: ID
   }
 
   type Query {
@@ -55,8 +60,13 @@ module.exports = gql`
 
     # Item Functionality
     add_item(name: String!, listID: ID!): List!
-    remove_item(name: String!, listID: ID!): List!
-    claim_item(name: String!, listID: ID!, userID: ID!): List!
-    unclaim_item(name: String!, listID: ID!, userID: ID!): List!
+    remove_item(listID: ID!, itemID: ID!): List!
+
+    # Is there a way to make these a toggle?
+    claim_item(listID: ID!, itemID: ID!, options: item_params): List!
+    purchase_item(listID: ID!, itemID: ID!, method: String): List!
+
+    # Future Implementation
+    # claim_and_purchase(name: String!, listID: ID!, userID: ID!): List!
   }
 `;

@@ -3,6 +3,7 @@ const { UserInputError } = require("apollo-server-errors");
 const { item_validation } = require("../../util/validation");
 const List = require("../../models/list");
 const User = require("../../models/user");
+const get_index = require("../../util/get_index");
 
 module.exports = {
   Mutation: {
@@ -25,14 +26,14 @@ module.exports = {
         ...list._doc,
       };
     },
-    remove_item: async (_, { name, listID }) => {
+    remove_item: async (_, { listID, itemID }) => {
       // input validation
-      const { errors, valid } = await item_validation.remove(name, listID);
+      const { errors, valid } = await item_validation.remove(listID, itemID);
       if (!valid) throw new UserInputError("Remove Item Error", { errors });
 
       // finds the index of the item, removes it, and updates the database
       const list = await List.findById(listID);
-      const index = list.items.indexOf({ name });
+      const index = get_index(list, itemID);
       list.items.splice(index, 1);
       list.save();
 
@@ -41,21 +42,24 @@ module.exports = {
         ...list._doc,
       };
     },
-    claim_item: async (_, { name, listID, userID }) => {
+    claim_item: async (
+      _,
+      { listID, itemID, options: { method = "claim", userID = null } }
+    ) => {
       // input validation
       const { errors, valid } = await item_validation.claim(
-        name,
         listID,
+        itemID,
         userID
       );
       if (!valid) throw new UserInputError("Item Claim Error", { errors });
 
       const list = await List.findById(listID);
-      const { screen_name } = await User.findById(userID);
+      const user = !userID ? null : await User.findById(userID);
 
-      // gets the index of the item, updates its member key, and saves it to the database
-      const index = list.items.indexOf({ name });
-      list.items[index].member = screen_name;
+      const index = get_index(list, itemID);
+      list.items[index].member = method == "claim" ? user.screen_name : null;
+
       list.save();
 
       return {
@@ -63,17 +67,19 @@ module.exports = {
         ...list._doc,
       };
     },
-    unclaim_item: async (_, { name, listID, userID }) => {
-      // input validation
-      const { errors, valid } = await item_validation.unclaim(
-        name,
-        listID,
-        userID
-      );
-      if (!valid) throw new UserInputError("Item Unclaim Error", { errors });
+    purchase_item: async (_, { listID, itemID, method = "purchase" }) => {
+      const { errors, valid } = await item_validation.purchase(listID, itemID);
+      if (!valid) throw new UserInputError("Purchase Error", { errors });
 
-      //   const list = await List.findById(listID);
-      // QUESTIONS: do we want multiple people to be able to claim the same item?
+      const list = await List.findById(listID);
+      const index = get_index(list, itemID);
+      list.items[index].purchased = method == "purchase" ? true : false;
+      list.save();
+
+      return {
+        id: list._id,
+        ...list._doc,
+      };
     },
   },
 };
