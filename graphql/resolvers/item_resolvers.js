@@ -1,8 +1,8 @@
 const { UserInputError } = require("apollo-server-errors");
 
-const { item_validation } = require("../../util/validation");
 const List = require("../../models/list");
 const User = require("../../models/user");
+const { item_validation } = require("../../util/validation");
 const get_index = require("../../util/get_index");
 
 module.exports = {
@@ -44,20 +44,26 @@ module.exports = {
     },
     claim_item: async (
       _,
-      { listID, itemID, options: { method = "claim", userID = null } }
+      { listID, itemID, options: { method = "unclaim", userID = null } }
     ) => {
       // input validation
       const { errors, valid } = await item_validation.claim(
         listID,
         itemID,
+        method,
         userID
       );
       if (!valid) throw new UserInputError("Item Claim Error", { errors });
 
       const list = await List.findById(listID);
+
+      // sets the user to null if there was no specified userID
       const user = !userID ? null : await User.findById(userID);
 
       const index = get_index(list, itemID);
+
+      // if the method is claim, sets the memeber to the user claiming it.
+      // the only other option is unclaim, so it sets the member to null
       list.items[index].member = method == "claim" ? user.screen_name : null;
 
       list.save();
@@ -68,11 +74,18 @@ module.exports = {
       };
     },
     purchase_item: async (_, { listID, itemID, method = "purchase" }) => {
-      const { errors, valid } = await item_validation.purchase(listID, itemID);
+      // input validation
+      const { errors, valid } = await item_validation.purchase(
+        listID,
+        itemID,
+        method
+      );
       if (!valid) throw new UserInputError("Purchase Error", { errors });
 
       const list = await List.findById(listID);
       const index = get_index(list, itemID);
+
+      // if the method is purchase, then purchased is true. Unpurchase method sets it to false
       list.items[index].purchased = method == "purchase" ? true : false;
       list.save();
 

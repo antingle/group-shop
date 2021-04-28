@@ -87,6 +87,8 @@ module.exports = {
         if (list.members.length == 0) {
           await List.findByIdAndDelete(list._id);
           return "Successfully deleted the list";
+        } else if (userID == list.owner) {
+          list.owner = list.members[0];
         }
 
         list.save();
