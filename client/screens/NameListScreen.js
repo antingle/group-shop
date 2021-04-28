@@ -21,6 +21,7 @@ export default function NameListScreen({ navigation }) {
         onChangeText={setListName}
         onSubmitEditing={handleSubmit}
         autoCorrect={false}
+        returnKeyType={"done"}
       />
     </SafeAreaView>
   );

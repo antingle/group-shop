@@ -14,9 +14,9 @@ export default function Item({ name, onPress, purchased }) {
   return (
     <TouchableHighlight
       style={styles.touchable}
-      onPress={handlePress}
       underlayColor={colors.green}
       activeOpacity={0.6}
+      onPress={handlePress}
     >
       <View style={styles.card}>
         <BouncyCheckbox
@@ -24,6 +24,7 @@ export default function Item({ name, onPress, purchased }) {
           fillColor={colors.green}
           iconStyle={{ borderColor: colors.green }}
           isChecked={purchased}
+          disabled={true}
           ref={checkboxRef}
         />
       </View>

@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 28,
     fontWeight: "800",
+    width: 280,
     marginTop: 40,
     color: colors.green,
   },
@@ -111,11 +112,12 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: colors.green,
     marginBottom: 12,
-    marginTop: 24,
+    paddingTop: 40,
   },
   textInput: {
     fontSize: 24,
-    paddingTop: 10,
+    marginTop: 20,
+    width: 280,
     color: colors.dark,
   },
   signInButton: {

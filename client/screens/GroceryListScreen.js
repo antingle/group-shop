@@ -1,42 +1,56 @@
 import React from "react";
-import { FlatList, SafeAreaView, StyleSheet, Text } from "react-native";
+import { SafeAreaView, SectionList, StyleSheet, Text } from "react-native";
 import Item from "../components/Item";
 import { colors } from "../colors.js";
 
 const DATA = [
   {
-    id: 1,
-    title: "carrots",
-    purchased: false,
+    data: [
+      { id: 1, title: "carrots", purchased: false },
+      { id: 2, title: "lettuce", purchased: false },
+    ],
   },
   {
-    id: 2,
-    title: "lettuce",
-    purchased: false,
+    title: "Purchased",
+    data: [{ id: 3, title: "oats", purchased: true }],
   },
 ];
 
 export default function ({ navigation, groceryListName, groceryListCode }) {
-  const [purchased, setPurchased] = React.useState(false);
+  const [refresh, setRefresh] = React.useState(false);
+  const setPurchased = (item) => {
+    let arr = DATA[0].data;
+    if (arr.indexOf(item) == -1) return;
+    let spliced = arr.splice(arr.indexOf(item), 1);
+    DATA[1].data.push(spliced[0]);
+    setRefresh(!refresh);
+
+    return spliced[0];
+  };
 
   const renderItem = ({ item }) => (
     <Item
+      id={item.id}
       name={item.title}
       onPress={() => {
-        setPurchased(true);
-        console.log(purchased);
+        item = setPurchased(item);
+        if (item == -1) return;
+        item.purchased = true;
       }}
-      purchased={purchased}
+      purchased={item.purchased}
     />
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Groceries</Text>
-      <FlatList
-        data={DATA}
+      <SectionList
+        sections={DATA}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        renderSectionHeader={({ section: { title } }) =>
+          title && <Text style={styles.heading}>{title}</Text>
+        }
+        extraData={refresh}
       />
     </SafeAreaView>
   );
@@ -56,6 +70,14 @@ const styles = StyleSheet.create({
     color: colors.green,
     marginBottom: 12,
     marginTop: 24,
+  },
+  heading: {
+    fontSize: 28,
+    fontWeight: "800",
+    width: 280,
+    marginTop: 20,
+    marginBottom: 10,
+    color: colors.green,
   },
   nameInput: {
     fontSize: 24,

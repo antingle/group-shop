@@ -10,6 +10,7 @@ import {
   Platform,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { colors } from "../colors.js";
 
 export default function CreateAccountScreen({ navigation }) {
@@ -63,69 +64,68 @@ export default function CreateAccountScreen({ navigation }) {
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <Text style={styles.title}>Create Account</Text>
-      <Text style={styles.heading}>Name</Text>
-      <TextInput
-        autoFocus={true}
-        placeholder="Name"
-        style={styles.nameInput}
-        autoCapitalize={"words"}
-        onChangeText={setName}
-        autoCorrect={false}
-        autoCompleteType="name"
-        textContentType="name"
-        returnKeyType="next"
-        ref={nameRef}
-        onSubmitEditing={() => emailRef.current.focus()}
-      />
-      <Text style={styles.heading}>Email</Text>
-      <TextInput
-        placeholder="Email"
-        style={styles.nameInput}
-        autoCapitalize={"none"}
-        onChangeText={setEmail}
-        autoCorrect={false}
-        autoCompleteType="email"
-        textContentType="emailAddress"
-        returnKeyType="next"
-        ref={emailRef}
-        onSubmitEditing={() => passRef.current.focus()}
-      />
-      <Text style={styles.heading}>Password</Text>
-      <TextInput
-        placeholder="Password"
-        style={styles.nameInput}
-        autoCapitalize={"none"}
-        onChangeText={setPassword}
-        autoCorrect={false}
-        autoCompleteType="password"
-        secureTextEntry={true}
-        textContentType="newPassword"
-        returnKeyType="next"
-        ref={passRef}
-        onSubmitEditing={() => confirmPassRef.current.focus()}
-      />
-      <Text style={styles.heading}>Confirm Password</Text>
-      <TextInput
-        placeholder="Confirm Password"
-        style={styles.nameInput}
-        autoCapitalize={"none"}
-        onChangeText={setConfirmPassword}
-        autoCorrect={false}
-        autoCompleteType="password"
-        secureTextEntry={true}
-        textContentType="newPassword"
-        returnKeyType="done"
-        ref={confirmPassRef}
-      />
-      <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
-        <Text style={styles.createText}>Create Account</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+    <KeyboardAwareScrollView>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.heading}>Name</Text>
+        <TextInput
+          autoFocus={true}
+          placeholder="Name"
+          style={styles.textInput}
+          autoCapitalize={"words"}
+          onChangeText={setName}
+          autoCorrect={false}
+          autoCompleteType="name"
+          textContentType="name"
+          returnKeyType="next"
+          ref={nameRef}
+          onSubmitEditing={() => emailRef.current.focus()}
+        />
+        <Text style={styles.heading}>Email</Text>
+        <TextInput
+          placeholder="Email"
+          style={styles.textInput}
+          autoCapitalize={"none"}
+          onChangeText={setEmail}
+          autoCorrect={false}
+          autoCompleteType="email"
+          textContentType="emailAddress"
+          returnKeyType="next"
+          ref={emailRef}
+          onSubmitEditing={() => passRef.current.focus()}
+        />
+        <Text style={styles.heading}>Password</Text>
+        <TextInput
+          placeholder="Password"
+          style={styles.textInput}
+          autoCapitalize={"none"}
+          onChangeText={setPassword}
+          autoCorrect={false}
+          autoCompleteType="password"
+          secureTextEntry={true}
+          textContentType="newPassword"
+          returnKeyType="next"
+          ref={passRef}
+          onSubmitEditing={() => confirmPassRef.current.focus()}
+        />
+        <Text style={styles.heading}>Confirm Password</Text>
+        <TextInput
+          placeholder="Confirm Password"
+          style={styles.textInput}
+          autoCapitalize={"none"}
+          onChangeText={setConfirmPassword}
+          autoCorrect={false}
+          autoCompleteType="password"
+          secureTextEntry={true}
+          textContentType="newPassword"
+          returnKeyType="done"
+          ref={confirmPassRef}
+        />
+        <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
+          <Text style={styles.createText}>Create Account</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -137,9 +137,10 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   heading: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "800",
-    marginTop: 24,
+    width: 280,
+    marginTop: 40,
     color: colors.green,
   },
   title: {
@@ -150,9 +151,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingTop: 40,
   },
-  nameInput: {
-    fontSize: 20,
-    paddingTop: 40,
+  textInput: {
+    fontSize: 24,
+    marginTop: 20,
+    width: 280,
     color: colors.dark,
   },
   createButton: {
