@@ -1,34 +1,67 @@
 const { gql } = require("apollo-server");
 
 module.exports = gql`
+  type User {
+    id: ID!
+    email: String
+    password: String
+    screen_name: String!
+    lists: [String!]!
+    join_date: String!
+  }
   type List {
-    id: String!
+    id: ID!
+    owner: ID!
     list_name: String!
     code: String!
-    members: [String]!
-    items: [Item!]
-    createdAt: String!
+    members: [String!]!
+    items: [Item!]!
+    created: String!
   }
   type Item {
+    id: ID!
     name: String!
-    amount: Int!
     member: String
-    purchased: String!
+    purchased: Boolean!
+  }
+
+  input registration_info {
+    email: String!
+    password: String!
+    confirm_password: String!
+    screen_name: String!
+  }
+  input item_params {
+    method: String
+    userID: ID
   }
 
   type Query {
-    get_list(id: ID): List!
+    # User Queries
+    get_every_user: [User!]
+    get_user(userID: ID!): User
+
+    # List Queries
+    get_list(listID: ID!): List
+    get_user_lists(userID: ID!): [List!]
   }
   type Mutation {
-    create_list(list_name: String!, name: String!): List!
-    join_list(name: String!, code: String!): List!
-    leave_list(name: String!, id: ID!): String!
-    delete_list(id: ID!): String!
+    # User Functionality
+    register(info: registration_info): User!
+    login(email: String!, password: String!): User!
+    create_temp_user(screen_name: String!): User!
+    delete_user(userID: ID!): String!
 
-    add_item(name: String!, amount: Int!, id: ID!): List!
-    remove_item(name: String!, amount: Int!, id: ID!): List!
-  }
-  type Subscription {
-    user_added(code: String!): String!
+    # List Functionality
+    create_list(list_name: String!, userID: ID!): List!
+    join_list(code: String!, userID: ID!): List!
+    leave_list(listID: ID!, userID: ID!): String!
+    delete_list(listID: ID!): String!
+
+    # Item Functionality
+    add_item(name: String!, listID: ID!): List!
+    remove_item(listID: ID!, itemID: ID!): List!
+    claim_item(listID: ID!, itemID: ID!, options: item_params): List!
+    purchase_item(listID: ID!, itemID: ID!, method: String): List!
   }
 `;

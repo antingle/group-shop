@@ -1,95 +1,101 @@
 const { UserInputError } = require("apollo-server-errors");
+const bcrypt = require("bcryptjs");
 
-const List = require("../../models/list");
-const { create_validation, join_validation } = require("../../util/validation");
+const User = require("../../models/user");
+const { user_validation } = require("../../util/validation");
 
 module.exports = {
   Query: {
-    get_list: async (_, { id }) => {
-      // Get the list from the database and check to see if it exists
-      const list = await List.findById(id);
-      if (!list) throw new Error("List not found");
-
-      return {
-        id: list._id,
-        ...list._doc,
-      };
+    get_every_user: async () => {
+      try {
+        const users = await User.find();
+        return users;
+      } catch (err) {
+        throw new Error("Every User Query Error", err);
+      }
+    },
+    get_user: async (_, { userID }) => {
+      try {
+        const user = await User.findById(userID);
+        return {
+          id: user._id,
+          ...user._doc,
+        };
+      } catch (err) {
+        throw new Error("User Query Error", err);
+      }
     },
   },
   Mutation: {
-    create_list: async (_, { list_name, name }) => {
-      // Input validation
-      const { errors, valid } = create_validation(list_name, name);
-      if (!valid) throw new UserInputError("Create Error", errors);
+    register: async (
+      _,
+      { info: { email, password, confirm_password, screen_name } }
+    ) => {
+      // input validation
+      const { errors, valid } = await user_validation.registration(
+        email,
+        password,
+        confirm_password,
+        screen_name
+      );
+      if (!valid) throw new UserInputError("Registration Error", { errors });
 
-      // generates a unique 4-digit code
-      do {
-        var code = Math.floor(Math.random() * (10000 - 1000)) + 1000;
-        var invalid = await List.findOne({ code: code.toString() });
-      } while (invalid);
+      // password hashing
+      password = await bcrypt.hash(password, 12);
 
-      // saves the list to the database
-      const list = await new List({
-        list_name,
-        code,
-        members: [name],
-        items: [],
-        createdAt: new Date().toISOString(),
+      // adds the user to the database
+      const user = await new User({
+        email,
+        password,
+        screen_name,
+        lists: [],
+        join_date: new Date().toISOString(),
       }).save();
 
       return {
-        id: list._id,
-        ...list._doc,
+        id: user._id,
+        ...user._doc,
       };
     },
-    join_list: async (_, { name, code }, { pubsub }) => {
-      // Input validation
-      const { errors, valid } = await join_validation(name, code);
-      if (!valid) throw new UserInputError("Join Error", errors);
+    login: async (_, { email, password }) => {
+      // input validation
+      const { errors, valid } = await user_validation.login(email, password);
+      if (!valid) throw new UserInputError("Login Error", { errors });
 
-      // Update the database with the new member
-      const list = await List.findOne({ code });
-      list.members.push(name);
-      const updated_list = await list.save();
-
-      pubsub.publish(code, {
-        user_added: `${name} has joined`,
-      });
+      const user = await User.findOne({ email });
 
       return {
-        id: updated_list._id,
-        ...updated_list._doc,
+        id: user._id,
+        ...user._doc,
       };
     },
-    leave_list: async (_, { name, id }) => {
-      // finds the list and makes sure it still exists
-      const list = await List.findById(id);
-      if (!list) throw new Error("List not found");
+    create_temp_user: async (_, { screen_name }) => {
+      // input validation
+      if (screen_name.trim() === "") {
+        const errors = { screen_name: "Screen name must not be empty" };
+        throw new UserInputError("Temp Creation Error", { errors });
+      }
 
-      // removes the member from the members array
-      const index = list.members.indexOf(name);
-      list.members.splice(index, 1);
+      const user = await new User({
+        email: null,
+        password: null,
+        screen_name,
+        lists: [],
+        join_date: "temp",
+      }).save();
 
-      // updates the list in the database
-      const res = await list.save();
-
-      if (!res) return "Successfully left the list";
-      else return "Failed to leave list";
+      return {
+        id: user._id,
+        ...user._doc,
+      };
     },
-    delete_list: async (_, { id }) => {
-      if (!List.findById(id)) throw new Error("List not found");
-
-      const res = await List.findByIdAndDelete(id, (err) => {
-        if (err) throw new Error("Could not delete list", err);
-      });
-
-      if (!res) return "Successfully deleted the list";
-      else return "Failed to delete the list";
-    },
-  },
-  Subscription: {
-    user_added: {
-      subscribe: (_, { code }, { pubsub }) => pubsub.asyncIterator(code),
+    delete_user: async (_, { userID }) => {
+      try {
+        await User.findByIdAndDelete(userID);
+        return "Successfully deleted account";
+      } catch (err) {
+        throw new Error("Account Deletion Error", err);
+      }
     },
   },
 };

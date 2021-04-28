@@ -1,18 +1,18 @@
 const { model, Schema } = require("mongoose");
 
 const LIST_SCHEMA = new Schema({
+  owner: String,
   list_name: String,
   code: String,
   members: [String],
   items: [
     {
       name: String,
-      amount: Number,
       member: String,
       purchased: Boolean,
     },
   ],
-  createdAt: String,
+  created: String,
 });
 
 module.exports = model("lists", LIST_SCHEMA);

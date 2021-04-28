@@ -19,6 +19,7 @@
   "homepage": "https://github.com/ingleanthony/group-shopping#readme",
   "dependencies": {
     "apollo-server": "^2.23.0",
+    "bcryptjs": "^2.4.3",
     "graphql": "^15.5.0",
     "mongoose": "^5.12.5"
   },
