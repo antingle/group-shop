@@ -12,4 +12,9 @@ module.exports = {
     ...list_resolvers.Mutation,
     ...item_resolvers.Mutation,
   },
+  Subscription: {
+    update: {
+      subscribe: (_, { code }, { pubsub }) => pubsub.asyncIterator(code),
+    },
+  },
 };

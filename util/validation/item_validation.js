@@ -3,7 +3,7 @@ const User = require("../../models/user");
 const get_index = require("../../util/get_index");
 
 module.exports = {
-  add: async (name, listID) => {
+  add: async (name, listID, userID) => {
     const errors = {};
 
     // makes sure the name is valid
@@ -12,8 +12,20 @@ module.exports = {
     // make sure the list ID is valid and exists in the database
     if (listID === "") errors.listID = "List ID must not be empty";
     else {
-      const list = await List.findById(listID);
+      var list = await List.findById(listID);
       if (!list) errors.listID = "List with that ID not found";
+    }
+
+    // makes sure that the user ID is valid, exists in the database, and is part of the list
+    if (userID === "") errors.userID = "User ID must not be empty";
+    else {
+      const user = await User.findById(userID);
+      if (user) {
+        if (list) {
+          const index = list.members.indexOf(user.screen_name);
+          if (index == -1) errors.userID = "User is not a part of this list";
+        }
+      } else errors.userID = "User with that ID not found";
     }
 
     return {
@@ -21,7 +33,7 @@ module.exports = {
       valid: Object.keys(errors).length < 1,
     };
   },
-  remove: async (listID, itemID) => {
+  remove: async (listID, itemID, userID) => {
     const errors = {};
 
     // make sure the list ID is valid, exists in the database, and has the item in it
@@ -36,6 +48,16 @@ module.exports = {
     else if (list) {
       const index = get_index(list, itemID);
       if (index == -1) errors.itemID = "Item does not exist in the list";
+    }
+
+    // makes sure that the user ID is valid, exists in the database, and is part of the list
+    if (userID === "") errors.userID = "User ID must not be empty";
+    else {
+      const user = await User.findById(userID);
+      if (user) {
+        const index = list.members.indexOf(user.screen_name);
+        if (index == -1) errors.userID = "User is not a part of this list";
+      } else errors.userID = "User with that ID not found";
     }
 
     return {
@@ -62,26 +84,18 @@ module.exports = {
       if (index == -1) errors.itemID = "Item does not exist in the list";
     }
 
-    if (method != "claim" && method != "unclaim")
-      errors.method = "Invalid method";
-
-    // returns early if the userID is null
-    if (!userID) {
-      return {
-        errors,
-        valid: Object.keys(errors).length < 1,
-      };
-    }
-
     // makes sure that the user ID is valid, exists in the database, and is part of the list
     if (userID === "") errors.userID = "User ID must not be empty";
     else {
       const user = await User.findById(userID);
       if (user) {
         const index = list.members.indexOf(user.screen_name);
-        if (index == -1) errors.userID = "User is not apart of this list";
+        if (index == -1) errors.userID = "User is not a part of this list";
       } else errors.userID = "User with that ID not found";
     }
+
+    if (method != "claim" && method != "unclaim")
+      errors.method = "Invalid method";
 
     return {
       errors,
@@ -103,6 +117,16 @@ module.exports = {
     else if (list) {
       const index = get_index(list, itemID);
       if (index == -1) errors.itemID = "Item does not exist in the list";
+    }
+
+    // makes sure that the user ID is valid, exists in the database, and is part of the list
+    if (userID === "") errors.userID = "User ID must not be empty";
+    else {
+      const user = await User.findById(userID);
+      if (user) {
+        const index = list.members.indexOf(user.screen_name);
+        if (index == -1) errors.userID = "User is not a part of this list";
+      } else errors.userID = "User with that ID not found";
     }
 
     if (method != "purchase" && method != "unpurchase")

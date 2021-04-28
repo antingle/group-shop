@@ -1,4 +1,5 @@
 const { UserInputError } = require("apollo-server-errors");
+const { subscribe } = require("graphql");
 
 const List = require("../../models/list");
 const User = require("../../models/user");
@@ -59,7 +60,7 @@ module.exports = {
         ...list._doc,
       };
     },
-    join_list: async (_, { code, userID }) => {
+    join_list: async (_, { code, userID }, { pubsub }) => {
       // input validation
       const { errors, valid } = await list_validation.join(code, userID);
       if (!valid) throw new UserInputError("List Join Error", { errors });
@@ -70,12 +71,16 @@ module.exports = {
       list.members.push(user.screen_name);
       list.save();
 
+      pubsub.publish(code, {
+        update: `${user.screen_name} has joined the list`,
+      });
+
       return {
         id: list._id,
         ...list._doc,
       };
     },
-    leave_list: async (_, { listID, userID }) => {
+    leave_list: async (_, { listID, userID }, { pubsub }) => {
       try {
         const list = await List.findById(listID);
         const { screen_name } = await User.findById(userID);
@@ -84,11 +89,18 @@ module.exports = {
         const index = list.members.indexOf(screen_name);
         list.members.splice(index, 1);
 
+        pubsub.publish(code, {
+          update: `${screen_name} has left the list`,
+        });
+
         if (list.members.length == 0) {
           await List.findByIdAndDelete(list._id);
           return "Successfully deleted the list";
         } else if (userID == list.owner) {
           list.owner = list.members[0];
+          pubsub.publish(code, {
+            update: `${list.members[0]} is now the list owner`,
+          });
         }
 
         list.save();

@@ -31,10 +31,6 @@ module.exports = gql`
     confirm_password: String!
     screen_name: String!
   }
-  input item_params {
-    method: String
-    userID: ID
-  }
 
   type Query {
     # User Queries
@@ -59,9 +55,12 @@ module.exports = gql`
     delete_list(listID: ID!): String!
 
     # Item Functionality
-    add_item(name: String!, listID: ID!): List!
-    remove_item(listID: ID!, itemID: ID!): List!
-    claim_item(listID: ID!, itemID: ID!, options: item_params): List!
-    purchase_item(listID: ID!, itemID: ID!, method: String): List!
+    add_item(name: String!, listID: ID!, userID: ID!): List!
+    remove_item(listID: ID!, itemID: ID!, userID: ID!): List!
+    claim_item(listID: ID!, itemID: ID!, userID: ID!, method: String): List!
+    purchase_item(listID: ID!, itemID: ID!, userID: ID!, method: String): List!
+  }
+  type Subscription {
+    update(code: String!): String!
   }
 `;

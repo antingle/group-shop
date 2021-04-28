@@ -7,9 +7,9 @@ const get_index = require("../../util/get_index");
 
 module.exports = {
   Mutation: {
-    add_item: async (_, { name, listID }) => {
+    add_item: async (_, { name, listID, userID }, { pubsub }) => {
       // input validation
-      const { errors, valid } = await item_validation.add(name, listID);
+      const { errors, valid } = await item_validation.add(name, listID, userID);
       if (!valid) throw new UserInputError("Add Item Error", { errors });
 
       // adds the item to the list and updates the database
@@ -21,50 +21,71 @@ module.exports = {
       });
       list.save();
 
+      const { screen_name } = await User.findById(userID);
+
+      pubsub.publish(list.code, {
+        update: `${screen_name} added ${name} to the list`,
+      });
+
       return {
         id: list._id,
         ...list._doc,
       };
     },
-    remove_item: async (_, { listID, itemID }) => {
+    remove_item: async (_, { listID, itemID, userID }, { pubsub }) => {
       // input validation
-      const { errors, valid } = await item_validation.remove(listID, itemID);
+      const { errors, valid } = await item_validation.remove(
+        listID,
+        itemID,
+        userID
+      );
       if (!valid) throw new UserInputError("Remove Item Error", { errors });
 
       // finds the index of the item, removes it, and updates the database
       const list = await List.findById(listID);
       const index = get_index(list, itemID);
+      const name = list.items[index].name;
       list.items.splice(index, 1);
       list.save();
+
+      const { screen_name } = await User.findById(userID);
+
+      pubsub.publish(list.code, {
+        update: `${screen_name} removed ${name} from the list`,
+      });
 
       return {
         id: list._id,
         ...list._doc,
       };
     },
-    claim_item: async (
-      _,
-      { listID, itemID, options: { method = "unclaim", userID = null } }
-    ) => {
+    claim_item: async (_, { listID, itemID, userID, method = "claim" }) => {
       // input validation
       const { errors, valid } = await item_validation.claim(
         listID,
         itemID,
-        method,
-        userID
+        userID,
+        method
       );
       if (!valid) throw new UserInputError("Item Claim Error", { errors });
 
       const list = await List.findById(listID);
 
       // sets the user to null if there was no specified userID
-      const user = !userID ? null : await User.findById(userID);
-
+      const { screen_name } = await User.findById(userID);
       const index = get_index(list, itemID);
 
-      // if the method is claim, sets the memeber to the user claiming it.
-      // the only other option is unclaim, so it sets the member to null
-      list.items[index].member = method == "claim" ? user.screen_name : null;
+      if (method == "claim") {
+        list.items[index].member = screen_name;
+        pubsub.publish(list.code, {
+          update: `${screen_name} has claimed ${list.items[index].name}`,
+        });
+      } else {
+        list.items[index].member = null;
+        pubsub.publish(list.code, {
+          update: `${screen_name} has unclaimed ${list.items[index].name}`,
+        });
+      }
 
       list.save();
 
@@ -73,11 +94,16 @@ module.exports = {
         ...list._doc,
       };
     },
-    purchase_item: async (_, { listID, itemID, method = "purchase" }) => {
+    purchase_item: async (
+      _,
+      { listID, itemID, userID, method = "purchase" },
+      { pubsub }
+    ) => {
       // input validation
       const { errors, valid } = await item_validation.purchase(
         listID,
         itemID,
+        userID,
         method
       );
       if (!valid) throw new UserInputError("Purchase Error", { errors });
@@ -85,8 +111,20 @@ module.exports = {
       const list = await List.findById(listID);
       const index = get_index(list, itemID);
 
-      // if the method is purchase, then purchased is true. Unpurchase method sets it to false
-      list.items[index].purchased = method == "purchase" ? true : false;
+      const { screen_name } = await User.findById(userID);
+
+      if (method == "purchase") {
+        list.items[index].purchased = true;
+        pubsub.publish(list.code, {
+          update: `${screen_name} has purchased ${list.items[index].name}`,
+        });
+      } else {
+        list.items[index].purchased = false;
+        pubsub.publish(list.code, {
+          update: `${screen_name} has unpurchased ${list.items[index].name}`,
+        });
+      }
+
       list.save();
 
       return {
