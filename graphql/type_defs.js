@@ -14,15 +14,24 @@ module.exports = gql`
     owner: ID!
     list_name: String!
     code: String!
-    members: [String!]!
+    members: [Member!]!
     items: [Item!]!
     created: String!
+  }
+  type Member {
+    id: ID!
+    screen_name: String!
   }
   type Item {
     id: ID!
     name: String!
     member: String
     purchased: Boolean!
+  }
+  type item_update {
+    type: String!
+    affector: String!
+    item: Item!
   }
 
   input registration_info {
@@ -62,5 +71,7 @@ module.exports = gql`
   }
   type Subscription {
     update(code: String!): String!
+
+    item_updates(code: String!): item_update!
   }
 `;

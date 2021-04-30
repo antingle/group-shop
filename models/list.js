@@ -4,7 +4,11 @@ const LIST_SCHEMA = new Schema({
   owner: String,
   list_name: String,
   code: String,
-  members: [String],
+  members: [
+    {
+      screen_name: String,
+    },
+  ],
   items: [
     {
       name: String,

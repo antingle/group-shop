@@ -1,30 +1,35 @@
 const { UserInputError } = require("apollo-server-errors");
 
-const List = require("../../models/list");
-const User = require("../../models/user");
 const { item_validation } = require("../../util/validation");
-const get_index = require("../../util/get_index");
 
 module.exports = {
   Mutation: {
     add_item: async (_, { name, listID, userID }, { pubsub }) => {
       // input validation
-      const { errors, valid } = await item_validation.add(name, listID, userID);
+      const { valid, errors, list, user } = await item_validation({
+        name,
+        listID,
+        userID,
+      });
       if (!valid) throw new UserInputError("Add Item Error", { errors });
 
       // adds the item to the list and updates the database
-      const list = await List.findById(listID);
       list.items.push({
         name,
         member: null,
         purchased: false,
       });
-      list.save();
-
-      const { screen_name } = await User.findById(userID);
+      await list.save();
 
       pubsub.publish(list.code, {
-        update: `${screen_name} added ${name} to the list`,
+        item_updates: {
+          type: "add",
+          affector: user.screen_name,
+          item: {
+            id: list.items[list.items.length - 1]._id,
+            ...list.items[list.items.length - 1]._doc,
+          },
+        },
       });
 
       return {
@@ -34,24 +39,27 @@ module.exports = {
     },
     remove_item: async (_, { listID, itemID, userID }, { pubsub }) => {
       // input validation
-      const { errors, valid } = await item_validation.remove(
+      const { valid, errors, list, user, item_index } = await item_validation({
         listID,
         itemID,
-        userID
-      );
+        userID,
+      });
       if (!valid) throw new UserInputError("Remove Item Error", { errors });
 
-      // finds the index of the item, removes it, and updates the database
-      const list = await List.findById(listID);
-      const index = get_index(list, itemID);
-      const name = list.items[index].name;
-      list.items.splice(index, 1);
-      list.save();
+      const item = list.items[item_index];
 
-      const { screen_name } = await User.findById(userID);
+      list.items.splice(item_index, 1);
+      await list.save();
 
       pubsub.publish(list.code, {
-        update: `${screen_name} removed ${name} from the list`,
+        item_updates: {
+          type: "remove",
+          affector: user.screen_name,
+          item: {
+            id: item._id,
+            ...item._doc,
+          },
+        },
       });
 
       return {
@@ -61,33 +69,29 @@ module.exports = {
     },
     claim_item: async (_, { listID, itemID, userID, method = "claim" }) => {
       // input validation
-      const { errors, valid } = await item_validation.claim(
+      const { errors, valid, list, user, item_index } = await item_validation({
         listID,
         itemID,
         userID,
-        method
-      );
+        method,
+      });
       if (!valid) throw new UserInputError("Item Claim Error", { errors });
 
-      const list = await List.findById(listID);
+      if (method == "claim") list.items[item_index].member = user.screen_name;
+      else if (method == "unclaim") list.items[item_index].member = null;
 
-      // sets the user to null if there was no specified userID
-      const { screen_name } = await User.findById(userID);
-      const index = get_index(list, itemID);
+      await list.save();
 
-      if (method == "claim") {
-        list.items[index].member = screen_name;
-        pubsub.publish(list.code, {
-          update: `${screen_name} has claimed ${list.items[index].name}`,
-        });
-      } else {
-        list.items[index].member = null;
-        pubsub.publish(list.code, {
-          update: `${screen_name} has unclaimed ${list.items[index].name}`,
-        });
-      }
-
-      list.save();
+      pubsub.publish(list.code, {
+        item_updates: {
+          type: method == "claim" ? "claim" : "unclaim",
+          affector: user.screen_name,
+          item: {
+            id: list.items[item_index]._id,
+            ...list.items[item_index]._doc,
+          },
+        },
+      });
 
       return {
         id: list._id,
@@ -100,37 +104,39 @@ module.exports = {
       { pubsub }
     ) => {
       // input validation
-      const { errors, valid } = await item_validation.purchase(
+      const { errors, valid, list, user, item_index } = await item_validation({
         listID,
         itemID,
         userID,
-        method
-      );
+        method,
+      });
       if (!valid) throw new UserInputError("Purchase Error", { errors });
 
-      const list = await List.findById(listID);
-      const index = get_index(list, itemID);
+      if (method == "purchase") list.items[item_index].purchased = true;
+      else if (method == "unpurchase") list.items[item_index].purchased = false;
 
-      const { screen_name } = await User.findById(userID);
+      await list.save();
 
-      if (method == "purchase") {
-        list.items[index].purchased = true;
-        pubsub.publish(list.code, {
-          update: `${screen_name} has purchased ${list.items[index].name}`,
-        });
-      } else {
-        list.items[index].purchased = false;
-        pubsub.publish(list.code, {
-          update: `${screen_name} has unpurchased ${list.items[index].name}`,
-        });
-      }
-
-      list.save();
+      pubsub.publish(list.code, {
+        item_updates: {
+          type: method == "purchase" ? "purchase" : "unpurchase",
+          affector: user.screen_name,
+          item: {
+            id: list.items[item_index]._id,
+            ...list.items[item_index]._doc,
+          },
+        },
+      });
 
       return {
         id: list._id,
         ...list._doc,
       };
+    },
+  },
+  Subscription: {
+    item_updates: {
+      subscribe: (_, { code }, { pubsub }) => pubsub.asyncIterator(code),
     },
   },
 };

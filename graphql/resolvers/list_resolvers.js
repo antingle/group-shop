@@ -1,9 +1,9 @@
 const { UserInputError } = require("apollo-server-errors");
-const { subscribe } = require("graphql");
 
 const List = require("../../models/list");
 const User = require("../../models/user");
 const { list_validation } = require("../../util/validation");
+const { get_user_index } = require("../../util/get_index");
 
 module.exports = {
   Query: {
@@ -43,14 +43,20 @@ module.exports = {
       } while (invalid);
 
       // gets the user's screen name to add to the members array
-      const { screen_name } = await User.findById(userID);
+      const user = await User.findById(userID);
 
       // creates a new list and saves it to the database
       const list = await new List({
         owner: userID,
         list_name,
         code: code.toString(),
-        members: [screen_name],
+        members: [
+          {
+            _id: user._id,
+            member: user._id,
+            screen_name: user.screen_name,
+          },
+        ],
         items: [],
         created: new Date().toISOString(),
       }).save();
@@ -68,7 +74,10 @@ module.exports = {
       // adds the user to the members array in the list and updates the database
       const list = await List.findOne({ code });
       const user = await User.findById(userID);
-      list.members.push(user.screen_name);
+      list.members.push({
+        _id: userID,
+        screen_name: user.screen_name,
+      });
       list.save();
 
       pubsub.publish(code, {
@@ -81,34 +90,33 @@ module.exports = {
       };
     },
     leave_list: async (_, { listID, userID }, { pubsub }) => {
-      try {
-        const list = await List.findById(listID);
-        const { screen_name } = await User.findById(userID);
+      // try {
+      const list = await List.findById(listID);
+      const user = await User.findById(userID);
+      // finds the index of the leaving member, removes them, and updates the database
+      const index = get_user_index(list, userID);
+      console.log(index);
 
-        // finds the index of the leaving member, removes them, and updates the database
-        const index = list.members.indexOf(screen_name);
-        list.members.splice(index, 1);
+      list.members.splice(index, 1);
 
-        pubsub.publish(code, {
-          update: `${screen_name} has left the list`,
+      pubsub.publish(list.code, {
+        update: `${user.screen_name} has left the list`,
+      });
+
+      if (list.members.length == 0) return delete_list(listID);
+      else if (userID == list.owner) {
+        list.owner = list.members[0]._id;
+        pubsub.publish(list.code, {
+          update: `${list.members[0].screen_name} is now the list owner`,
         });
-
-        if (list.members.length == 0) {
-          await List.findByIdAndDelete(list._id);
-          return "Successfully deleted the list";
-        } else if (userID == list.owner) {
-          list.owner = list.members[0];
-          pubsub.publish(code, {
-            update: `${list.members[0]} is now the list owner`,
-          });
-        }
-
-        list.save();
-
-        return "Successfully left the list";
-      } catch (err) {
-        throw new Error("Leave Error", err);
       }
+
+      list.save();
+
+      return "Successfully left the list";
+      // } catch (err) {
+      //   throw new Error("Leave Error", err);
+      // }
     },
     delete_list: async (_, { listID }) => {
       try {
