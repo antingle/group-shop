@@ -8,7 +8,6 @@ export default function Item({ name, onPress, purchased }) {
 
   const handlePress = async () => {
     await onPress();
-    checkboxRef?.current.onPress();
   };
 
   return (

@@ -16,7 +16,7 @@ export default function App() {
   const Stack = createStackNavigator();
 
   const client = new ApolloClient({
-    uri: "localhost:5000",
+    uri: "http://localhost:5000",
     cache: new InMemoryCache(),
   });
 
@@ -28,14 +28,14 @@ export default function App() {
             headerShown: false,
           }}
         >
-          <Stack.Screen name="firstScreen" component={FirstScreen} />
+          {/* <Stack.Screen name="firstScreen" component={FirstScreen} />
           <Stack.Screen name="createAccount" component={CreateAccountScreen} />
           <Stack.Screen name="signIn" component={SignInScreen} />
-          <Stack.Screen name="createOrJoin" component={CreateOrJoinScreen} />
+          <Stack.Screen name="name" component={NameScreen} /> */}
+          {/* <Stack.Screen name="createOrJoin" component={CreateOrJoinScreen} />
           <Stack.Screen name="nameList" component={NameListScreen} />
-          <Stack.Screen name="code" component={CodeScreen} />
-          <Stack.Screen name="name" component={NameScreen} />
-          <Stack.Screen name="lists" component={ListScreen} />
+          <Stack.Screen name="code" component={CodeScreen} /> */}
+          {/* <Stack.Screen name="lists" component={ListScreen} /> */}
           <Stack.Screen name="groceryList" component={GroceryListScreen} />
         </Stack.Navigator>
       </NavigationContainer>
