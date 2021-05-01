@@ -2,6 +2,7 @@ const { UserInputError } = require("apollo-server-errors");
 const bcrypt = require("bcryptjs");
 
 const User = require("../../models/user");
+const List = require("../../models/list");
 const { user_validation } = require("../../util/validation");
 
 module.exports = {
@@ -64,10 +65,9 @@ module.exports = {
 
       const user = await User.findOne({ email });
 
-      return {
-        id: user._id,
-        ...user._doc,
-      };
+      const lists = await List.find({ owner: user._id });
+
+      return lists;
     },
     create_temp_user: async (_, { screen_name }) => {
       // input validation
@@ -91,8 +91,7 @@ module.exports = {
     },
     delete_user: async (_, { userID }) => {
       try {
-        await User.findByIdAndDelete(userID);
-        return "Successfully deleted account";
+        return await User.findByIdAndDelete(userID);
       } catch (err) {
         throw new Error("Account Deletion Error", err);
       }

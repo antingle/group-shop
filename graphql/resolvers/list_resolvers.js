@@ -89,13 +89,19 @@ module.exports = {
         ...list._doc,
       };
     },
+    delete_list: async (_, { listID }) => {
+      try {
+        return await List.findByIdAndDelete(listID);
+      } catch (err) {
+        throw new Error("List Deletion Error", err);
+      }
+    },
     leave_list: async (_, { listID, userID }, { pubsub }) => {
       // try {
       const list = await List.findById(listID);
       const user = await User.findById(userID);
       // finds the index of the leaving member, removes them, and updates the database
       const index = get_user_index(list, userID);
-      console.log(index);
 
       list.members.splice(index, 1);
 
@@ -103,7 +109,7 @@ module.exports = {
         update: `${user.screen_name} has left the list`,
       });
 
-      if (list.members.length == 0) return delete_list(listID);
+      if (list.members.length == 0) return await List.findByIdAndDelete(listID);
       else if (userID == list.owner) {
         list.owner = list.members[0]._id;
         pubsub.publish(list.code, {
@@ -113,18 +119,13 @@ module.exports = {
 
       list.save();
 
-      return "Successfully left the list";
+      return {
+        id: list._id,
+        ...list._doc,
+      };
       // } catch (err) {
       //   throw new Error("Leave Error", err);
       // }
-    },
-    delete_list: async (_, { listID }) => {
-      try {
-        await List.findByIdAndDelete(listID);
-        return "Successfully deleted the list";
-      } catch (err) {
-        throw new Error("List Deletion Error", err);
-      }
     },
   },
 };

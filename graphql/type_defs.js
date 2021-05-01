@@ -53,15 +53,15 @@ module.exports = gql`
   type Mutation {
     # User Functionality
     register(info: registration_info): User!
-    login(email: String!, password: String!): User!
+    login(email: String!, password: String!): [List!]!
     create_temp_user(screen_name: String!): User!
-    delete_user(userID: ID!): String!
+    delete_user(userID: ID!): User!
 
     # List Functionality
     create_list(list_name: String!, userID: ID!): List!
     join_list(code: String!, userID: ID!): List!
-    leave_list(listID: ID!, userID: ID!): String!
-    delete_list(listID: ID!): String!
+    leave_list(listID: ID!, userID: ID!): List!
+    delete_list(listID: ID!): List!
 
     # Item Functionality
     add_item(name: String!, listID: ID!, userID: ID!): List!
