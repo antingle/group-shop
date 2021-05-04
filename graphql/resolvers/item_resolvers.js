@@ -65,7 +65,11 @@ module.exports = {
         ...updated_list._doc,
       };
     },
-    claim_item: async (_, { listID, itemID, userID, method = "claim" }) => {
+    claim_item: async (
+      _,
+      { listID, itemID, userID, method = "claim" },
+      { pubsub }
+    ) => {
       // input validation
       const { errors, valid, list, user, item_index } = await item_validation({
         listID,
