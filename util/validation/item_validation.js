@@ -12,10 +12,11 @@ module.exports = async ({
 }) => {
   const errors = {};
 
-  if (name && name.trim() == "") errors.name = "Name must not be empty";
+  if (name != null)
+    if (name.trim() == "") errors.name = "Name must not be empty";
 
   // make sure the list ID is valid and exists in the database
-  if (listID) {
+  if (listID != null) {
     if (listID === "") errors.listID = "List ID must not be empty";
     else {
       var list = await List.findById(listID);
@@ -23,7 +24,7 @@ module.exports = async ({
     }
   }
 
-  if (itemID) {
+  if (itemID != null) {
     if (itemID == "") errors.itemID = "Item ID must not be empty";
     else if (list) {
       var item_index = get_item_index(list, itemID);
@@ -33,7 +34,7 @@ module.exports = async ({
   }
 
   // makes sure that the user ID is valid, exists in the database, and is part of the list
-  if (userID) {
+  if (userID != null) {
     if (userID === "") errors.userID = "User ID must not be empty";
     else {
       var user = await User.findById(userID);

@@ -19,22 +19,22 @@ module.exports = {
         member: null,
         purchased: false,
       });
-      await list.save();
+      const updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        item_updates: {
+        update: {
           type: "add",
           affector: user.screen_name,
-          item: {
-            id: list.items[list.items.length - 1]._id,
-            ...list.items[list.items.length - 1]._doc,
+          list: {
+            id: updated_list._id,
+            ...updated_list._doc,
           },
         },
       });
 
       return {
-        id: list._id,
-        ...list._doc,
+        id: updated_list._id,
+        ...updated_list._doc,
       };
     },
     remove_item: async (_, { listID, itemID, userID }, { pubsub }) => {
@@ -46,25 +46,23 @@ module.exports = {
       });
       if (!valid) throw new UserInputError("Remove Item Error", { errors });
 
-      const item = list.items[item_index];
-
       list.items.splice(item_index, 1);
-      await list.save();
+      const updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        item_updates: {
+        update: {
           type: "remove",
           affector: user.screen_name,
-          item: {
-            id: item._id,
-            ...item._doc,
+          list: {
+            id: updated_list._id,
+            ...updated_list._doc,
           },
         },
       });
 
       return {
-        id: list._id,
-        ...list._doc,
+        id: updated_list._id,
+        ...updated_list._doc,
       };
     },
     claim_item: async (_, { listID, itemID, userID, method = "claim" }) => {
@@ -80,22 +78,22 @@ module.exports = {
       if (method == "claim") list.items[item_index].member = user.screen_name;
       else if (method == "unclaim") list.items[item_index].member = null;
 
-      await list.save();
+      const updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        item_updates: {
+        update: {
           type: method == "claim" ? "claim" : "unclaim",
           affector: user.screen_name,
-          item: {
-            id: list.items[item_index]._id,
-            ...list.items[item_index]._doc,
+          list: {
+            id: updated_list._id,
+            ...updated_list._doc,
           },
         },
       });
 
       return {
-        id: list._id,
-        ...list._doc,
+        id: updated_list._id,
+        ...updated_list._doc,
       };
     },
     purchase_item: async (
@@ -115,28 +113,23 @@ module.exports = {
       if (method == "purchase") list.items[item_index].purchased = true;
       else if (method == "unpurchase") list.items[item_index].purchased = false;
 
-      await list.save();
+      updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        item_updates: {
+        update: {
           type: method == "purchase" ? "purchase" : "unpurchase",
           affector: user.screen_name,
-          item: {
-            id: list.items[item_index]._id,
-            ...list.items[item_index]._doc,
+          list: {
+            id: updated_list._id,
+            ...updated_list._doc,
           },
         },
       });
 
       return {
-        id: list._id,
-        ...list._doc,
+        id: updated_list._id,
+        ...updated_list._doc,
       };
-    },
-  },
-  Subscription: {
-    item_updates: {
-      subscribe: (_, { code }, { pubsub }) => pubsub.asyncIterator(code),
     },
   },
 };

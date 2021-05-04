@@ -1,9 +1,7 @@
 const { UserInputError } = require("apollo-server-errors");
 
 const List = require("../../models/list");
-const User = require("../../models/user");
 const { list_validation } = require("../../util/validation");
-const { get_user_index } = require("../../util/get_index");
 
 module.exports = {
   Query: {
@@ -30,10 +28,10 @@ module.exports = {
   Mutation: {
     create_list: async (_, { list_name, userID }) => {
       // input validation
-      const { errors, valid } = await list_validation.creation(
+      const { valid, errors, user } = await list_validation({
         list_name,
-        userID
-      );
+        userID,
+      });
       if (!valid) throw new UserInputError("List Creation Error", { errors });
 
       // generate a 5-digit join code
@@ -42,18 +40,14 @@ module.exports = {
         var invalid = await List.findOne({ code: code.toString() });
       } while (invalid);
 
-      // gets the user's screen name to add to the members array
-      const user = await User.findById(userID);
-
       // creates a new list and saves it to the database
       const list = await new List({
-        owner: userID,
+        owner: user._id,
         list_name,
         code: code.toString(),
         members: [
           {
             _id: user._id,
-            member: user._id,
             screen_name: user.screen_name,
           },
         ],
@@ -68,64 +62,94 @@ module.exports = {
     },
     join_list: async (_, { code, userID }, { pubsub }) => {
       // input validation
-      const { errors, valid } = await list_validation.join(code, userID);
+      const { errors, valid, list, user } = await list_validation({
+        code,
+        userID,
+        method: "user-join",
+      });
       if (!valid) throw new UserInputError("List Join Error", { errors });
 
-      // adds the user to the members array in the list and updates the database
-      const list = await List.findOne({ code });
-      const user = await User.findById(userID);
       list.members.push({
-        _id: userID,
+        _id: user._id,
         screen_name: user.screen_name,
       });
-      list.save();
+      const updated_list = await list.save();
 
-      pubsub.publish(code, {
-        update: `${user.screen_name} has joined the list`,
+      pubsub.publish(list.code, {
+        update: {
+          type: "join",
+          affector: user.screen_name,
+          list: {
+            id: updated_list._id,
+            ...updated_list._doc,
+          },
+        },
       });
 
       return {
-        id: list._id,
-        ...list._doc,
+        id: updated_list._id,
+        ...updated_list._doc,
+      };
+    },
+    leave_list: async (_, { listID, userID }, { pubsub }) => {
+      const { valid, errors, list, user, user_index } = await list_validation({
+        listID,
+        userID,
+        method: "user-leave",
+      });
+      if (!valid) throw new UserInputError("Leave Error", { errors });
+
+      list.members.splice(user_index, 1);
+
+      if (list.members.length == 0) {
+        const removed = await List.findByIdAndDelete(listID);
+        return {
+          id: removed._id,
+          ...removed._doc,
+        };
+      }
+
+      pubsub.publish(list.code, {
+        update: {
+          type: "leave",
+          affector: user.screen_name,
+          list: {
+            id: list._id,
+            ...list._doc,
+          },
+        },
+      });
+
+      if (userID == list.owner) {
+        list.owner = list.members[0]._id;
+        pubsub.publish(list.code, {
+          update: {
+            type: "owner change",
+            affector: list.members[0].screen_name,
+            list: {
+              id: list._id,
+              ...list._doc,
+            },
+          },
+        });
+      }
+      const updated_list = list.save();
+
+      return {
+        id: updated_list._id,
+        ...updated_list._doc,
       };
     },
     delete_list: async (_, { listID }) => {
       try {
-        return await List.findByIdAndDelete(listID);
+        const removed = await List.findByIdAndDelete(listID);
+        return {
+          id: removed._id,
+          ...removed._doc,
+        };
       } catch (err) {
         throw new Error("List Deletion Error", err);
       }
-    },
-    leave_list: async (_, { listID, userID }, { pubsub }) => {
-      // try {
-      const list = await List.findById(listID);
-      const user = await User.findById(userID);
-      // finds the index of the leaving member, removes them, and updates the database
-      const index = get_user_index(list, userID);
-
-      list.members.splice(index, 1);
-
-      pubsub.publish(list.code, {
-        update: `${user.screen_name} has left the list`,
-      });
-
-      if (list.members.length == 0) return await List.findByIdAndDelete(listID);
-      else if (userID == list.owner) {
-        list.owner = list.members[0]._id;
-        pubsub.publish(list.code, {
-          update: `${list.members[0].screen_name} is now the list owner`,
-        });
-      }
-
-      list.save();
-
-      return {
-        id: list._id,
-        ...list._doc,
-      };
-      // } catch (err) {
-      //   throw new Error("Leave Error", err);
-      // }
     },
   },
 };

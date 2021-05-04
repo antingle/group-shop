@@ -13,7 +13,6 @@ module.exports = {
     ...item_resolvers.Mutation,
   },
   Subscription: {
-    ...item_resolvers.Subscription,
     update: {
       subscribe: (_, { code }, { pubsub }) => pubsub.asyncIterator(code),
     },

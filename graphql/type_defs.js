@@ -28,10 +28,10 @@ module.exports = gql`
     member: String
     purchased: Boolean!
   }
-  type item_update {
+  type Update {
     type: String!
     affector: String!
-    item: Item!
+    list: List!
   }
 
   input registration_info {
@@ -70,8 +70,6 @@ module.exports = gql`
     purchase_item(listID: ID!, itemID: ID!, userID: ID!, method: String): List!
   }
   type Subscription {
-    update(code: String!): String!
-
-    item_updates(code: String!): item_update!
+    update(code: String!): Update!
   }
 `;
