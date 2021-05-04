@@ -81,7 +81,7 @@ export default function SignInScreen({ navigation }) {
         autoCompleteType="password"
         secureTextEntry={true}
         textContentType="password"
-        returnKeyType="next"
+        returnKeyType="done"
         ref={passRef}
       />
 
