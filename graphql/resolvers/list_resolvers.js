@@ -76,12 +76,12 @@ module.exports = {
       const updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        update: {
+        member_updates: {
           type: "join",
           affector: user.screen_name,
-          list: {
-            id: updated_list._id,
-            ...updated_list._doc,
+          member: {
+            id: updated_list.members[list.members.length - 1]._id,
+            ...updated_list.members[list.members.length - 1]._doc,
           },
         },
       });
@@ -99,6 +99,8 @@ module.exports = {
       });
       if (!valid) throw new UserInputError("Leave Error", { errors });
 
+      const member = list.members[user_index];
+
       list.members.splice(user_index, 1);
 
       if (list.members.length == 0) {
@@ -110,12 +112,12 @@ module.exports = {
       }
 
       pubsub.publish(list.code, {
-        update: {
+        member_updates: {
           type: "leave",
           affector: user.screen_name,
-          list: {
-            id: list._id,
-            ...list._doc,
+          member: {
+            id: member._id,
+            ...member._doc,
           },
         },
       });
@@ -123,17 +125,18 @@ module.exports = {
       if (userID == list.owner) {
         list.owner = list.members[0]._id;
         pubsub.publish(list.code, {
-          update: {
+          member_updates: {
             type: "owner change",
             affector: list.members[0].screen_name,
-            list: {
-              id: list._id,
-              ...list._doc,
+            member: {
+              id: list.members[0]._id,
+              ...list.members[0]._doc,
             },
           },
         });
       }
-      const updated_list = list.save();
+
+      const updated_list = await list.save();
 
       return {
         id: updated_list._id,
@@ -150,6 +153,11 @@ module.exports = {
       } catch (err) {
         throw new Error("List Deletion Error", err);
       }
+    },
+  },
+  Subscription: {
+    member_updates: {
+      subscribe: (_, { code }, { pubsub }) => pubsub.asyncIterator(code),
     },
   },
 };

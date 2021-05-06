@@ -1,4 +1,5 @@
 const { UserInputError } = require("apollo-server-errors");
+const { update } = require("../../models/user");
 
 const { item_validation } = require("../../util/validation");
 
@@ -22,12 +23,12 @@ module.exports = {
       const updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        update: {
+        item_updates: {
           type: "add",
           affector: user.screen_name,
-          list: {
-            id: updated_list._id,
-            ...updated_list._doc,
+          item: {
+            id: updated_list.items[updated_list.items.length - 1]._id,
+            ...list.items[updated_list.items.length - 1]._doc,
           },
         },
       });
@@ -46,16 +47,18 @@ module.exports = {
       });
       if (!valid) throw new UserInputError("Remove Item Error", { errors });
 
+      const item = list.items[item_index];
+
       list.items.splice(item_index, 1);
       const updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        update: {
+        item_updates: {
           type: "remove",
           affector: user.screen_name,
-          list: {
-            id: updated_list._id,
-            ...updated_list._doc,
+          item: {
+            id: item._id,
+            ...item._doc,
           },
         },
       });
@@ -85,12 +88,12 @@ module.exports = {
       const updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        update: {
+        item_updates: {
           type: method == "claim" ? "claim" : "unclaim",
           affector: user.screen_name,
-          list: {
-            id: updated_list._id,
-            ...updated_list._doc,
+          item: {
+            id: list.items[item_index]._id,
+            ...list.items[item_index]._doc,
           },
         },
       });
@@ -117,15 +120,15 @@ module.exports = {
       if (method == "purchase") list.items[item_index].purchased = true;
       else if (method == "unpurchase") list.items[item_index].purchased = false;
 
-      updated_list = await list.save();
+      const updated_list = await list.save();
 
       pubsub.publish(list.code, {
-        update: {
+        item_updates: {
           type: method == "purchase" ? "purchase" : "unpurchase",
           affector: user.screen_name,
-          list: {
-            id: updated_list._id,
-            ...updated_list._doc,
+          item: {
+            id: list.items[item_index]._id,
+            ...list.items[item_index]._doc,
           },
         },
       });
@@ -134,6 +137,11 @@ module.exports = {
         id: updated_list._id,
         ...updated_list._doc,
       };
+    },
+  },
+  Subscription: {
+    item_updates: {
+      subscribe: (_, { code }, { pubsub }) => pubsub.asyncIterator(code),
     },
   },
 };

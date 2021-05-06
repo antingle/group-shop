@@ -28,10 +28,20 @@ module.exports = gql`
     member: String
     purchased: Boolean!
   }
-  type Update {
+
+  interface Update {
     type: String!
     affector: String!
-    list: List!
+  }
+  type item_update implements Update {
+    type: String!
+    affector: String!
+    item: Item!
+  }
+  type member_update implements Update {
+    type: String!
+    affector: String!
+    member: Member!
   }
 
   input registration_info {
@@ -70,6 +80,7 @@ module.exports = gql`
     purchase_item(listID: ID!, itemID: ID!, userID: ID!, method: String): List!
   }
   type Subscription {
-    update(code: String!): Update!
+    item_updates(code: String!): item_update!
+    member_updates(code: String!): member_update!
   }
 `;
