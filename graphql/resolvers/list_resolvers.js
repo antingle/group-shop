@@ -2,6 +2,7 @@ const { UserInputError } = require("apollo-server-errors");
 
 const List = require("../../models/list");
 const { list_validation } = require("../../util/validation");
+const generate_code = require("../../util/code_generator");
 
 module.exports = {
   Query: {
@@ -36,15 +37,15 @@ module.exports = {
 
       // generate a 5-digit join code
       do {
-        var code = Math.floor(Math.random() * (100000 - 10000)) + 10000;
-        var invalid = await List.findOne({ code: code.toString() });
+        var code = generate_code();
+        var invalid = await List.findOne({ code });
       } while (invalid);
 
       // creates a new list and saves it to the database
       const list = await new List({
         owner: user._id,
         list_name,
-        code: code.toString(),
+        code,
         members: [
           {
             _id: user._id,

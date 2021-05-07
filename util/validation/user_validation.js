@@ -12,7 +12,7 @@ module.exports = {
     if (email.trim() === "") errors.email = "Email must not be empty";
     else if (!email.match(regEx)) errors.email = "Must be a valid email";
     else {
-      const user = await User.findOne({ email });
+      var user = await User.findOne({ email });
       if (user) errors.email = "There is already a user with that email";
     }
 
