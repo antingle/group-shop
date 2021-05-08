@@ -1,19 +1,15 @@
-const user_resolvers = require("./user_resolvers");
-const list_resolvers = require("./list_resolvers");
-const item_resolvers = require("./item_resolvers");
+const { Query } = require("./queries");
+const { Mutation } = require("./mutations");
+const { Subscription } = require("./subscriptions");
 
 module.exports = {
   Query: {
-    ...user_resolvers.Query,
-    ...list_resolvers.Query,
+    ...Query,
   },
   Mutation: {
-    ...user_resolvers.Mutation,
-    ...list_resolvers.Mutation,
-    ...item_resolvers.Mutation,
+    ...Mutation,
   },
   Subscription: {
-    ...list_resolvers.Subscription,
-    ...item_resolvers.Subscription,
+    ...Subscription,
   },
 };

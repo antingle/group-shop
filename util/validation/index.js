@@ -1,6 +1,6 @@
-const user_validation = require("./user_validation");
-const list_validation = require("./list_validation");
-const item_validation = require("./item_validation");
+const user_validation = require("./user");
+const list_validation = require("./list");
+const item_validation = require("./item");
 
 module.exports = {
   user_validation,

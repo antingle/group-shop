@@ -1,6 +1,6 @@
 const User = require("../../models/user");
 const List = require("../../models/list");
-const { get_user_index } = require("../../util/get_index");
+const { get_user_index } = require("../get_index");
 
 module.exports = async ({
   list_name = null,
@@ -11,12 +11,12 @@ module.exports = async ({
 }) => {
   const errors = {};
 
-  // makes sure the list name is valid
+  // the list name must not be empty
   if (list_name != null)
     if (list_name.trim() === "")
       errors.list_name = "List name must not be empty";
 
-  // makes sure that the id is valid and exists in the database
+  // the user ID must not be empty and must exist in the database
   if (userID != null) {
     if (userID === "") errors.userID = "User id must not be empty";
     else {
@@ -25,7 +25,7 @@ module.exports = async ({
     }
   }
 
-  // makes sure that the code is valid and exists in the database
+  // the code must not be empty and a list with this code must exist in the database
   if (code != null) {
     if (code.trim() === "") errors.code = "Code must not be empty";
     else {
@@ -34,6 +34,7 @@ module.exports = async ({
     }
   }
 
+  // the list ID must not be empty and must exist in the database
   if (listID != null) {
     if (listID === "") errors.listID = "List ID must not be empty";
     else {
@@ -42,8 +43,10 @@ module.exports = async ({
     }
   }
 
+  // the method can only be 'no-user-check', 'user-join', or 'user-leave'. Anything else is invalid
   switch (method) {
     case "no-user-check":
+      // returns early since there is no required check on the user
       return {
         valid: Object.keys(errors).length < 1,
         errors,
@@ -51,11 +54,13 @@ module.exports = async ({
         user: user ? user : null,
       };
     case "user-join":
+      // the user must not exist in the list
       var user_index = get_user_index(list, userID);
       if (user_index != -1)
         errors.userID = "User is already a part of this list";
       break;
     case "user-leave":
+      // the user must exist in the list
       var user_index = get_user_index(list, userID);
       if (user_index == -1) errors.userID = "User is not a part of the list";
       break;

@@ -1,7 +1,7 @@
 const List = require("../../models/list");
 const User = require("../../models/user");
-const { get_item_index } = require("../../util/get_index");
-const { get_user_index } = require("../../util/get_index");
+const { get_item_index } = require("../get_index");
+const { get_user_index } = require("../get_index");
 
 module.exports = async ({
   name = null,
@@ -12,10 +12,11 @@ module.exports = async ({
 }) => {
   const errors = {};
 
+  // name must not be empty
   if (name != null)
     if (name.trim() == "") errors.name = "Name must not be empty";
 
-  // make sure the list ID is valid and exists in the database
+  // list ID must not be empty and must exist in the database
   if (listID != null) {
     if (listID === "") errors.listID = "List ID must not be empty";
     else {
@@ -24,6 +25,7 @@ module.exports = async ({
     }
   }
 
+  // item ID must not be empty and must exist in the list
   if (itemID != null) {
     if (itemID == "") errors.itemID = "Item ID must not be empty";
     else if (list) {
@@ -33,7 +35,7 @@ module.exports = async ({
     }
   }
 
-  // makes sure that the user ID is valid, exists in the database, and is part of the list
+  // user ID mustnot be empty, must exist in the database, and must exist in the list
   if (userID != null) {
     if (userID === "") errors.userID = "User ID must not be empty";
     else {
@@ -45,14 +47,12 @@ module.exports = async ({
     }
   }
 
+  // the method plays a role in the item functionality. If it is not one of these four, it is invalid.
   if (method) {
     switch (method) {
       case "claim":
-        break;
       case "unclaim":
-        break;
       case "purchase":
-        break;
       case "unpurchase":
         break;
       default:
