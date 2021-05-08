@@ -6,21 +6,26 @@ module.exports = gql`
     email: String
     password: String
     screen_name: String!
-    lists: [String!]!
+    lists: [Shortened_List!]!
     join_date: String!
+  }
+  type Shortened_User {
+    id: ID!
+    screen_name: String!
   }
   type List {
     id: ID!
     owner: ID!
     list_name: String!
     code: String!
-    members: [Member!]!
+    members: [Shortened_User!]!
     items: [Item!]!
     created: String!
   }
-  type Member {
+  type Shortened_List {
     id: ID!
-    screen_name: String!
+    list_name: String!
+    owned: Boolean!
   }
   type Item {
     id: ID!
@@ -41,7 +46,7 @@ module.exports = gql`
   type member_update implements Update {
     type: String!
     affector: String!
-    member: Member!
+    member: User!
   }
 
   input registration_info {

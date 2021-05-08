@@ -1,6 +1,6 @@
 const User = require("../../models/user");
 const List = require("../../models/list");
-const { get_user_index } = require("../get_index");
+const { get_user_index, get_list_index } = require("../get_index");
 
 module.exports = async ({
   list_name = null,
@@ -63,6 +63,12 @@ module.exports = async ({
       // the user must exist in the list
       var user_index = get_user_index(list, userID);
       if (user_index == -1) errors.userID = "User is not a part of the list";
+
+      // the list must exist in the user
+      var list_index = get_list_index(user, listID);
+      if (list_index == -1)
+        errors.listID = "List not found in user's list array";
+
       break;
     default:
       errors.method = "Invalid method";
@@ -74,5 +80,6 @@ module.exports = async ({
     list: list ? list : null,
     user: user ? user : null,
     user_index: user_index != -1 ? user_index : null,
+    list_index: list_index != -1 ? list_index : null,
   };
 };

@@ -4,7 +4,12 @@ const USER_SCHEMA = new Schema({
   email: String,
   password: String,
   screen_name: String,
-  lists: [String],
+  lists: [
+    {
+      list_name: String,
+      owned: Boolean,
+    },
+  ],
   join_date: String,
 });
 

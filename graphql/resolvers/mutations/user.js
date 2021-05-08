@@ -2,7 +2,6 @@ const { UserInputError } = require("apollo-server-errors");
 const bcrypt = require("bcryptjs");
 
 const User = require("../../../models/user");
-const List = require("../../../models/list");
 const { user_validation } = require("../../../util/validation");
 
 module.exports = {
@@ -20,7 +19,7 @@ module.exports = {
     });
     if (!valid) throw new UserInputError("Registration Error", { errors });
 
-    // hash the passwoed BEFORE saving to the database
+    // hash the password BEFORE saving to the database
     password = await bcrypt.hash(password, 12);
 
     // adds the new user to the database
@@ -46,11 +45,7 @@ module.exports = {
     });
     if (!valid) throw new UserInputError("Login Error", { errors });
 
-    // gets all of the lists that the user is a part of
-    // THIS NEEDS TO BE CHANGED TO INCLUDE LISTS THAT THE USER IS NOT THE OWNER OF
-    const lists = await List.find({ owner: user._id });
-
-    return lists;
+    return user.lists;
   },
   create_temp_user: async (_, { screen_name }) => {
     // validation
