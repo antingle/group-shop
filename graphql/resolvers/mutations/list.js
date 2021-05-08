@@ -8,6 +8,8 @@ const {
   get_list_index,
   get_last_owned_index,
 } = require("../../../util/get_index");
+const list = require("../../../models/list");
+const user = require("../../../models/user");
 
 module.exports = {
   create_list: async (_, { list_name, userID }) => {
@@ -185,6 +187,17 @@ module.exports = {
   delete_list: async (_, { listID }) => {
     try {
       const deleted_list = await List.findByIdAndDelete(listID);
+
+      // for every user in the list - finds the index in their list array, removes it, then overwrites the user in the database
+      deleted_list.members.forEach(async (member) => {
+        const user = await User.findById(member._id);
+
+        const list_index = get_list_index(user, deleted_list._id);
+
+        user.lists.splice(list_index, 1);
+        await user.save();
+      });
+
       return {
         id: deleted_list._id,
         ...deleted_list._doc,
