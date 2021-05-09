@@ -33,8 +33,8 @@ module.exports = {
     });
 
     return {
-      id: updated_list._id,
-      ...updated_list._doc,
+      id: updated_list.items[updated_list.items.length - 1]._id,
+      ...updated_list.items[updated_list.items.length - 1]._doc,
     };
   },
   remove_item: async (_, { listID, itemID, userID }, { pubsub }) => {
@@ -65,8 +65,8 @@ module.exports = {
     });
 
     return {
-      id: updated_list._id,
-      ...updated_list._doc,
+      id: item._id,
+      ...item._doc,
     };
   },
   claim_item: async (
@@ -103,8 +103,8 @@ module.exports = {
     });
 
     return {
-      id: updated_list._id,
-      ...updated_list._doc,
+      id: updated_list.items[item_index]._id,
+      ...updated_list.items[item_index]._doc,
     };
   },
   purchase_item: async (
@@ -141,8 +141,8 @@ module.exports = {
     });
 
     return {
-      id: updated_list._id,
-      ...updated_list._doc,
+      id: updated_list.items[item_index]._id,
+      ...updated_list.items[item_index]._doc,
     };
   },
 };

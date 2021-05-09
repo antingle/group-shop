@@ -79,10 +79,10 @@ module.exports = gql`
     delete_list(listID: ID!): List!
 
     # Item Functionality
-    add_item(name: String!, listID: ID!, userID: ID!): List!
-    remove_item(listID: ID!, itemID: ID!, userID: ID!): List!
-    claim_item(listID: ID!, itemID: ID!, userID: ID!, method: String): List!
-    purchase_item(listID: ID!, itemID: ID!, userID: ID!, method: String): List!
+    add_item(name: String!, listID: ID!, userID: ID!): Item!
+    remove_item(listID: ID!, itemID: ID!, userID: ID!): Item!
+    claim_item(listID: ID!, itemID: ID!, userID: ID!, method: String): Item!
+    purchase_item(listID: ID!, itemID: ID!, userID: ID!, method: String): Item!
   }
   type Subscription {
     item_updates(code: String!): item_update!
