@@ -47,7 +47,7 @@ module.exports = {
     });
     if (!valid) throw new UserInputError("Login Error", { errors });
 
-    return user.lists;
+    return user;
   },
   create_temp_user: async (_, { screen_name }) => {
     // validation
