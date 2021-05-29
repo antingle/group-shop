@@ -1,3 +1,4 @@
+import { useMutation } from "@apollo/client";
 import React from "react";
 import {
   View,
@@ -6,12 +7,13 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { colors } from "../colors.js";
+import { REGISTER } from "../graphql/graphql.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { setStorageData } from "../storage.js";
 
 export default function CreateAccountScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
@@ -24,13 +26,28 @@ export default function CreateAccountScreen({ navigation }) {
   const passRef = React.useRef();
   const confirmPassRef = React.useRef();
 
+  const [register, { loading, error }] = useMutation(REGISTER, {
+    update(proxy, result) {
+      try {
+        const returnedData = result.data.register;
+        let userData = returnedData;
+        delete userData.lists; // delete is not an ideal operation
+        const listData = returnedData.lists;
+        setStorageData("@user", userData);
+      } catch (e) {
+        console.log(e);
+        navigation.navigate("firstScreen");
+      }
+    },
+  });
+
   const hasUnsavedChanges = Boolean(
     name || email || password || confirmPassword
   );
 
   const handleCreate = () => {
     console.log({ email, name, password, confirmPassword });
-    navigation.navigate("createOrJoin");
+    register({ variables: { name, email, password, confirmPassword } });
   };
 
   React.useEffect(
@@ -62,6 +79,17 @@ export default function CreateAccountScreen({ navigation }) {
       }),
     [navigation, hasUnsavedChanges]
   );
+
+  if (loading)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  if (error)
+    <View>
+      <Text>{error}</Text>
+    </View>;
 
   return (
     <KeyboardAwareScrollView>

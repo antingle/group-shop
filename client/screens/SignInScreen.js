@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { colors } from "../colors.js";
+import { LOGIN } from "../graphql/graphql.js";
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
@@ -17,42 +18,36 @@ export default function SignInScreen({ navigation }) {
   const emailRef = React.useRef();
   const passRef = React.useRef();
 
-  const hasUnsavedChanges = Boolean(email || password);
+  const [login, { loading, error }] = useMutation(LOGIN, {
+    update(proxy, result) {
+      try {
+        const returnedData = result.data.login;
+        let userData = returnedData;
+        delete userData.lists; // delete is not an ideal operation
+        const listData = returnedData.lists;
+        setStorageData("@user", userData);
+      } catch (e) {
+        console.log(e);
+        navigation.navigate("firstScreen");
+      }
+    },
+  });
 
-  const handleCreate = () => {
+  const handleSignIn = () => {
     console.log({ email, password });
     navigation.navigate("createOrJoin");
   };
 
-  React.useEffect(
-    () =>
-      navigation.addListener("beforeRemove", (e) => {
-        if (!hasUnsavedChanges) {
-          // If we don't have unsaved changes, then we don't need to do anything
-          return;
-        }
-
-        // Prevent default behavior of leaving the screen
-        e.preventDefault();
-
-        // Prompt the user before leaving the screen
-        Alert.alert(
-          "Discard changes?",
-          "You have unsaved changes. Are you sure to discard them?",
-          [
-            { text: "Cancel", style: "cancel", onPress: () => {} },
-            {
-              text: "Discard",
-              style: "destructive",
-              // If the user confirmed, then we dispatch the action we blocked earlier
-              // This will continue the action that had triggered the removal of the screen
-              onPress: () => navigation.dispatch(e.data.action),
-            },
-          ]
-        );
-      }),
-    [navigation, hasUnsavedChanges]
-  );
+  if (loading)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  if (error)
+    <View>
+      <Text>{error}</Text>
+    </View>;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,7 +80,7 @@ export default function SignInScreen({ navigation }) {
         ref={passRef}
       />
 
-      <TouchableOpacity style={styles.signInButton} onPress={handleCreate}>
+      <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
     </SafeAreaView>

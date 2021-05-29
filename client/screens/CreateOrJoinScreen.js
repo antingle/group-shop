@@ -10,12 +10,12 @@ import { colors } from "../colors.js";
 
 export default function CreateOrJoinScreen({ navigation }) {
   const handleCreate = () => {
-    console.log("create list");
+    console.log("creating list...");
     navigation.navigate("nameList");
   };
 
   const handleJoin = () => {
-    console.log("join list");
+    console.log("joining list...");
     navigation.navigate("code");
   };
 

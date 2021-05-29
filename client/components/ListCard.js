@@ -3,7 +3,7 @@ import { StyleSheet, Text } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { colors } from "../colors.js";
 
-export default function Card({ name }) {
+export default function ListCard({ name }) {
   return (
     <TouchableOpacity style={styles.card}>
       <Text style={styles.cardText}>{name}</Text>

@@ -1,15 +1,47 @@
+import { useQuery } from "@apollo/client";
 import React from "react";
-import { SafeAreaView, Text, StyleSheet, ScrollView } from "react-native";
+import { render } from "react-dom";
+import { SafeAreaView, Text, StyleSheet, FlatList } from "react-native";
 import { colors } from "../colors.js";
-import Card from "../components/Card.js";
+import ListCard from "../components/ListCard.js";
+import { cache } from "../graphql/cache.js";
+import { GET_USER_LISTS } from "../graphql/graphql.js";
+import { getStorageData } from "../storage.js";
 
-export default function ListScreen({ navigation }) {
+export default function ListScreen({ route, navigation }) {
+  const { userID } = route.params;
+  console.log(userID);
+  const { loading, error, data } = useQuery(GET_USER_LISTS, {
+    variables: { userID },
+  });
+
+  if (loading)
+    return (
+      <SafeAreaView>
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+
+  if (error)
+    return (
+      <SafeAreaView>
+        <Text>{error}</Text>
+      </SafeAreaView>
+    );
+
+  let DATA = data.get_user_lists;
+  console.log(data.get_user_lists);
+
+  const renderItem = ({ list }) => <ListCard name={list.list_name} />;
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.heading}>Grocery Lists</Text>
-      <ScrollView>
-        <Card name="Grocery List 1" />
-      </ScrollView>
+      <FlatList
+        data={DATA}
+        renderItem={renderItem}
+        keyExtractor={(list) => list.id}
+      />
     </SafeAreaView>
   );
 }

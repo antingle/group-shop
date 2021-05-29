@@ -1,29 +1,51 @@
 import { useMutation } from "@apollo/client";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
 import { colors } from "../colors.js";
-import { join_list } from "../graphql.js";
-import { userID } from "../storage.js";
+import { JOIN_LIST } from "../graphql/graphql.js";
+import { getStorageData, setStorageData } from "../storage.js";
 
 export default function CodeScreen({ navigation }) {
   const [code, setCode] = React.useState(null);
-  const [joinList, { loading }] = useMutation(join_list, {
-    update(proxy, result) {
-      let listID = result.data.join_list.id;
-      let listName = result.data.join_list.list_name;
 
-      // pass params to grocery list
-      if (result)
+  const mergeList = async (value) => {
+    try {
+      let lists = await getStorageData("@lists");
+      if (lists == null) lists = new Array();
+      console.log("storedLists", lists);
+      lists.unshift(value);
+      console.log("newLists", lists);
+
+      setStorageData("@lists", lists);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const [joinList, { loading }] = useMutation(JOIN_LIST, {
+    update(proxy, result) {
+      try {
+        mergeList(result.data.join_list);
+        // pass params to grocery list
+        let listID = result.data.join_list.id;
+        let listName = result.data.join_list.list_name;
         navigation.navigate("groceryList", {
           listID: listID,
           listName: listName,
         });
+      } catch (e) {
+        console.log(e);
+      }
     },
   });
 
   const handleSubmit = async () => {
     try {
-      await joinList({ variables: { code: code, userID: userID } });
+      // get userID from storage
+      const userID = await getStorageData("@user", "id");
+      console.log(`${userID} is joining list with code ${code}`);
+      await joinList({ variables: { code: code, userID } });
     } catch (err) {
       console.log(err);
     }

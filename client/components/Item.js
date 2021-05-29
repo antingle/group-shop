@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 export default function Item({
   id,
   name,
+  member,
   purchased,
   onPress,
   onTriggerLeftSwipe,
@@ -21,22 +22,23 @@ export default function Item({
   onRightOpen,
 }) {
   const checkboxRef = React.useRef();
-
-  const onTriggerLeft = (progress) => {
-    let progressFloat = parseFloat(JSON.stringify(progress));
-    onTriggerLeftSwipe(id, { progress: progressFloat });
-  };
+  const swipeableRef = React.useRef();
 
   const onTriggerRight = () => {
     onTriggerRightSwipe(id);
   };
 
-  const renderLeftActions = (progress, dragX) => {
+  const onTriggerLeft = () => {
+    swipeableRef?.current.close();
+    onTriggerLeftSwipe(id, member);
+  };
+
+  const renderLeftActions = (dragX) => {
+    if (purchased) return;
     const trans = dragX.interpolate({
-      inputRange: [0, 50, 100, 101],
-      outputRange: [-20, 0, 0, 1],
+      inputRange: [-101, -100, -50, 0],
+      outputRange: [1, 0, 0, -20],
     });
-    onTriggerLeft(progress);
     return (
       <View style={styles.leftAction}>
         <Animated.Text style={[styles.actionText]}>Claim</Animated.Text>
@@ -63,15 +65,18 @@ export default function Item({
 
   return (
     <Swipeable
+      ref={swipeableRef}
       renderLeftActions={renderLeftActions}
       renderRightActions={renderRightActions}
       containerStyle={styles.swipeable}
       overshootLeft={false}
-      leftThreshold={680}
+      leftThreshold={100}
       onSwipeableRightWillOpen={onTriggerRight}
       onSwipeableRightOpen={() => onRightOpen(id)}
       friction={1.7}
       overshootFriction={4}
+      onSwipeableLeftOpen={onTriggerLeft}
+      useNativeAnimations={true}
     >
       <TouchableHighlight
         style={styles.touchable}
