@@ -37,16 +37,12 @@ module.exports = gql`
     last_modified: String!
   }
 
-  interface Update {
-    type: String!
-    affector: String!
-  }
-  type item_update implements Update {
+  type item_update {
     type: String!
     affector: String!
     item: Item!
   }
-  type member_update implements Update {
+  type member_update {
     type: String!
     affector: String!
     member: User!
