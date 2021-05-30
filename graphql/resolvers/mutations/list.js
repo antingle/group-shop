@@ -7,6 +7,7 @@ const generate_code = require("../../../util/code_generator");
 const {
   get_list_index,
   get_last_owned_index,
+  get_user_index,
 } = require("../../../util/get_index");
 const list = require("../../../models/list");
 const user = require("../../../models/user");
@@ -39,6 +40,7 @@ module.exports = {
       ],
       items: [],
       created: new Date().toISOString(),
+      last_modified: new Date().toISOString(),
     }).save();
 
     const last_owned_index = get_last_owned_index(user);
@@ -48,6 +50,7 @@ module.exports = {
       _id: list._id,
       list_name: list.list_name,
       owned: true,
+      members: list.members,
     });
     await user.save();
 
@@ -77,8 +80,18 @@ module.exports = {
       _id: list._id,
       list_name: list.list_name,
       owned: false,
+      members: list.members,
     });
     const updated_user = await user.save();
+
+    updated_list.members.forEach(async (member) => {
+      const user = await User.findById(member._id);
+
+      const list_index = get_list_index(user, updated_list._id);
+      user.lists[list_index].members = list.members;
+
+      await user.save();
+    });
 
     // sends an update to everyone in the list containing the user that just joined
     pubsub.publish(updated_list.code, {
@@ -123,6 +136,17 @@ module.exports = {
     // if there are no more users in the list, deletes the list
     if (list.members.length == 0) {
       const deleted_list = await List.findByIdAndDelete(listID);
+
+      // for every user in the list - finds the index in their list array, removes it, then overwrites the user in the database
+      deleted_list.members.forEach(async (member) => {
+        const user = await User.findById(member._id);
+
+        const list_index = get_list_index(user, deleted_list._id);
+
+        user.lists.splice(list_index, 1);
+        await user.save();
+      });
+
       return {
         id: deleted_list._id,
         ...deleted_list._doc,
@@ -152,6 +176,16 @@ module.exports = {
 
     // overwrites the list in the database
     const updated_list = await list.save();
+
+    // updates the list members for each member in the list
+    list.members.forEach(async (member) => {
+      const user = await User.findById(member._id);
+
+      const list_index = get_list_index(user, updated_list._id);
+      user.lists[list_index].members = list.members;
+
+      await user.save();
+    });
 
     // sends an update to everyone in the list containing the user that left
     pubsub.publish(list.code, {

@@ -21,17 +21,20 @@ module.exports = gql`
     members: [Shortened_User!]!
     items: [Item!]!
     created: String!
+    last_modified: String!
   }
   type Shortened_List {
     id: ID!
     list_name: String!
     owned: Boolean!
+    members: [Shortened_User!]
   }
   type Item {
     id: ID!
     name: String!
     member: String
     purchased: Boolean!
+    last_modified: String!
   }
 
   interface Update {
@@ -63,12 +66,12 @@ module.exports = gql`
 
     # List Queries
     get_list(listID: ID!): List
-    get_user_lists(userID: ID!): [List!]
+    get_user_lists(userID: ID!): [Shortened_List!]
   }
   type Mutation {
     # User Functionality
     register(info: registration_info): User!
-    login(email: String!, password: String!): [List!]!
+    login(email: String!, password: String!): User!
     create_temp_user(screen_name: String!): User!
     delete_user(userID: ID!): User!
 

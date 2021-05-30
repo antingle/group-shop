@@ -8,6 +8,11 @@ const USER_SCHEMA = new Schema({
     {
       list_name: String,
       owned: Boolean,
+      members: [
+        {
+          screen_name: String,
+        },
+      ],
     },
   ],
   join_date: String,

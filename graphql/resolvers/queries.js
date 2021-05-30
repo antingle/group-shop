@@ -1,3 +1,4 @@
+const list = require("../../models/list");
 const List = require("../../models/list");
 const User = require("../../models/user");
 
@@ -16,7 +17,7 @@ module.exports = {
     },
     get_user_lists: async (_, { userID }) => {
       try {
-        const lists = await List.find({ owner: userID });
+        const { lists } = await User.findById(userID);
         return lists;
       } catch (err) {
         throw new Error("List Retrieval Error", err);
@@ -33,6 +34,7 @@ module.exports = {
     get_user: async (_, { userID }) => {
       try {
         const user = await User.findById(userID);
+
         return {
           id: user._id,
           ...user._doc,

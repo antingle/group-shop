@@ -17,7 +17,10 @@ module.exports = {
       name,
       member: null,
       purchased: false,
+      last_modified: new Date().toISOString(),
     });
+    list.last_modified = new Date().toISOString();
+
     const updated_list = await list.save();
 
     // sends an update to everyone in the list containing the added item
@@ -50,6 +53,8 @@ module.exports = {
 
     // removes the item at the specified index and overwrites the list in the database
     list.items.splice(item_index, 1);
+    list.last_modified = new Date().toISOString();
+
     const updated_list = await list.save();
 
     // sends an update to everyone in the list containing the removed item
@@ -86,6 +91,9 @@ module.exports = {
     // updates whether the item is claimed or not based on the method
     if (method == "claim") list.items[item_index].member = user.screen_name;
     else if (method == "unclaim") list.items[item_index].member = null;
+
+    list.items[item_index].last_modified = new Date().toISOString();
+    list.last_modified = new Date().toISOString();
 
     // overwrites the list in the database
     const updated_list = await list.save();
@@ -124,6 +132,9 @@ module.exports = {
     // updates whether the item is purchased or not based on the method
     if (method == "purchase") list.items[item_index].purchased = true;
     else if (method == "unpurchase") list.items[item_index].purchased = false;
+
+    list.items[item_index].last_modified = new Date().toISOString();
+    list.last_modified = new Date().toISOString();
 
     // overwrites the list in the database
     const updated_list = await list.save();

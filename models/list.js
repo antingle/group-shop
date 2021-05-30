@@ -14,9 +14,11 @@ const LIST_SCHEMA = new Schema({
       name: String,
       member: String,
       purchased: Boolean,
+      last_modified: String,
     },
   ],
   created: String,
+  last_modified: String,
 });
 
 module.exports = model("lists", LIST_SCHEMA);
