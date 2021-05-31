@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-import { colors } from "../colors.js";
+import { colors } from "../other/colors.js";
 
 export default function FirstScreen({ navigation }) {
   const handleCreate = () => {

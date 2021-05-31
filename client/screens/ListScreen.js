@@ -1,46 +1,29 @@
-import { useQuery } from "@apollo/client";
 import React from "react";
-import { render } from "react-dom";
 import { SafeAreaView, Text, StyleSheet, FlatList } from "react-native";
-import { colors } from "../colors.js";
+import { colors } from "../other/colors.js";
 import ListCard from "../components/ListCard.js";
 import { cache } from "../graphql/cache.js";
-import { GET_USER_LISTS } from "../graphql/graphql.js";
-import { getStorageData } from "../storage.js";
+import useAuth from "../hooks/useAuth.js";
 
-export default function ListScreen({ route, navigation }) {
-  const { userID } = route.params;
-  console.log(userID);
-  const { loading, error, data } = useQuery(GET_USER_LISTS, {
-    variables: { userID },
-  });
+export default function ListScreen({ navigation }) {
+  const { lists } = useAuth();
 
-  if (loading)
-    return (
-      <SafeAreaView>
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    );
-
-  if (error)
-    return (
-      <SafeAreaView>
-        <Text>{error}</Text>
-      </SafeAreaView>
-    );
-
-  let DATA = data.get_user_lists;
-  console.log(data.get_user_lists);
-
-  const renderItem = ({ list }) => <ListCard name={list.list_name} />;
+  const renderItem = ({ item }) => (
+    <ListCard
+      id={item.id}
+      name={item.list_name}
+      members={item.members}
+      navigation={navigation}
+    />
+  );
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.heading}>Grocery Lists</Text>
       <FlatList
-        data={DATA}
+        data={lists}
         renderItem={renderItem}
-        keyExtractor={(list) => list.id}
+        keyExtractor={(item) => item.id}
       />
     </SafeAreaView>
   );

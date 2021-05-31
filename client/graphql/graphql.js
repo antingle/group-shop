@@ -18,14 +18,16 @@ export const REGISTER = gql`
     ) {
       id
       email
-      password
       screen_name
       lists {
         id
         list_name
         owned
+        members {
+          id
+          screen_name
+        }
       }
-      join_date
     }
   }
 `;
@@ -34,14 +36,17 @@ export const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       id
-      owner
-      list_name
-      code
-      members {
+      email
+      screen_name
+      lists {
         id
-        screen_name
+        list_name
+        owned
+        members {
+          id
+          screen_name
+        }
       }
-      created
     }
   }
 `;
@@ -58,6 +63,28 @@ export const JOIN_LIST = gql`
         screen_name
       }
       created
+      last_modified
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query get_user($userID: ID!) {
+    get_user(userID: $userID) {
+      id
+      email
+      password
+      screen_name
+      lists {
+        id
+        list_name
+        owned
+        members {
+          id
+          screen_name
+        }
+      }
+      join_date
     }
   }
 `;
@@ -66,14 +93,12 @@ export const GET_USER_LISTS = gql`
   query get_user_lists($userID: ID!) {
     get_user_lists(userID: $userID) {
       id
-      owner
       list_name
-      code
+      owned
       members {
         id
         screen_name
       }
-      created
     }
   }
 `;

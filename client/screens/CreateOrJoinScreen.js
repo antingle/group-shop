@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { colors } from "../colors.js";
+import { colors } from "../other/colors.js";
 
 export default function CreateOrJoinScreen({ navigation }) {
   const handleCreate = () => {

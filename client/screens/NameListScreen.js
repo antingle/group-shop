@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
-import { colors } from "../colors.js";
+import { colors } from "../other/colors.js";
 
 export default function NameListScreen({ navigation }) {
   const [listName, setListName] = React.useState(null);

@@ -10,10 +10,9 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { colors } from "../colors.js";
+import { colors } from "../other/colors.js";
 import { REGISTER } from "../graphql/graphql.js";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setStorageData } from "../storage.js";
+import useAuth from "../hooks/useAuth.js";
 
 export default function CreateAccountScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
@@ -26,17 +25,17 @@ export default function CreateAccountScreen({ navigation }) {
   const passRef = React.useRef();
   const confirmPassRef = React.useRef();
 
+  const [signIn] = useAuth();
+
   const [register, { loading, error }] = useMutation(REGISTER, {
     update(proxy, result) {
       try {
-        const returnedData = result.data.register;
-        let userData = returnedData;
+        const userData = result.data.register;
+        // const listData = returnedData.lists; // use in future when registering with link?
         delete userData.lists; // delete is not an ideal operation
-        const listData = returnedData.lists;
-        setStorageData("@user", userData);
+        signIn(userData);
       } catch (e) {
-        console.log(e);
-        navigation.navigate("firstScreen");
+        console.log(e); // in the future, add error to display on screen
       }
     },
   });
@@ -88,7 +87,7 @@ export default function CreateAccountScreen({ navigation }) {
     );
   if (error)
     <View>
-      <Text>{error}</Text>
+      <Text>{JSON.stringify(error)}</Text>
     </View>;
 
   return (

@@ -1,15 +1,10 @@
+import { useMutation } from "@apollo/client";
 import React from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { colors } from "../colors.js";
+import { colors } from "../other/colors.js";
 import { LOGIN } from "../graphql/graphql.js";
+import useAuth from "../hooks/useAuth.js";
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
@@ -18,24 +13,23 @@ export default function SignInScreen({ navigation }) {
   const emailRef = React.useRef();
   const passRef = React.useRef();
 
+  const { signIn } = useAuth();
+
   const [login, { loading, error }] = useMutation(LOGIN, {
     update(proxy, result) {
       try {
-        const returnedData = result.data.login;
-        let userData = returnedData;
+        const userData = result.data.login;
+        const listData = userData.lists;
         delete userData.lists; // delete is not an ideal operation
-        const listData = returnedData.lists;
-        setStorageData("@user", userData);
+        signIn(userData);
       } catch (e) {
-        console.log(e);
-        navigation.navigate("firstScreen");
+        console.log(e); // in future, display error messages on this screen
       }
     },
   });
 
   const handleSignIn = () => {
-    console.log({ email, password });
-    navigation.navigate("createOrJoin");
+    login({ variables: { email, password } });
   };
 
   if (loading)
