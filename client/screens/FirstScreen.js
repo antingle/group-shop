@@ -12,17 +12,14 @@ import { colors } from "../other/colors.js";
 
 export default function FirstScreen({ navigation }) {
   const handleCreate = () => {
-    console.log("create account");
     navigation.navigate("createAccount");
   };
 
   const handleSignIn = () => {
-    console.log("signing in");
     navigation.navigate("signIn");
   };
 
   const handleGuest = () => {
-    console.log("guest");
     navigation.navigate("name");
   };
 

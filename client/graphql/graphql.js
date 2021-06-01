@@ -51,19 +51,21 @@ export const LOGIN = gql`
   }
 `;
 
-export const JOIN_LIST = gql`
-  mutation join_list($code: String!, $userID: ID!) {
-    join_list(code: $code, userID: $userID) {
+export const CREATE_TEMP_USER = gql`
+  mutation create_temp_user($name: String!) {
+    create_temp_user(screen_name: $name) {
       id
-      owner
-      list_name
-      code
-      members {
+      email
+      screen_name
+      lists {
         id
-        screen_name
+        list_name
+        owned
+        members {
+          id
+          screen_name
+        }
       }
-      created
-      last_modified
     }
   }
 `;
@@ -99,6 +101,40 @@ export const GET_USER_LISTS = gql`
         id
         screen_name
       }
+    }
+  }
+`;
+
+export const JOIN_LIST = gql`
+  mutation join_list($code: String!, $userID: ID!) {
+    join_list(code: $code, userID: $userID) {
+      id
+      owner
+      list_name
+      code
+      members {
+        id
+        screen_name
+      }
+      created
+      last_modified
+    }
+  }
+`;
+
+export const CREATE_LIST = gql`
+  mutation create_list($listName: String!, $userID: ID!) {
+    create_list(list_name: $listName, userID: $userID) {
+      id
+      owner
+      list_name
+      code
+      members {
+        id
+        screen_name
+      }
+      created
+      last_modified
     }
   }
 `;

@@ -56,6 +56,7 @@ export default function SignInScreen({ navigation }) {
         autoCorrect={false}
         autoCompleteType="email"
         textContentType="emailAddress"
+        keyboardType={"email-address"}
         returnKeyType="next"
         ref={emailRef}
         onSubmitEditing={() => passRef.current.focus()}

@@ -2,8 +2,9 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import useAuth from "../hooks/useAuth";
 import Loading from "../screens/Loading";
-import AppStack from "./AppStack";
 import AuthStack from "./AuthStack";
+import { ListProvider } from "../contexts/ListContext";
+import RootStack from "./RootStack";
 
 export default function Router() {
   const { authData, loading, signOut } = useAuth();
@@ -12,7 +13,13 @@ export default function Router() {
 
   return (
     <NavigationContainer>
-      {authData ? <AppStack /> : <AuthStack />}
+      {authData ? (
+        <ListProvider>
+          <RootStack />
+        </ListProvider>
+      ) : (
+        <AuthStack />
+      )}
     </NavigationContainer>
   );
 }

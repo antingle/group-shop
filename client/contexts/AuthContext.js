@@ -40,17 +40,40 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     removeStorageData("user");
     removeStorageData("lists");
+    setLists(false);
     setAuthData(null);
   };
 
   const updateLists = async (lists) => {
-    await setStorageData("lists", lists);
-    setLists(lists);
+    if (!lists || lists.length == 0) {
+      console.log("No lists for this user");
+      return;
+    } else if (lists.length == 1) {
+      let currentLists = await getStorageData("lists");
+      if (!currentLists) {
+        setStorageData("lists", lists);
+        setLists(lists);
+      } else {
+        currentLists.unshift(lists[0]);
+        setStorageData("lists", currentLists);
+        setLists(currentLists);
+      }
+    } else {
+      await setStorageData("lists", lists);
+      setLists(lists);
+    }
   };
 
   return (
     <AuthContext.Provider
-      value={{ authData, loading, signIn, signOut, lists, updateLists }}
+      value={{
+        authData,
+        loading,
+        signIn,
+        signOut,
+        lists,
+        updateLists,
+      }}
     >
       {children}
     </AuthContext.Provider>

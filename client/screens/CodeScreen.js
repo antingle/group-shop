@@ -1,37 +1,23 @@
 import { useMutation } from "@apollo/client";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import React from "react";
 import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
 import { colors } from "../other/colors.js";
 import { JOIN_LIST } from "../graphql/graphql.js";
-import { getStorageData, setStorageData } from "../other/storage.js";
+import useAuth from "../hooks/useAuth.js";
 
 export default function CodeScreen({ navigation }) {
   const [code, setCode] = React.useState(null);
-
-  const mergeList = async (value) => {
-    try {
-      let lists = await getStorageData("lists");
-      if (lists == null) lists = new Array();
-      lists.unshift(value);
-      console.log("newLists", lists);
-      setStorageData("lists", lists);
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const { authData, updateLists } = useAuth();
 
   const [joinList, { loading }] = useMutation(JOIN_LIST, {
     update(proxy, result) {
       try {
-        mergeList(result.data.join_list);
+        let returnedData = result.data.join_list;
+        let listArray = [];
+        listArray.push(returnedData);
+        updateLists(listArray);
         // pass params to grocery list
-        let listID = result.data.join_list.id;
-        let listName = result.data.join_list.list_name;
-        navigation.navigate("groceryList", {
-          listID: listID,
-          listName: listName,
-        });
+        navigation.navigate("groceryList", { listID: returnedData.id });
       } catch (e) {
         console.log(e);
       }
@@ -41,9 +27,7 @@ export default function CodeScreen({ navigation }) {
   const handleSubmit = async () => {
     try {
       // get userID from storage
-      const userID = await getStorageData("user", "id");
-      console.log(`${userID} is joining list with code ${code}`);
-      await joinList({ variables: { code: code, userID } });
+      await joinList({ variables: { code, userID: authData.id } });
     } catch (err) {
       console.log(err);
     }

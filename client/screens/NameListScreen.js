@@ -1,13 +1,32 @@
+import { useMutation } from "@apollo/client";
 import React from "react";
-import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
+import { Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
+import { CREATE_LIST } from "../graphql/graphql.js";
+import useAuth from "../hooks/useAuth.js";
 import { colors } from "../other/colors.js";
 
 export default function NameListScreen({ navigation }) {
   const [listName, setListName] = React.useState(null);
+  const { authData, updateLists } = useAuth();
+
+  const [createList] = useMutation(CREATE_LIST, {
+    update(proxy, result) {
+      returnedData = result.data.create_list;
+      let listArray = [];
+      listArray.push(returnedData);
+      updateLists(listArray);
+      // pass params to grocery list
+      navigation.navigate("groceryList", { listID: returnedData.id });
+    },
+  });
 
   const handleSubmit = () => {
-    console.log(listName);
-    navigation.navigate("groceryList");
+    try {
+      console.log("creating list:", listName);
+      createList({ variables: { userID: authData.id, listName } });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (

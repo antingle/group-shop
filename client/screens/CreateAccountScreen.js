@@ -25,7 +25,7 @@ export default function CreateAccountScreen({ navigation }) {
   const passRef = React.useRef();
   const confirmPassRef = React.useRef();
 
-  const [signIn] = useAuth();
+  const { signIn } = useAuth();
 
   const [register, { loading, error }] = useMutation(REGISTER, {
     update(proxy, result) {
@@ -117,6 +117,7 @@ export default function CreateAccountScreen({ navigation }) {
           autoCorrect={false}
           autoCompleteType="email"
           textContentType="emailAddress"
+          keyboardType={"email-address"}
           returnKeyType="next"
           ref={emailRef}
           onSubmitEditing={() => passRef.current.focus()}

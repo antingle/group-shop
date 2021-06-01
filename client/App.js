@@ -3,7 +3,7 @@ import { ApolloClient, ApolloProvider, split, HttpLink } from "@apollo/client";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { cache } from "./graphql/cache";
-import { AuthProvider } from "./authentication/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import Router from "./navigation/Router";
 
 export default function App() {

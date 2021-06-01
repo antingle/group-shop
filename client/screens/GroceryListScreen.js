@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import {
   View,
   SafeAreaView,
   SectionList,
   StyleSheet,
   Text,
+  TouchableHighlight,
   KeyboardAvoidingView,
 } from "react-native";
 import Item from "../components/Item";
@@ -19,11 +20,12 @@ import {
   CLAIM_ITEM,
   ITEM_UPDATES,
 } from "../graphql/graphql.js";
-import { TouchableHighlight } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { cache } from "../graphql/cache";
 import useAuth from "../hooks/useAuth";
+import GoBackButton from "../components/GoBackButton";
+import { ListContext } from "../contexts/ListContext";
 
 const DATA = [
   { data: [] },
@@ -41,9 +43,14 @@ export default function ({ route, navigation }) {
 
   const listRef = React.useRef();
   const { authData } = useAuth();
+  const { setCreatingList } = useContext(ListContext);
   const userID = authData.id;
   // gets id and name from the join or create screen
   const { listID } = route.params;
+
+  useEffect(() => {
+    setCreatingList(false);
+  }, []);
 
   // get list query to use on first load
   const { data, loading, error } = useQuery(GET_LIST, {
@@ -228,9 +235,17 @@ export default function ({ route, navigation }) {
     Haptics.impactAsync("light");
   }
 
+  const handleGoBack = () => {
+    navigation.navigate("lists");
+  };
+
   console.log("--*-- re-rendered --*--");
   DATA[0].data = readList.get_list.items.filter((item) => !item.purchased);
   DATA[1].data = readList.get_list.items.filter((item) => item.purchased);
+
+  // Remove "Purchased" heading if no items purchased
+  if (DATA[1].data.length == 0) DATA[1].title = null;
+  else DATA[1].title = "Purchased";
 
   // renders SectionList (newitem is rendered when adding a new item)
   const renderItem = ({ item }) => {
@@ -260,6 +275,7 @@ export default function ({ route, navigation }) {
       style={styles.container}
     >
       <Text style={styles.title}>{data.get_list.list_name}</Text>
+      <GoBackButton onPress={handleGoBack} />
       <SectionList
         sections={DATA}
         renderItem={renderItem}
