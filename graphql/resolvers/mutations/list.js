@@ -105,7 +105,7 @@ module.exports = {
     });
 
     // sends an update to everyone in the list containing the user that just joined
-    pubsub.publish(updated_list.code, {
+    pubsub.publish(updated_list._id, {
       member_updates: {
         type: "join",
         affector: updated_user.screen_name,
@@ -142,16 +142,6 @@ module.exports = {
     if (list.members.length == 0) {
       const deleted_list = await List.findByIdAndDelete(listID);
 
-      // for every user in the list - finds the index in their list array, removes it, then overwrites the user in the database
-      deleted_list.members.forEach(async (member) => {
-        const user = await User.findById(member._id);
-
-        const list_index = get_list_index(user, deleted_list._id);
-
-        user.lists.splice(list_index, 1);
-        await user.save();
-      });
-
       return {
         id: deleted_list._id,
         ...deleted_list._doc,
@@ -159,13 +149,15 @@ module.exports = {
     }
 
     // if the owner left, updates the owner
-    if (updated_user._id == list.owner) {
+    if (
+      updated_user._id.toString().localeCompare(list.owner.toString()) === 0
+    ) {
       // finds the next owner of the list
       var new_owner = await User.findById(list.members[0]._id);
       if (!new_owner) throw new Error("Owner Change Error: ID not found");
 
       // updates the list's owner
-      list.owner = new_owner.screen_name;
+      list.owner = new_owner._id;
 
       // gets the index of the list in the new owner's list array
       const owner_list_index = get_list_index(new_owner, listID);
@@ -183,17 +175,17 @@ module.exports = {
     const updated_list = await list.save();
 
     // updates the list members for each member in the list
-    list.members.forEach(async (member) => {
+    updated_list.members.forEach(async (member) => {
       const user = await User.findById(member._id);
 
       const list_index = get_list_index(user, updated_list._id);
-      user.lists[list_index].members = list.members;
+      user.lists[list_index].members = updated_list.members;
 
       await user.save();
     });
 
     // sends an update to everyone in the list containing the user that left
-    pubsub.publish(list.code, {
+    pubsub.publish(updated_list._id, {
       member_updates: {
         type: "leave",
         affector: updated_user.screen_name,
@@ -206,7 +198,7 @@ module.exports = {
 
     // if the owner changed, sends an update to everyone in the list containing the new owner
     if (updated_list.owner != updated_user._id) {
-      pubsub.publish(updated_list.code, {
+      pubsub.publish(updated_list._id, {
         member_updates: {
           type: "owner change",
           affector: new_owner.screen_name,

@@ -85,7 +85,7 @@ module.exports = gql`
     purchase_item(listID: ID!, itemID: ID!, userID: ID!, method: String): Item!
   }
   type Subscription {
-    item_updates(code: String!): item_update!
-    member_updates(code: String!): member_update!
+    item_updates(listID: ID!): item_update!
+    member_updates(listID: ID!): member_update!
   }
 `;

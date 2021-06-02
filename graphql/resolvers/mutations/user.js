@@ -95,32 +95,107 @@ module.exports = {
         else unowned_lists.push(deleted_user.lists[i]);
       }
 
-      // For every user in every owned list *exluding the owner*, removes the list from that user's list array
       owned_lists.forEach(async (user_list) => {
         const list = await List.findById(user_list._id);
 
-        list.members.forEach(async (member) => {
-          const user = await User.findById(member._id);
+        /* 
+           1. remove the deleted user from the list
+           2. delete the list if there are no more members
+           3. if there are members, update ownership
+           4. pubsub
+        */
 
-          if (
-            user._id.toString().localeCompare(deleted_user._id.toString()) != 0
-          ) {
-            const list_index = get_list_index(user, list._id);
+        // removes the user at the specified index
+        const user_index = get_user_index(list, deleted_user._id);
+        list.members.splice(user_index, 1);
 
-            user.lists.splice(list_index, 1);
+        // deletes the list if there are no more members
+        if (list.members.length == 0)
+          var deleted_list = await List.findByIdAndDelete(list._id);
+
+        if (!deleted_list) {
+          // updates list ownership
+          var new_owner = await User.findById(list.members[0]._id);
+
+          list.owner = new_owner._id;
+
+          // gets the index of the list in the new owner's list array
+          const owner_list_index = get_list_index(new_owner, list._id);
+
+          // updates the owned status in the new owner's list and overwrites the user in the database
+          new_owner.lists[owner_list_index].owned = true;
+          new_owner = await new_owner.save();
+
+          const updated_list = await list.save();
+
+          // updates the list members for each member in the list
+          updated_list.members.forEach(async (member) => {
+            const user = await User.findById(member._id);
+
+            const list_index = get_list_index(user, updated_list._id);
+            user.lists[list_index].members = updated_list.members;
+
             await user.save();
-          }
-        });
+          });
+
+          // sends an update to all the users in the list that the deleted user has left
+          pubsub.publish(updated_list._id, {
+            member_updates: {
+              type: "leave",
+              affector: deleted_user.screen_name,
+              member: {
+                id: deleted_user._id,
+                ...deleted_user._doc,
+              },
+            },
+          });
+
+          // sends an update to all the users in the list that the owner has changed
+          pubsub.publish(updated_list._id, {
+            member_updates: {
+              type: "owner change",
+              affector: new_owner.screen_name,
+              member: {
+                id: new_owner._id,
+                ...new_owner._doc,
+              },
+            },
+          });
+        }
       });
 
       // For every unowned list, removes the deleted user from that list
       unowned_lists.forEach(async (user_list) => {
         const list = await List.findById(user_list._id);
 
+        // removes the deleted user from the list
         const user_index = get_user_index(list, deleted_user._id);
-
         list.members.splice(user_index, 1);
-        await list.save();
+
+        // overwrites the list in the database
+        const updated_list = await list.save();
+
+        // updates the list members
+        updated_list.members.forEach(async (member) => {
+          const user = await User.findById(member._id);
+
+          const list_index = get_list_index(user, updated_list._id);
+          user.lists[list_index].members = updated_list.members;
+
+          await user.save();
+        });
+
+        // sends an update to all users in the list that the deleted user has left
+        pubsub.publish(updated_list._id, {
+          member_updates: {
+            type: "leave",
+            affector: deleted_user.screen_name,
+            member: {
+              id: deleted_user._id,
+              ...deleted_user._doc,
+            },
+          },
+        });
       });
 
       return {
