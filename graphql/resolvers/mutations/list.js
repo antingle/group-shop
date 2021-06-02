@@ -7,10 +7,7 @@ const generate_code = require("../../../util/code_generator");
 const {
   get_list_index,
   get_last_owned_index,
-  get_user_index,
 } = require("../../../util/get_index");
-const list = require("../../../models/list");
-const user = require("../../../models/user");
 
 module.exports = {
   create_list: async (_, { list_name, userID }) => {
@@ -27,6 +24,8 @@ module.exports = {
       var invalid = await List.findOne({ code });
     } while (invalid);
 
+    const date = new Date().toISOString();
+
     // creates a new list and saves it to the database
     const list = await new List({
       owner: user._id,
@@ -39,8 +38,8 @@ module.exports = {
         },
       ],
       items: [],
-      created: new Date().toISOString(),
-      last_modified: new Date().toISOString(),
+      created: date,
+      last_modified: date,
     }).save();
 
     const last_owned_index = get_last_owned_index(user);
@@ -51,6 +50,7 @@ module.exports = {
       list_name: list.list_name,
       owned: true,
       members: list.members,
+      last_modified: date,
     });
     await user.save();
 
@@ -77,20 +77,31 @@ module.exports = {
 
     // adds the joined list to the user's lists and overwrites the user in the database
     user.lists.push({
-      _id: list._id,
-      list_name: list.list_name,
+      _id: updated_list._id,
+      list_name: updated_list.list_name,
       owned: false,
-      members: list.members,
+      members: updated_list.members,
+      last_modified: updated_list.last_modified,
     });
     const updated_user = await user.save();
 
+    // updates the members in each user's list array
     updated_list.members.forEach(async (member) => {
-      const user = await User.findById(member._id);
+      try {
+        const list_user = await User.findById(member._id);
 
-      const list_index = get_list_index(user, updated_list._id);
-      user.lists[list_index].members = list.members;
+        if (
+          list_user._id.toString().localeCompare(updated_user._id.toString()) !=
+          0
+        ) {
+          const list_index = get_list_index(list_user, updated_list._id);
+          list_user.lists[list_index].members = updated_list.members;
 
-      await user.save();
+          await list_user.save();
+        }
+      } catch (err) {
+        throw new Error("Error updating list array: ", err);
+      }
     });
 
     // sends an update to everyone in the list containing the user that just joined
@@ -112,18 +123,12 @@ module.exports = {
   },
   leave_list: async (_, { listID, userID }, { pubsub }) => {
     // validation
-    const {
-      valid,
-      errors,
-      list,
-      user,
-      user_index,
-      list_index,
-    } = await list_validation({
-      listID,
-      userID,
-      method: "user-leave",
-    });
+    const { valid, errors, list, user, user_index, list_index } =
+      await list_validation({
+        listID,
+        userID,
+        method: "user-leave",
+      });
     if (!valid) throw new UserInputError("Leave Error", { errors });
 
     // removes the user at the specified index

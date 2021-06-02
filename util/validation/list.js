@@ -55,11 +55,15 @@ module.exports = async ({
       };
     case "user-join":
       // the user must not exist in the list
+      if (!list) break;
+
       var user_index = get_user_index(list, userID);
       if (user_index != -1)
         errors.userID = "User is already a part of this list";
       break;
     case "user-leave":
+      if (!list) break;
+
       // the user must exist in the list
       var user_index = get_user_index(list, userID);
       if (user_index == -1) errors.userID = "User is not a part of the list";

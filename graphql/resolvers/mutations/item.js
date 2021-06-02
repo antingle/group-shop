@@ -1,6 +1,19 @@
 const { UserInputError } = require("apollo-server-errors");
 
+const User = require("../../../models/user");
+const { get_list_index } = require("../../../util/get_index");
 const { item_validation } = require("../../../util/validation");
+
+const update_members = async ({ _id, members, last_modified }) => {
+  members.forEach(async (member) => {
+    const user = await User.findById(member._id);
+
+    const list_index = get_list_index(user, _id);
+    user.lists[list_index].last_modified = last_modified;
+
+    await user.save();
+  });
+};
 
 module.exports = {
   add_item: async (_, { name, listID, userID }, { pubsub }) => {
@@ -22,6 +35,8 @@ module.exports = {
     list.last_modified = new Date().toISOString();
 
     const updated_list = await list.save();
+
+    update_members(updated_list);
 
     // sends an update to everyone in the list containing the added item
     pubsub.publish(updated_list.code, {
@@ -56,6 +71,8 @@ module.exports = {
     list.last_modified = new Date().toISOString();
 
     const updated_list = await list.save();
+
+    update_members(updated_list);
 
     // sends an update to everyone in the list containing the removed item
     pubsub.publish(updated_list.code, {
@@ -98,6 +115,8 @@ module.exports = {
     // overwrites the list in the database
     const updated_list = await list.save();
 
+    update_members(updated_list);
+
     // sends an update to everyone in the list containing the item that was claimed/unclaimed
     pubsub.publish(updated_list.code, {
       item_updates: {
@@ -138,6 +157,8 @@ module.exports = {
 
     // overwrites the list in the database
     const updated_list = await list.save();
+
+    update_members(updated_list);
 
     // sends an updated to everyone in the list containing the item that was purchased/unpurchased
     pubsub.publish(updated_list.code, {

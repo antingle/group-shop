@@ -21,8 +21,11 @@ module.exports = {
     });
     if (!valid) throw new UserInputError("Registration Error", { errors });
 
+    // mmmm salt
+    const salt = await bcrypt.genSalt(12);
+
     // hash the password BEFORE saving to the database
-    password = await bcrypt.hash(password, 12);
+    password = await bcrypt.hash(password, salt);
 
     // adds the new user to the database
     const user = await new User({
@@ -97,9 +100,11 @@ module.exports = {
         const list = await List.findById(user_list._id);
 
         list.members.forEach(async (member) => {
-          if (member._id != deleted_user._id) {
-            const user = await User.findById(member._id);
+          const user = await User.findById(member._id);
 
+          if (
+            user._id.toString().localeCompare(deleted_user._id.toString()) != 0
+          ) {
             const list_index = get_list_index(user, list._id);
 
             user.lists.splice(list_index, 1);

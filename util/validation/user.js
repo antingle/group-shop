@@ -2,7 +2,8 @@ const bcrypt = require("bcryptjs");
 
 const User = require("../../models/user");
 
-const email_regEx = /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/;
+const email_regEx =
+  /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})$/;
 
 module.exports = async ({
   method = null,
@@ -41,7 +42,7 @@ module.exports = async ({
     if (password === "") errors.password = "Pasword must not be empty";
     else if (password.length < 8) errors.password = "Password is too short";
     else if (user && method == "login") {
-      const matched = bcrypt.compare(password, user.password);
+      const matched = await bcrypt.compare(password, user.password);
       if (!matched) errors.password = "Password is incorrect";
     }
   }

@@ -28,6 +28,7 @@ module.exports = gql`
     list_name: String!
     owned: Boolean!
     members: [Shortened_User!]
+    last_modified: String!
   }
   type Item {
     id: ID!

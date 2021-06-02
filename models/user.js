@@ -13,6 +13,7 @@ const USER_SCHEMA = new Schema({
           screen_name: String,
         },
       ],
+      last_modified: String,
     },
   ],
   join_date: String,
