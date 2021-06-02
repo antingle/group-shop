@@ -30,6 +30,11 @@ module.exports = gql`
     members: [Shortened_User!]
     last_modified: String!
   }
+  type List_Properties {
+    owner: ID
+    list_name: String
+    code: String
+  }
   type Item {
     id: ID!
     name: String!
@@ -40,13 +45,18 @@ module.exports = gql`
 
   type item_update {
     type: String!
-    affector: String!
+    affector: Shortened_User!
     item: Item!
   }
   type member_update {
     type: String!
-    affector: String!
+    affector: Shortened_User!
     member: User!
+  }
+  type list_update {
+    type: String!
+    affector: Shortened_User!
+    list: List_Properties!
   }
 
   input registration_info {
@@ -93,5 +103,6 @@ module.exports = gql`
   type Subscription {
     item_updates(listID: ID!): item_update!
     member_updates(listID: ID!): member_update!
+    list_updates(listID: ID!): list_update!
   }
 `;

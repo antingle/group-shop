@@ -42,7 +42,10 @@ module.exports = {
     pubsub.publish(updated_list._id, {
       item_updates: {
         type: "add",
-        affector: user.screen_name,
+        affector: {
+          id: user._id,
+          screen_name: user.screen_name,
+        },
         item: {
           id: updated_list.items[updated_list.items.length - 1]._id,
           ...updated_list.items[updated_list.items.length - 1]._doc,
@@ -78,7 +81,10 @@ module.exports = {
     pubsub.publish(updated_list._id, {
       item_updates: {
         type: "remove",
-        affector: user.screen_name,
+        affector: {
+          id: user._id,
+          screen_name: user.screen_name,
+        },
         item: {
           id: item._id,
           ...item._doc,
@@ -121,7 +127,10 @@ module.exports = {
     pubsub.publish(updated_list._id, {
       item_updates: {
         type: method == "claim" ? "claim" : "unclaim",
-        affector: user.screen_name,
+        affector: {
+          id: user._id,
+          screen_name: user.screen_name,
+        },
         item: {
           id: updated_list.items[item_index]._id,
           ...updated_list.items[item_index]._doc,
@@ -164,7 +173,10 @@ module.exports = {
     pubsub.publish(updated_list._id, {
       item_updates: {
         type: method == "purchase" ? "purchase" : "unpurchase",
-        affector: user.screen_name,
+        affector: {
+          id: user._id,
+          screen_name: user.screen_name,
+        },
         item: {
           id: updated_list.items[item_index]._id,
           ...updated_list.items[item_index]._doc,

@@ -108,7 +108,10 @@ module.exports = {
     pubsub.publish(updated_list._id, {
       member_updates: {
         type: "join",
-        affector: updated_user.screen_name,
+        affector: {
+          id: updated_user._id,
+          screen_name: updated_user.screen_name,
+        },
         member: {
           id: updated_list.members[updated_list.members.length - 1]._id,
           ...updated_list.members[updated_list.members.length - 1]._doc,
@@ -188,7 +191,10 @@ module.exports = {
     pubsub.publish(updated_list._id, {
       member_updates: {
         type: "leave",
-        affector: updated_user.screen_name,
+        affector: {
+          id: updated_user._id,
+          screen_name: updated_user.screen_name,
+        },
         member: {
           id: updated_user._id,
           ...updated_user._doc,
@@ -201,7 +207,10 @@ module.exports = {
       pubsub.publish(updated_list._id, {
         member_updates: {
           type: "owner change",
-          affector: new_owner.screen_name,
+          affector: {
+            id: updated_user._id,
+            screen_name: updated_user.screen_name,
+          },
           member: {
             id: new_owner._id,
             ...new_owner._doc,
@@ -224,8 +233,8 @@ module.exports = {
         const user = await User.findById(member._id);
 
         const list_index = get_list_index(user, deleted_list._id);
-
         user.lists.splice(list_index, 1);
+
         await user.save();
       });
 
@@ -239,14 +248,56 @@ module.exports = {
   },
   update_list: async (
     _,
-    { listID, owner = null, list_name = null, code = false }
-  ) => {
-    const { valid, errors, list, user, user_index } = list_validation({
+    {
       listID,
-      userID: owner,
+      userID,
+      ownerID = null,
+      list_name = null,
+      generate_new_code = false,
+    },
+    { pubsub }
+  ) => {
+    const { valid, errors, list, user, owner } = list_validation({
+      listID,
+      userID,
       list_name,
-      method: "user-leave",
+      ownerID,
+      method: "list-update",
     });
     if (!valid) throw new UserInputError("List Update Error", { errors });
+
+    if (list_name != null) list.list_name = list_name;
+
+    if (owner != null) list.owner = owner._id;
+
+    if (generate_new_code) {
+      do {
+        var code = generate_code();
+        var invalid = await List.findOne({ code });
+      } while (invalid);
+      list.code = code;
+    }
+
+    const updated_list = await list.save();
+
+    pubsub.publish(updated_list._id, {
+      list_updates: {
+        type: "list-update",
+        affector: {
+          id: user._id,
+          screen_name: user.screen_name,
+        },
+        properties: {
+          owner: owner != null ? updated_list.owner : null,
+          list_name: list_name != null ? updated_list.list_name : null,
+          code: generate_new_code ? updated_list.code : null,
+        },
+      },
+    });
+
+    return {
+      id: updated_list._id,
+      ...updated_list._doc,
+    };
   },
 };

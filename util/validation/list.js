@@ -3,10 +3,11 @@ const List = require("../../models/list");
 const { get_user_index, get_list_index } = require("../get_index");
 
 module.exports = async ({
-  list_name = null,
   listID = null,
   userID = null,
+  list_name = null,
   code = null,
+  ownerID = null,
   method = "no-user-check",
 }) => {
   const errors = {};
@@ -43,6 +44,14 @@ module.exports = async ({
     }
   }
 
+  if (ownerID != null) {
+    if (ownerID === "") errors.ownerID = "Owner ID must not be empty";
+    else {
+      var owner = await User.findById(ownerID);
+      if (!owner) errors.ownerID = "Owner with that ID not found";
+    }
+  }
+
   // the method can only be 'no-user-check', 'user-join', or 'user-leave'. Anything else is invalid
   switch (method) {
     case "no-user-check":
@@ -74,6 +83,18 @@ module.exports = async ({
         errors.listID = "List not found in user's list array";
 
       break;
+    case "update-list":
+      if (!list) break;
+
+      if (user) {
+        var user_index = get_user_index(list, userID);
+        if (user_index == -1) errors.userID = "User is not a part of the list";
+      }
+
+      if (owner) {
+        var owner_index = get_user_index(list, ownerID);
+        if (owner_index == -1) errors.userID = "User is not a part of the list";
+      }
     default:
       errors.method = "Invalid method";
   }
@@ -83,7 +104,9 @@ module.exports = async ({
     errors,
     list: list ? list : null,
     user: user ? user : null,
+    owner: owner ? owner : null,
     user_index: user_index != -1 ? user_index : null,
+    owner_index: owner_index != -1 ? owner_index : null,
     list_index: list_index != -1 ? list_index : null,
   };
 };

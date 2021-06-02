@@ -142,7 +142,10 @@ module.exports = {
           pubsub.publish(updated_list._id, {
             member_updates: {
               type: "leave",
-              affector: deleted_user.screen_name,
+              affector: {
+                id: deleted_user._id,
+                screen_name: deleted_user.screen_name,
+              },
               member: {
                 id: deleted_user._id,
                 ...deleted_user._doc,
@@ -154,7 +157,10 @@ module.exports = {
           pubsub.publish(updated_list._id, {
             member_updates: {
               type: "owner change",
-              affector: new_owner.screen_name,
+              affector: {
+                id: deleted_user._id,
+                screen_name: deleted_user.screen_name,
+              },
               member: {
                 id: new_owner._id,
                 ...new_owner._doc,
@@ -189,7 +195,10 @@ module.exports = {
         pubsub.publish(updated_list._id, {
           member_updates: {
             type: "leave",
-            affector: deleted_user.screen_name,
+            affector: {
+              id: deleted_user._id,
+              screen_name: deleted_user.screen_name,
+            },
             member: {
               id: deleted_user._id,
               ...deleted_user._doc,
