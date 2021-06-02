@@ -51,7 +51,7 @@ module.exports = gql`
   type member_update {
     type: String!
     affector: Shortened_User!
-    member: User!
+    member: Shortened_User!
   }
   type list_update {
     type: String!

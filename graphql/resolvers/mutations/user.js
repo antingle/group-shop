@@ -148,7 +148,7 @@ module.exports = {
               },
               member: {
                 id: deleted_user._id,
-                ...deleted_user._doc,
+                screen_name: deleted_user.screen_name,
               },
             },
           });
@@ -163,7 +163,7 @@ module.exports = {
               },
               member: {
                 id: new_owner._id,
-                ...new_owner._doc,
+                screen_name: new_owner.screen_name,
               },
             },
           });
@@ -201,7 +201,7 @@ module.exports = {
             },
             member: {
               id: deleted_user._id,
-              ...deleted_user._doc,
+              screen_name: deleted_user.screen_name,
             },
           },
         });

@@ -114,7 +114,8 @@ module.exports = {
         },
         member: {
           id: updated_list.members[updated_list.members.length - 1]._id,
-          ...updated_list.members[updated_list.members.length - 1]._doc,
+          screen_name:
+            updated_list.members[updated_list.members.length - 1].screen_name,
         },
       },
     });
@@ -197,7 +198,7 @@ module.exports = {
         },
         member: {
           id: updated_user._id,
-          ...updated_user._doc,
+          screen_name: updated_user.screen_name,
         },
       },
     });
@@ -213,7 +214,7 @@ module.exports = {
           },
           member: {
             id: new_owner._id,
-            ...new_owner._doc,
+            screen_name: new_owner.screen_name,
           },
         },
       });
