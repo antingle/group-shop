@@ -259,6 +259,7 @@ export const ITEM_UPDATES = gql`
         name
         member
         purchased
+        last_modified
       }
     }
   }
