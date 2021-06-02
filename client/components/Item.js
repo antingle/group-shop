@@ -8,7 +8,7 @@ import {
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { Swipeable } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
-import { colors } from "../colors.js";
+import { colors } from "../other/colors.js";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function Item({
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   card: {
     alignItems: "center",
     flexDirection: "row",
-    height: 56,
+    height: 50,
     width: 340,
     borderRadius: 24,
     paddingLeft: 20,

@@ -1,48 +1,104 @@
-import { useQuery } from "@apollo/client";
-import React from "react";
-import { render } from "react-dom";
-import { SafeAreaView, Text, StyleSheet, FlatList } from "react-native";
-import { colors } from "../colors.js";
+import React, { useContext, useState } from "react";
+import {
+  SafeAreaView,
+  View,
+  TouchableHighlight,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableWithoutFeedback,
+} from "react-native";
+import { colors } from "../other/colors.js";
+import { AntDesign } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import ListCard from "../components/ListCard.js";
-import { cache } from "../graphql/cache.js";
-import { GET_USER_LISTS } from "../graphql/graphql.js";
-import { getStorageData } from "../storage.js";
+import useAuth from "../hooks/useAuth.js";
+import { ListContext } from "../contexts/ListContext.js";
+import SettingsButton from "../components/SettingsButton.js";
 
-export default function ListScreen({ route, navigation }) {
-  const { userID } = route.params;
-  console.log(userID);
-  const { loading, error, data } = useQuery(GET_USER_LISTS, {
-    variables: { userID },
-  });
+export default function ListScreen({ navigation }) {
+  const { lists } = useAuth();
+  const { setCreatingList } = useContext(ListContext);
+  const [selectList, setSelectList] = useState(false);
 
-  if (loading)
-    return (
-      <SafeAreaView>
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    );
+  const newList = () => {
+    setSelectList((prevState) => !prevState);
+  };
 
-  if (error)
-    return (
-      <SafeAreaView>
-        <Text>{error}</Text>
-      </SafeAreaView>
-    );
+  const handleCreate = async () => {
+    console.log("creating list...");
+    await setCreatingList(true);
+    setSelectList(false);
+    navigation.navigate("nameList");
+  };
 
-  let DATA = data.get_user_lists;
-  console.log(data.get_user_lists);
+  const handleJoin = async () => {
+    console.log("joining list...");
+    await setCreatingList(true);
+    setSelectList(false);
+    navigation.navigate("code");
+  };
 
-  const renderItem = ({ list }) => <ListCard name={list.list_name} />;
+  const renderItem = ({ item }) => (
+    <ListCard
+      id={item.id}
+      name={item.list_name}
+      members={item.members}
+      navigation={navigation}
+    />
+  );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.heading}>Grocery Lists</Text>
-      <FlatList
-        data={DATA}
-        renderItem={renderItem}
-        keyExtractor={(list) => list.id}
-      />
-    </SafeAreaView>
+    <TouchableWithoutFeedback
+      onPress={() => setSelectList(false)}
+      disabled={!selectList}
+    >
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.heading}>Lists</Text>
+        <SettingsButton />
+        <FlatList
+          data={lists}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+        />
+        {selectList && (
+          <View style={styles.listSelection}>
+            <TouchableHighlight
+              style={styles.listButton}
+              onPress={handleCreate}
+              underlayColor={colors.light}
+            >
+              <View style={styles.listContainer}>
+                <Ionicons name="create-outline" style={styles.listIcon} />
+                <Text style={styles.buttonText}>Create List</Text>
+              </View>
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={styles.listButton}
+              onPress={handleJoin}
+              underlayColor={colors.light}
+            >
+              <View style={styles.listContainer}>
+                <Ionicons name="person-add" style={styles.listIcon} />
+                <Text style={styles.buttonText}>Join List</Text>
+              </View>
+            </TouchableHighlight>
+          </View>
+        )}
+        <View style={styles.absolute}>
+          <TouchableHighlight
+            style={styles.addButton}
+            onPress={newList}
+            underlayColor={colors.light}
+          >
+            <View style={styles.addButton}>
+              <AntDesign name="plus" style={styles.plus} />
+              <Text style={styles.buttonText}>New List</Text>
+            </View>
+          </TouchableHighlight>
+        </View>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -54,22 +110,66 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   heading: {
-    fontSize: 32,
+    fontSize: 40,
     fontWeight: "800",
     color: colors.green,
-    padding: 40,
+    paddingTop: 20,
+    paddingBottom: 10,
   },
-  card: {
+  addButton: {
+    width: 180,
+    height: 60,
+    borderRadius: 45,
+    backgroundColor: colors.green,
     alignItems: "center",
     justifyContent: "center",
-    height: 100,
-    width: 340,
-    borderRadius: 24,
-    backgroundColor: "white",
+    flexDirection: "row",
   },
-  cardText: {
+  buttonText: {
     fontSize: 20,
-    fontWeight: "500",
-    color: colors.dark,
+    color: colors.light,
+  },
+  plus: {
+    fontSize: 36,
+    color: colors.light,
+    marginRight: 16,
+  },
+  absolute: {
+    position: "absolute",
+    bottom: 40,
+  },
+  listSelection: {
+    position: "absolute",
+    bottom: 34,
+    width: 180,
+    height: 200,
+    borderRadius: 45,
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  listButton: {
+    width: 180,
+    height: 60,
+    borderRadius: 45,
+    backgroundColor: colors.dark,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    marginBottom: 7,
+  },
+  listContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    backgroundColor: colors.dark,
+    width: 180,
+    height: 60,
+    borderRadius: 45,
+  },
+  listIcon: {
+    color: "white",
+    fontSize: 24,
+    marginRight: 10,
   },
 });

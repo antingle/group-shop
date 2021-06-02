@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import {
   View,
   SafeAreaView,
   SectionList,
   StyleSheet,
   Text,
+  TouchableHighlight,
   KeyboardAvoidingView,
 } from "react-native";
 import Item from "../components/Item";
 import NewItem from "../components/NewItem";
-import { colors } from "../colors.js";
+import { colors } from "../other/colors.js";
 import { useQuery, useMutation, gql, useSubscription } from "@apollo/client";
 import {
   GET_LIST,
@@ -19,10 +20,12 @@ import {
   CLAIM_ITEM,
   ITEM_UPDATES,
 } from "../graphql/graphql.js";
-import { TouchableHighlight } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { cache } from "../graphql/cache";
+import useAuth from "../hooks/useAuth";
+import GoBackButton from "../components/GoBackButton";
+import { ListContext } from "../contexts/ListContext";
 
 const DATA = [
   { data: [] },
@@ -39,15 +42,19 @@ export default function ({ route, navigation }) {
   const [refresh, setRefresh] = React.useState(false);
 
   const listRef = React.useRef();
-
+  const { authData } = useAuth();
+  const { setCreatingList } = useContext(ListContext);
+  const userID = authData.id;
   // gets id and name from the join or create screen
-  // const { listID, listName } = route.params;
-  const tempID = "60971d4cc2a22a21a41e244c";
-  const userID = "608b5ddddb8f322bbc238bca";
+  const { listID } = route.params;
+
+  useEffect(() => {
+    setCreatingList(false);
+  }, []);
 
   // get list query to use on first load
   const { data, loading, error } = useQuery(GET_LIST, {
-    variables: { listID: tempID },
+    variables: { listID },
   });
 
   const readList = cache.readQuery({
@@ -63,7 +70,7 @@ export default function ({ route, navigation }) {
         }
       }
     `,
-    variables: { listID: tempID },
+    variables: { listID },
   });
 
   const createNewItem = () => {
@@ -76,7 +83,7 @@ export default function ({ route, navigation }) {
     };
 
     cache.modify({
-      id: `List:${tempID}`,
+      id: `List:${listID}`,
       fields: {
         items(existingItemRefs) {
           const newItemRef = cache.writeFragment({
@@ -109,7 +116,7 @@ export default function ({ route, navigation }) {
   //       console.log("my mutation");
 
   //     cache.modify({
-  //       id: `List:${tempID}`,
+  //       id: `List:${listID}`,
   //       fields: {
   //         items(existingItemRefs, { readField }) {
   //           const newItemRef = cache.writeFragment({
@@ -136,7 +143,7 @@ export default function ({ route, navigation }) {
     ignoreResults: true,
     update(cache, result) {
       cache.modify({
-        id: `List:${tempID}`,
+        id: `List:${listID}`,
         fields: {
           items(existingItemRefs, { readField }) {
             return existingItemRefs
@@ -160,7 +167,7 @@ export default function ({ route, navigation }) {
     ignoreResults: true,
     update(cache, result) {
       cache.modify({
-        id: `List:${tempID}`,
+        id: `List:${listID}`,
         fields: {
           items(existingItemRefs, { readField }) {
             return existingItemRefs.filter(
@@ -186,7 +193,7 @@ export default function ({ route, navigation }) {
     // don't add if item is empty
     if (adding === "") {
       cache.modify({
-        id: `List:${tempID}`,
+        id: `List:${listID}`,
         fields: {
           items(existingItemRefs, { readField }) {
             return existingItemRefs.filter(
@@ -196,7 +203,7 @@ export default function ({ route, navigation }) {
         },
       });
     } else {
-      addItem({ variables: { name: adding, listID: tempID, userID } });
+      addItem({ variables: { name: adding, listID, userID } });
       setAdding("");
     }
   }
@@ -204,7 +211,7 @@ export default function ({ route, navigation }) {
   function onPurchase(id, purchased) {
     let method = purchased ? "unpurchase" : "purchase";
     Haptics.selectionAsync();
-    purchaseItem({ variables: { listID: tempID, itemID: id, userID, method } });
+    purchaseItem({ variables: { listID, itemID: id, userID, method } });
   }
 
   // pass state in when changing text when adding new item
@@ -217,22 +224,28 @@ export default function ({ route, navigation }) {
   }
 
   function onRightOpen(id) {
-    removeItem({ variables: { listID: tempID, itemID: id, userID } });
+    removeItem({ variables: { listID, itemID: id, userID } });
   }
 
   function onTriggerLeftSwipe(id, member) {
     let method = member ? "unclaim" : "claim";
     claimItem({
-      variables: { listID: tempID, itemID: id, userID, method },
+      variables: { listID, itemID: id, userID, method },
     });
     Haptics.impactAsync("light");
   }
+
+  const handleGoBack = () => {
+    navigation.navigate("lists");
+  };
 
   console.log("--*-- re-rendered --*--");
   DATA[0].data = readList.get_list.items.filter((item) => !item.purchased);
   DATA[1].data = readList.get_list.items.filter((item) => item.purchased);
 
-  // console.log(DATA[0].data);
+  // Remove "Purchased" heading if no items purchased
+  if (DATA[1].data.length == 0) DATA[1].title = null;
+  else DATA[1].title = "Purchased";
 
   // renders SectionList (newitem is rendered when adding a new item)
   const renderItem = ({ item }) => {
@@ -262,6 +275,7 @@ export default function ({ route, navigation }) {
       style={styles.container}
     >
       <Text style={styles.title}>{data.get_list.list_name}</Text>
+      <GoBackButton onPress={handleGoBack} />
       <SectionList
         sections={DATA}
         renderItem={renderItem}

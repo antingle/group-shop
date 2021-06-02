@@ -18,14 +18,16 @@ export const REGISTER = gql`
     ) {
       id
       email
-      password
       screen_name
       lists {
         id
         list_name
         owned
+        members {
+          id
+          screen_name
+        }
       }
-      join_date
     }
   }
 `;
@@ -34,14 +36,71 @@ export const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       id
-      owner
+      email
+      screen_name
+      lists {
+        id
+        list_name
+        owned
+        members {
+          id
+          screen_name
+        }
+      }
+    }
+  }
+`;
+
+export const CREATE_TEMP_USER = gql`
+  mutation create_temp_user($name: String!) {
+    create_temp_user(screen_name: $name) {
+      id
+      email
+      screen_name
+      lists {
+        id
+        list_name
+        owned
+        members {
+          id
+          screen_name
+        }
+      }
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query get_user($userID: ID!) {
+    get_user(userID: $userID) {
+      id
+      email
+      password
+      screen_name
+      lists {
+        id
+        list_name
+        owned
+        members {
+          id
+          screen_name
+        }
+      }
+      join_date
+    }
+  }
+`;
+
+export const GET_USER_LISTS = gql`
+  query get_user_lists($userID: ID!) {
+    get_user_lists(userID: $userID) {
+      id
       list_name
-      code
+      owned
       members {
         id
         screen_name
       }
-      created
     }
   }
 `;
@@ -58,13 +117,14 @@ export const JOIN_LIST = gql`
         screen_name
       }
       created
+      last_modified
     }
   }
 `;
 
-export const GET_USER_LISTS = gql`
-  query get_user_lists($userID: ID!) {
-    get_user_lists(userID: $userID) {
+export const CREATE_LIST = gql`
+  mutation create_list($listName: String!, $userID: ID!) {
+    create_list(list_name: $listName, userID: $userID) {
       id
       owner
       list_name
@@ -74,6 +134,7 @@ export const GET_USER_LISTS = gql`
         screen_name
       }
       created
+      last_modified
     }
   }
 `;

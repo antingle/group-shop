@@ -1,13 +1,30 @@
+import { useMutation } from "@apollo/client";
 import React from "react";
 import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
-import { colors } from "../colors.js";
+import { CREATE_TEMP_USER } from "../graphql/graphql.js";
+import useAuth from "../hooks/useAuth.js";
+import { colors } from "../other/colors.js";
 
 export default function NameScreen({ navigation }) {
   const [name, setName] = React.useState(null);
+  const { signIn } = useAuth();
+
+  const [createTempUser, { loading, error }] = useMutation(CREATE_TEMP_USER, {
+    update(proxy, result) {
+      try {
+        const userData = result.data.create_temp_user;
+        // const listData = returnedData.lists; // use in future when registering with link?
+        delete userData.lists; // delete is not an ideal operation
+        signIn(userData);
+      } catch (e) {
+        console.log(e); // in the future, add error to display on screen
+      }
+    },
+  });
 
   const handleSubmit = () => {
     console.log(name);
-    navigation.navigate("createOrJoin");
+    createTempUser({ variables: { name } });
   };
 
   return (

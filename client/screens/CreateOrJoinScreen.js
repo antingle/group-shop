@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -6,21 +6,27 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { colors } from "../colors.js";
+import { ListContext } from "../contexts/ListContext.js";
+import { colors } from "../other/colors.js";
+import SettingsButton from "../components/SettingsButton";
 
 export default function CreateOrJoinScreen({ navigation }) {
-  const handleCreate = () => {
+  const { setCreatingList } = useContext(ListContext);
+  const handleCreate = async () => {
+    await setCreatingList(true);
     console.log("creating list...");
     navigation.navigate("nameList");
   };
 
-  const handleJoin = () => {
+  const handleJoin = async () => {
+    await setCreatingList(true);
     console.log("joining list...");
     navigation.navigate("code");
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <SettingsButton />
       <View style={styles.logoContainer}>
         <Text style={styles.logo}>Group Shopping</Text>
       </View>
