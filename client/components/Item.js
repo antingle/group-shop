@@ -1,6 +1,7 @@
 import React from "react";
 import {
   View,
+  Text,
   StyleSheet,
   TouchableHighlight,
   I18nManager,
@@ -10,6 +11,7 @@ import { Swipeable } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { colors } from "../other/colors.js";
 import { Ionicons } from "@expo/vector-icons";
+import useAuth from "../hooks/useAuth.js";
 
 export default function Item({
   id,
@@ -19,10 +21,10 @@ export default function Item({
   onPress,
   onTriggerLeftSwipe,
   onTriggerRightSwipe,
-  onRightOpen,
 }) {
   const checkboxRef = React.useRef();
   const swipeableRef = React.useRef();
+  const { authData } = useAuth();
 
   const onTriggerRight = () => {
     onTriggerRightSwipe(id);
@@ -41,7 +43,9 @@ export default function Item({
     });
     return (
       <View style={styles.leftAction}>
-        <Animated.Text style={[styles.actionText]}>Claim</Animated.Text>
+        <Animated.Text style={[styles.actionText]}>
+          {member == authData.screen_name ? "Unclaim" : "Claim"}
+        </Animated.Text>
       </View>
     );
   };
@@ -72,7 +76,6 @@ export default function Item({
       overshootLeft={false}
       leftThreshold={100}
       onSwipeableRightWillOpen={onTriggerRight}
-      onSwipeableRightOpen={() => onRightOpen(id)}
       friction={1.7}
       overshootFriction={4}
       onSwipeableLeftOpen={onTriggerLeft}
@@ -93,6 +96,11 @@ export default function Item({
             disabled={true}
             ref={checkboxRef}
           />
+          {purchased ? (
+            <Text style={styles.caption}>Bought by {member}</Text>
+          ) : (
+            member && <Text style={styles.caption}>{member} is getting...</Text>
+          )}
         </View>
       </TouchableHighlight>
     </Swipeable>
@@ -103,6 +111,7 @@ const styles = StyleSheet.create({
   card: {
     alignItems: "center",
     flexDirection: "row",
+    justifyContent: "space-between",
     height: 50,
     width: 340,
     borderRadius: 24,
@@ -141,5 +150,9 @@ const styles = StyleSheet.create({
   },
   actionIcon: {
     marginHorizontal: 20,
+  },
+  caption: {
+    marginRight: 10,
+    color: colors.gray,
   },
 });

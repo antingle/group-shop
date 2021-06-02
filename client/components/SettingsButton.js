@@ -5,12 +5,30 @@ import { colors } from "../other/colors";
 import { TouchableHighlight } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/core";
 
-export default function SettingsButton({}) {
+export default function SettingsButton({ screen = "settings", marginTop = 0 }) {
   const navigation = useNavigation();
+
+  const styles = StyleSheet.create({
+    icon: {
+      fontSize: 30,
+      color: colors.green,
+    },
+    absolute: {
+      position: "absolute",
+      left: 40,
+      top: 75,
+    },
+    container: {
+      marginTop: marginTop,
+      backgroundColor: "transparent",
+      borderRadius: 12,
+    },
+  });
+
   return (
-    <View style={styles.absolute}>
+    <View>
       <TouchableHighlight
-        onPress={() => navigation.navigate("settings")}
+        onPress={() => navigation.navigate(screen)}
         underlayColor={colors.light}
         style={styles.container}
       >
@@ -21,19 +39,3 @@ export default function SettingsButton({}) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  icon: {
-    fontSize: 30,
-    color: colors.green,
-  },
-  absolute: {
-    position: "absolute",
-    left: 40,
-    top: 75,
-  },
-  container: {
-    backgroundColor: "transparent",
-    borderRadius: 12,
-  },
-});

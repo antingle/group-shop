@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import CreateOrJoinScreen from "../screens/CreateOrJoinScreen";
 import ListScreen from "../screens/ListScreen";
 import NameListScreen from "../screens/NameListScreen";
 import CodeScreen from "../screens/CodeScreen";
@@ -9,12 +8,14 @@ import useAuth from "../hooks/useAuth";
 import { useQuery } from "@apollo/client";
 import { GET_USER_LISTS } from "../graphql/graphql";
 import Loading from "../screens/Loading";
-import { ListContext } from "../contexts/ListContext";
+import { StyleSheet } from "react-native";
+import { colors } from "../other/colors";
+import useList from "../hooks/useList";
 
 export default function AppStack() {
   const Stack = createStackNavigator();
-  const { authData, updateLists, lists, loading } = useAuth();
-  const { creatingList } = useContext(ListContext);
+  const { authData, updateLists } = useAuth();
+  const { creatingList } = useList();
   const [listsLoading, setListsLoading] = useState(true);
 
   const { error } = useQuery(GET_USER_LISTS, {
@@ -34,18 +35,14 @@ export default function AppStack() {
         headerShown: false,
       }}
     >
-      {!lists ? (
-        <Stack.Screen name="createOrJoin" component={CreateOrJoinScreen} />
-      ) : (
-        <Stack.Screen
-          name="lists"
-          component={ListScreen}
-          unmountOnBlur={true}
-          options={{
-            animationEnabled: false,
-          }}
-        />
-      )}
+      <Stack.Screen
+        name="lists"
+        component={ListScreen}
+        unmountOnBlur={true}
+        options={{
+          animationEnabled: false,
+        }}
+      />
 
       <Stack.Screen name="groceryList" component={GroceryListScreen} />
       {creatingList ? (
@@ -57,3 +54,9 @@ export default function AppStack() {
     </Stack.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    backgroundColor: colors.light,
+  },
+});

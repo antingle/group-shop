@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from "react";
+import { useApolloClient } from "@apollo/client";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import {
   getStorageData,
   removeStorageData,
@@ -19,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   const [authData, setAuthData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lists, setLists] = useState(false);
+  let client = useApolloClient();
 
   useEffect(() => {
     getStorageData("user").then((data) => {
@@ -42,22 +44,14 @@ export const AuthProvider = ({ children }) => {
     removeStorageData("lists");
     setLists(false);
     setAuthData(null);
+    client.clearStore();
   };
 
   const updateLists = async (lists) => {
+    let currentLists = await getStorageData("lists");
     if (!lists || lists.length == 0) {
       console.log("No lists for this user");
       return;
-    } else if (lists.length == 1) {
-      let currentLists = await getStorageData("lists");
-      if (!currentLists) {
-        setStorageData("lists", lists);
-        setLists(lists);
-      } else {
-        currentLists.unshift(lists[0]);
-        setStorageData("lists", currentLists);
-        setLists(currentLists);
-      }
     } else {
       await setStorageData("lists", lists);
       setLists(lists);

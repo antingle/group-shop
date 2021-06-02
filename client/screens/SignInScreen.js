@@ -1,10 +1,11 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { colors } from "../other/colors.js";
 import { LOGIN } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
+import Header from "../components/Header.js";
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
@@ -44,8 +45,8 @@ export default function SignInScreen({ navigation }) {
     </View>;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Sign In</Text>
+    <View style={styles.container}>
+      <Header title={"Sign In"} />
       <Text style={styles.heading}>Email</Text>
       <TextInput
         placeholder="Email"
@@ -78,7 +79,7 @@ export default function SignInScreen({ navigation }) {
       <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }
 

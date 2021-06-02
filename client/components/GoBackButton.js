@@ -3,12 +3,27 @@ import { View, StyleSheet } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { colors } from "../other/colors";
 import { TouchableHighlight } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/core";
 
-export default function GoBackButton({ onPress }) {
+export default function GoBackButton({ marginTop = 0 }) {
+  const navigation = useNavigation();
+
+  const styles = StyleSheet.create({
+    icon: {
+      fontSize: 30,
+      color: colors.green,
+    },
+    container: {
+      marginTop: marginTop,
+      backgroundColor: "transparent",
+      borderRadius: 12,
+    },
+  });
+
   return (
-    <View style={styles.absolute}>
+    <View>
       <TouchableHighlight
-        onPress={onPress}
+        onPress={() => navigation.goBack()}
         underlayColor={colors.light}
         style={styles.container}
       >
@@ -19,19 +34,3 @@ export default function GoBackButton({ onPress }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  icon: {
-    fontSize: 30,
-    color: colors.green,
-  },
-  absolute: {
-    position: "absolute",
-    left: 40,
-    top: 70,
-  },
-  container: {
-    backgroundColor: "transparent",
-    borderRadius: 12,
-  },
-});

@@ -3,25 +3,19 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   StyleSheet,
   Switch,
   ScrollView,
   TouchableHighlight,
   Alert,
 } from "react-native";
-import GoBackButton2 from "../components/GoBackButton2";
+import Header from "../components/Header";
 import useAuth from "../hooks/useAuth";
 import { colors } from "../other/colors";
 
-export default function Settings() {
-  const navigation = useNavigation();
+export default function SettingsScreen() {
   const [yes, setYes] = useState(false);
   const { signOut } = useAuth();
-
-  const handleGoBack = () => {
-    navigation.goBack();
-  };
 
   const handleSignOut = () => {
     Alert.alert("Are you sure?", "Are you sure you want to sign out?", [
@@ -37,9 +31,8 @@ export default function Settings() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.heading}>Settings</Text>
-      <GoBackButton2 onPress={handleGoBack} adjustTop={-5} />
+    <View style={styles.container}>
+      <Header title={"Settings"} />
       <ScrollView>
         <View style={styles.card}>
           <Switch onValueChange={() => setYes((prev) => !prev)} value={yes} />
@@ -55,7 +48,7 @@ export default function Settings() {
           </View>
         </TouchableHighlight>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 

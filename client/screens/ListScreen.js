@@ -1,6 +1,5 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
-  SafeAreaView,
   View,
   TouchableHighlight,
   Text,
@@ -13,29 +12,30 @@ import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import ListCard from "../components/ListCard.js";
 import useAuth from "../hooks/useAuth.js";
-import { ListContext } from "../contexts/ListContext.js";
-import SettingsButton from "../components/SettingsButton.js";
+import CreateOrJoinScreen from "./CreateOrJoinScreen.js";
+import Header from "../components/Header.js";
+import useList from "../hooks/useList.js";
 
 export default function ListScreen({ navigation }) {
   const { lists } = useAuth();
-  const { setCreatingList } = useContext(ListContext);
-  const [selectList, setSelectList] = useState(false);
+  const { setCreatingList } = useList();
+  const [selectNewList, setSelectNewList] = useState(false);
 
   const newList = () => {
-    setSelectList((prevState) => !prevState);
+    setSelectNewList((prevState) => !prevState);
   };
 
   const handleCreate = async () => {
     console.log("creating list...");
     await setCreatingList(true);
-    setSelectList(false);
+    setSelectNewList(false);
     navigation.navigate("nameList");
   };
 
   const handleJoin = async () => {
     console.log("joining list...");
     await setCreatingList(true);
-    setSelectList(false);
+    setSelectNewList(false);
     navigation.navigate("code");
   };
 
@@ -48,58 +48,60 @@ export default function ListScreen({ navigation }) {
     />
   );
 
-  return (
-    <TouchableWithoutFeedback
-      onPress={() => setSelectList(false)}
-      disabled={!selectList}
-    >
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.heading}>Lists</Text>
-        <SettingsButton />
-        <FlatList
-          data={lists}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        />
-        {selectList && (
-          <View style={styles.listSelection}>
+  if (lists)
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => setSelectNewList(false)}
+        disabled={!selectNewList}
+      >
+        <View style={styles.container}>
+          <Header title={"Lists"} headerLeft={"settings"} />
+
+          <FlatList
+            data={lists}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+          />
+          {selectNewList && (
+            <View style={styles.listSelection}>
+              <TouchableHighlight
+                style={styles.listButton}
+                onPress={handleCreate}
+                underlayColor={colors.light}
+              >
+                <View style={styles.listContainer}>
+                  <Ionicons name="create-outline" style={styles.listIcon} />
+                  <Text style={styles.buttonText}>Create List</Text>
+                </View>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={styles.listButton}
+                onPress={handleJoin}
+                underlayColor={colors.light}
+              >
+                <View style={styles.listContainer}>
+                  <Ionicons name="person-add" style={styles.listIcon} />
+                  <Text style={styles.buttonText}>Join List</Text>
+                </View>
+              </TouchableHighlight>
+            </View>
+          )}
+          <View style={styles.absolute}>
             <TouchableHighlight
-              style={styles.listButton}
-              onPress={handleCreate}
+              style={styles.addButton}
+              onPress={newList}
               underlayColor={colors.light}
             >
-              <View style={styles.listContainer}>
-                <Ionicons name="create-outline" style={styles.listIcon} />
-                <Text style={styles.buttonText}>Create List</Text>
-              </View>
-            </TouchableHighlight>
-            <TouchableHighlight
-              style={styles.listButton}
-              onPress={handleJoin}
-              underlayColor={colors.light}
-            >
-              <View style={styles.listContainer}>
-                <Ionicons name="person-add" style={styles.listIcon} />
-                <Text style={styles.buttonText}>Join List</Text>
+              <View style={styles.addButton}>
+                <AntDesign name="plus" style={styles.plus} />
+                <Text style={styles.buttonText}>New List</Text>
               </View>
             </TouchableHighlight>
           </View>
-        )}
-        <View style={styles.absolute}>
-          <TouchableHighlight
-            style={styles.addButton}
-            onPress={newList}
-            underlayColor={colors.light}
-          >
-            <View style={styles.addButton}>
-              <AntDesign name="plus" style={styles.plus} />
-              <Text style={styles.buttonText}>New List</Text>
-            </View>
-          </TouchableHighlight>
         </View>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
-  );
+      </TouchableWithoutFeedback>
+    );
+  else return <CreateOrJoinScreen navigation={navigation} />;
 }
 
 const styles = StyleSheet.create({
@@ -113,8 +115,8 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: "800",
     color: colors.green,
-    paddingTop: 20,
-    paddingBottom: 10,
+    marginTop: 60,
+    marginBottom: 12,
   },
   addButton: {
     width: 180,

@@ -1,7 +1,6 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   View,
-  SafeAreaView,
   SectionList,
   StyleSheet,
   Text,
@@ -24,8 +23,10 @@ import { AntDesign } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { cache } from "../graphql/cache";
 import useAuth from "../hooks/useAuth";
-import GoBackButton from "../components/GoBackButton";
-import { ListContext } from "../contexts/ListContext";
+import useList from "../hooks/useList";
+import Header from "../components/Header";
+import Loading from "./Loading";
+import { sortByDate } from "../other/helperFunctions";
 
 const DATA = [
   { data: [] },
@@ -35,22 +36,21 @@ const DATA = [
   },
 ];
 
-export default function ({ route, navigation }) {
+export default function ({ route }) {
   // refreshes SectionList state (could be temporary fix)
-  const [listName, setListName] = React.useState("");
   const [adding, setAdding] = React.useState("");
-  const [refresh, setRefresh] = React.useState(false);
 
   const listRef = React.useRef();
   const { authData } = useAuth();
-  const { setCreatingList } = useContext(ListContext);
+  const { setCreatingList, setCurrentListID } = useList();
   const userID = authData.id;
   // gets id and name from the join or create screen
   const { listID } = route.params;
 
   useEffect(() => {
     setCreatingList(false);
-  }, []);
+    setCurrentListID(listID);
+  }, [listID]);
 
   // get list query to use on first load
   const { data, loading, error } = useQuery(GET_LIST, {
@@ -66,6 +66,7 @@ export default function ({ route, navigation }) {
             name
             member
             purchased
+            last_modified
           }
         }
       }
@@ -76,10 +77,11 @@ export default function ({ route, navigation }) {
   const createNewItem = () => {
     const newItem = {
       __typename: "Item",
-      id: "new",
+      id: `new${Math.random() * 10000}`,
       name: "",
       member: null,
       purchased: false,
+      last_modified: new Date().toString(),
     };
 
     cache.modify({
@@ -95,6 +97,7 @@ export default function ({ route, navigation }) {
                 name
                 member
                 purchased
+                last_modified
               }
             `,
           });
@@ -109,35 +112,50 @@ export default function ({ route, navigation }) {
       viewPosition: 0.5,
     });
   };
-  // const subscriptionResult = useSubscription(ITEM_UPDATES, {
-  //   variables: { code: "SNS82" },
-  //   onSubscriptionData: ({ client, subscriptionData }) => {
-  //     if (subscriptionData.data.item_updates.affector == "testmaballs")
-  //       console.log("my mutation");
+  useSubscription(ITEM_UPDATES, {
+    variables: { listID },
+    onSubscriptionData: ({ client, subscriptionData }) => {
+      const returnedData = subscriptionData.data.item_updates;
+      if (returnedData.affector != authData.screen_name)
+        switch (returnedData.type) {
+          case "add":
+            cache.modify({
+              id: `List:${listID}`,
+              fields: {
+                items(existingItemRefs, { readField }) {
+                  const newItemRef = cache.writeFragment({
+                    data: returnedData.item,
 
-  //     cache.modify({
-  //       id: `List:${listID}`,
-  //       fields: {
-  //         items(existingItemRefs, { readField }) {
-  //           const newItemRef = cache.writeFragment({
-  //             data: subscriptionData.data.item_updates.item,
-
-  //             fragment: gql`
-  //               fragment NewItem on Item {
-  //                 id
-  //                 name
-  //                 member
-  //                 purchased
-  //               }
-  //             `,
-  //           });
-  //           console.log(newItemRef);
-  //           return [...existingItemRefs, newItemRef];
-  //         },
-  //       },
-  //     });
-  //   },
-  // });
+                    fragment: gql`
+                      fragment NewItem on Item {
+                        id
+                        name
+                        member
+                        purchased
+                        last_modified
+                      }
+                    `,
+                  });
+                  return [...existingItemRefs, newItemRef];
+                },
+              },
+            });
+            break;
+          case "remove":
+            cache.modify({
+              id: `List:${listID}`,
+              fields: {
+                items(existingItemRefs, { readField }) {
+                  return existingItemRefs.filter(
+                    (itemRef) =>
+                      returnedData.item.id !== readField("id", itemRef)
+                  );
+                },
+              },
+            });
+        }
+    },
+  });
 
   const [addItem] = useMutation(ADD_ITEM, {
     ignoreResults: true,
@@ -180,12 +198,7 @@ export default function ({ route, navigation }) {
     },
   });
 
-  if (loading)
-    return (
-      <SafeAreaView>
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    );
+  if (loading) return <Loading />;
 
   if (error) console.log(error);
 
@@ -197,7 +210,7 @@ export default function ({ route, navigation }) {
         fields: {
           items(existingItemRefs, { readField }) {
             return existingItemRefs.filter(
-              (itemRef) => "new" !== readField("id", itemRef)
+              (itemRef) => !readField("id", itemRef).includes("new")
             );
           },
         },
@@ -221,27 +234,24 @@ export default function ({ route, navigation }) {
 
   function onTriggerRightSwipe(id) {
     Haptics.impactAsync("medium");
-  }
-
-  function onRightOpen(id) {
     removeItem({ variables: { listID, itemID: id, userID } });
   }
 
   function onTriggerLeftSwipe(id, member) {
-    let method = member ? "unclaim" : "claim";
+    let method = member === authData.screen_name ? "unclaim" : "claim";
     claimItem({
       variables: { listID, itemID: id, userID, method },
     });
     Haptics.impactAsync("light");
   }
 
-  const handleGoBack = () => {
-    navigation.navigate("lists");
-  };
-
   console.log("--*-- re-rendered --*--");
-  DATA[0].data = readList.get_list.items.filter((item) => !item.purchased);
-  DATA[1].data = readList.get_list.items.filter((item) => item.purchased);
+  let unpurchasedItems = readList.get_list.items.filter(
+    (item) => !item.purchased
+  );
+  let purchasedItems = readList.get_list.items.filter((item) => item.purchased);
+  DATA[0].data = unpurchasedItems.sort(sortByDate);
+  DATA[1].data = purchasedItems.sort(sortByDate);
 
   // Remove "Purchased" heading if no items purchased
   if (DATA[1].data.length == 0) DATA[1].title = null;
@@ -249,7 +259,7 @@ export default function ({ route, navigation }) {
 
   // renders SectionList (newitem is rendered when adding a new item)
   const renderItem = ({ item }) => {
-    return item.id === "new" ? (
+    return item.id.includes("new") ? (
       <NewItem
         id={DATA[0].data.length}
         onChangeAdd={onChangeAdd}
@@ -264,7 +274,6 @@ export default function ({ route, navigation }) {
         purchased={item.purchased}
         onTriggerLeftSwipe={(id, member) => onTriggerLeftSwipe(id, member)}
         onTriggerRightSwipe={(id) => onTriggerRightSwipe(id)}
-        onRightOpen={onRightOpen}
       />
     );
   };
@@ -274,8 +283,12 @@ export default function ({ route, navigation }) {
       behavior={"padding"}
       style={styles.container}
     >
-      <Text style={styles.title}>{data.get_list.list_name}</Text>
-      <GoBackButton onPress={handleGoBack} />
+      <Header
+        title={data.get_list.list_name}
+        headerLeft={"back"}
+        headerRight={"settings"}
+        settingsScreen={"listSettings"}
+      />
       <SectionList
         sections={DATA}
         renderItem={renderItem}

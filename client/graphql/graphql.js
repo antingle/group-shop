@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 
-//======= General Actions =======//
+//======= GENERAL ACTIONS =======//
 export const REGISTER = gql`
   mutation register(
     $name: String!
@@ -105,6 +105,31 @@ export const GET_USER_LISTS = gql`
   }
 `;
 
+//======= LIST ACTIONS =======//
+export const GET_LIST = gql`
+  query get_list($listID: ID!) {
+    get_list(listID: $listID) {
+      id
+      owner
+      list_name
+      code
+      members {
+        id
+        screen_name
+      }
+      items {
+        id
+        name
+        member
+        purchased
+        last_modified
+      }
+      created
+      last_modified
+    }
+  }
+`;
+
 export const JOIN_LIST = gql`
   mutation join_list($code: String!, $userID: ID!) {
     join_list(code: $code, userID: $userID) {
@@ -139,29 +164,23 @@ export const CREATE_LIST = gql`
   }
 `;
 
-//======= List Actions =======//
-
-export const GET_LIST = gql`
-  query get_list($listID: ID!) {
-    get_list(listID: $listID) {
+export const DELETE_LIST = gql`
+  mutation delete_list($listID: ID!) {
+    delete_list(listID: $listID) {
       id
-      owner
-      list_name
-      code
-      members {
-        id
-        screen_name
-      }
-      items {
-        id
-        name
-        member
-        purchased
-      }
     }
   }
 `;
 
+export const LEAVE_LIST = gql`
+  mutation leave_list($listID: ID!, $userID: ID!) {
+    leave_list(listID: $listID, userID: $userID) {
+      id
+    }
+  }
+`;
+
+//======= ITEM ACTIONS =======//
 export const ADD_ITEM = gql`
   mutation add_item($name: String!, $listID: ID!, $userID: ID!) {
     add_item(name: $name, listID: $listID, userID: $userID) {
@@ -169,6 +188,7 @@ export const ADD_ITEM = gql`
       name
       member
       purchased
+      last_modified
     }
   }
 `;
@@ -190,6 +210,7 @@ export const PURCHASE_ITEM = gql`
       name
       member
       purchased
+      last_modified
     }
   }
 `;
@@ -201,6 +222,7 @@ export const REMOVE_ITEM = gql`
       name
       member
       purchased
+      last_modified
     }
   }
 `;
@@ -222,13 +244,14 @@ export const CLAIM_ITEM = gql`
       name
       member
       purchased
+      last_modified
     }
   }
 `;
 
 export const ITEM_UPDATES = gql`
-  subscription item_updates($code: String!) {
-    item_updates(code: $code) {
+  subscription item_updates($listID: ID!) {
+    item_updates(listID: $listID) {
       type
       affector
       item {

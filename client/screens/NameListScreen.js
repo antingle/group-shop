@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import { Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
+import { Text, TextInput, StyleSheet, View } from "react-native";
+import Header from "../components/Header.js";
 import { CREATE_LIST } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
 import { colors } from "../other/colors.js";
@@ -30,7 +31,8 @@ export default function NameListScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Header />
       <Text style={styles.heading}>What is your list for?</Text>
       <TextInput
         autoFocus={true}
@@ -41,8 +43,9 @@ export default function NameListScreen({ navigation }) {
         onSubmitEditing={handleSubmit}
         autoCorrect={false}
         returnKeyType={"done"}
+        maxLength={35}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -51,12 +54,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.light,
     alignItems: "center",
-    justifyContent: "center",
   },
   heading: {
     fontSize: 32,
     fontWeight: "800",
     color: colors.green,
+    marginTop: 100,
   },
   nameInput: {
     fontSize: 24,

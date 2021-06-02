@@ -3,7 +3,6 @@ import React from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
@@ -24,7 +23,7 @@ export default function FirstScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <LinearGradient
         colors={["#5ad48d", colors.green]}
         style={styles.gradient}
@@ -45,7 +44,7 @@ export default function FirstScreen({ navigation }) {
           <Text style={styles.guestText}>Continue as Guest</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

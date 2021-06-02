@@ -12,7 +12,7 @@ export default function App() {
   });
 
   const wsLink = new WebSocketLink({
-    uri: "ws://localhost:5000/subscriptions",
+    uri: "ws://192.168.1.110:5000/subscriptions",
     options: {
       reconnect: true,
     },

@@ -1,18 +1,12 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { colors } from "../other/colors.js";
 import { REGISTER } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
+import Header from "../components/Header.js";
 
 export default function CreateAccountScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
@@ -92,8 +86,8 @@ export default function CreateAccountScreen({ navigation }) {
 
   return (
     <KeyboardAwareScrollView>
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Create Account</Text>
+      <View style={styles.container}>
+        <Header title={"Create Account"} />
         <Text style={styles.heading}>Name</Text>
         <TextInput
           autoFocus={true}
@@ -152,7 +146,7 @@ export default function CreateAccountScreen({ navigation }) {
         <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
           <Text style={styles.createText}>Create Account</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     </KeyboardAwareScrollView>
   );
 }
@@ -176,8 +170,8 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: "800",
     color: colors.green,
-    marginBottom: 12,
-    paddingTop: 40,
+    marginBottom: 10,
+    marginTop: 20,
   },
   textInput: {
     fontSize: 24,
