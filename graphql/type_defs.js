@@ -77,6 +77,12 @@ module.exports = gql`
     join_list(code: String!, userID: ID!): List!
     leave_list(listID: ID!, userID: ID!): List!
     delete_list(listID: ID!): List!
+    update_list(
+      listID: ID!
+      owner: ID!
+      list_name: String
+      generate_new_code: Boolean
+    ): List!
 
     # Item Functionality
     add_item(name: String!, listID: ID!, userID: ID!): Item!

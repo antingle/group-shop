@@ -237,4 +237,16 @@ module.exports = {
       throw new Error("List Deletion Error", err);
     }
   },
+  update_list: async (
+    _,
+    { listID, owner = null, list_name = null, code = false }
+  ) => {
+    const { valid, errors, list, user, user_index } = list_validation({
+      listID,
+      userID: owner,
+      list_name,
+      method: "user-leave",
+    });
+    if (!valid) throw new UserInputError("List Update Error", { errors });
+  },
 };

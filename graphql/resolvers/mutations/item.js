@@ -39,7 +39,7 @@ module.exports = {
     update_members(updated_list);
 
     // sends an update to everyone in the list containing the added item
-    pubsub.publish(updated_list.code, {
+    pubsub.publish(updated_list._id, {
       item_updates: {
         type: "add",
         affector: user.screen_name,
@@ -75,7 +75,7 @@ module.exports = {
     update_members(updated_list);
 
     // sends an update to everyone in the list containing the removed item
-    pubsub.publish(updated_list.code, {
+    pubsub.publish(updated_list._id, {
       item_updates: {
         type: "remove",
         affector: user.screen_name,
@@ -118,7 +118,7 @@ module.exports = {
     update_members(updated_list);
 
     // sends an update to everyone in the list containing the item that was claimed/unclaimed
-    pubsub.publish(updated_list.code, {
+    pubsub.publish(updated_list._id, {
       item_updates: {
         type: method == "claim" ? "claim" : "unclaim",
         affector: user.screen_name,
@@ -161,7 +161,7 @@ module.exports = {
     update_members(updated_list);
 
     // sends an updated to everyone in the list containing the item that was purchased/unpurchased
-    pubsub.publish(updated_list.code, {
+    pubsub.publish(updated_list._id, {
       item_updates: {
         type: method == "purchase" ? "purchase" : "unpurchase",
         affector: user.screen_name,
