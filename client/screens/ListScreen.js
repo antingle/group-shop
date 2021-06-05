@@ -15,6 +15,7 @@ import useAuth from "../hooks/useAuth.js";
 import CreateOrJoinScreen from "./CreateOrJoinScreen.js";
 import Header from "../components/Header.js";
 import useList from "../hooks/useList.js";
+import { sortByDate } from "../other/helperFunctions.js";
 
 export default function ListScreen({ navigation }) {
   const { lists } = useAuth();
@@ -48,6 +49,8 @@ export default function ListScreen({ navigation }) {
     />
   );
 
+  const sortedLists = [...lists].sort(sortByDate);
+
   if (lists)
     return (
       <TouchableWithoutFeedback
@@ -58,7 +61,7 @@ export default function ListScreen({ navigation }) {
           <Header title={"Lists"} headerLeft={"settings"} />
 
           <FlatList
-            data={lists}
+            data={sortedLists}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
           />
@@ -67,7 +70,7 @@ export default function ListScreen({ navigation }) {
               <TouchableHighlight
                 style={styles.listButton}
                 onPress={handleCreate}
-                underlayColor={colors.light}
+                underlayColor={colors.background}
               >
                 <View style={styles.listContainer}>
                   <Ionicons name="create-outline" style={styles.listIcon} />
@@ -77,7 +80,7 @@ export default function ListScreen({ navigation }) {
               <TouchableHighlight
                 style={styles.listButton}
                 onPress={handleJoin}
-                underlayColor={colors.light}
+                underlayColor={colors.background}
               >
                 <View style={styles.listContainer}>
                   <Ionicons name="person-add" style={styles.listIcon} />
@@ -90,7 +93,7 @@ export default function ListScreen({ navigation }) {
             <TouchableHighlight
               style={styles.addButton}
               onPress={newList}
-              underlayColor={colors.light}
+              underlayColor={colors.background}
             >
               <View style={styles.addButton}>
                 <AntDesign name="plus" style={styles.plus} />
@@ -107,14 +110,14 @@ export default function ListScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
   heading: {
     fontSize: 40,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
     marginTop: 60,
     marginBottom: 12,
   },
@@ -122,18 +125,18 @@ const styles = StyleSheet.create({
     width: 180,
     height: 60,
     borderRadius: 45,
-    backgroundColor: colors.green,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
   },
   buttonText: {
     fontSize: 20,
-    color: colors.light,
+    color: colors.background,
   },
   plus: {
     fontSize: 36,
-    color: colors.light,
+    color: colors.background,
     marginRight: 16,
   },
   absolute: {
@@ -154,7 +157,7 @@ const styles = StyleSheet.create({
     width: 180,
     height: 60,
     borderRadius: 45,
-    backgroundColor: colors.dark,
+    backgroundColor: colors.foreground,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
@@ -164,13 +167,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    backgroundColor: colors.dark,
+    backgroundColor: colors.secondary,
     width: 180,
     height: 60,
     borderRadius: 45,
   },
   listIcon: {
-    color: "white",
+    color: colors.background,
     fontSize: 24,
     marginRight: 10,
   },

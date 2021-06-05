@@ -35,19 +35,19 @@ const styles = StyleSheet.create({
     width: 340,
     borderRadius: 24,
     paddingLeft: 20,
-    backgroundColor: "white",
+    backgroundColor: colors.foreground,
     marginBottom: 10,
     textAlign: "left",
-    paddingBottom: 10,
+    paddingBottom: 12,
   },
   cardText: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "400",
-    color: colors.dark,
+    color: colors.text,
   },
   heading: {
     fontSize: 20,
-    color: colors.green,
+    color: colors.primary,
     fontWeight: "500",
     marginTop: 10,
     paddingLeft: 10,
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   caption: {
     marginLeft: 20,
-    color: colors.gray,
+    color: colors.caption,
   },
   member: {
     alignItems: "center",

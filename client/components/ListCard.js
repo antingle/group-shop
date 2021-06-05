@@ -11,13 +11,20 @@ export default function ListCard({ id, name, members, navigation }) {
     navigation.navigate("groceryList", { listID: id });
   };
 
+  const membersArray = members.filter(
+    (member) => member.screen_name != authData.screen_name
+  );
   const renderMembers = () => {
     let renderedMembers = "";
-    for (let i = 0; i < members.length; i++) {
-      if (members[i].screen_name == authData.screen_name)
-        renderedMembers += "Me";
-      else renderedMembers += members[i].screen_name;
-      if (i < members.length - 1) renderedMembers += ", ";
+    for (let i = 0; i < membersArray.length; i++) {
+      if (membersArray[i].screen_name !== authData.screen_name)
+        renderedMembers += membersArray[i].screen_name;
+
+      if (renderedMembers.length > 30) {
+        renderedMembers += ",...";
+        break;
+      }
+      if (i < membersArray.length - 1) renderedMembers += ", ";
     }
     return renderedMembers;
   };
@@ -40,13 +47,13 @@ const styles = StyleSheet.create({
     height: 100,
     width: 340,
     borderRadius: 24,
-    backgroundColor: "white",
+    backgroundColor: colors.foreground,
     marginBottom: 12,
   },
   cardText: {
     fontSize: 24,
     fontWeight: "700",
-    color: colors.dark,
+    color: colors.text,
     marginBottom: 16,
   },
   members: {
@@ -56,12 +63,12 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    color: colors.gray,
+    color: colors.caption,
     marginRight: 6,
   },
   membersText: {
     fontSize: 14,
-    fontWeight: "500",
-    color: colors.gray,
+    fontWeight: "400",
+    color: colors.caption,
   },
 });

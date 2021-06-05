@@ -48,19 +48,19 @@ export default function NameScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
   },
   heading: {
     marginTop: 100,
     fontSize: 32,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
   },
   nameInput: {
     fontSize: 24,
     paddingTop: 80,
     paddingBottom: 300,
-    color: colors.dark,
+    color: colors.text,
   },
 });

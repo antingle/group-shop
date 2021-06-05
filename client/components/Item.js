@@ -60,7 +60,7 @@ export default function Item({
         <Ionicons
           name="trash"
           size={24}
-          color="white"
+          color={colors.text}
           style={styles.actionIcon}
         />
       </View>
@@ -83,15 +83,16 @@ export default function Item({
     >
       <TouchableHighlight
         style={styles.touchable}
-        underlayColor={colors.green}
+        underlayColor={colors.primary}
         activeOpacity={0.6}
         onPress={() => onPress(id, purchased)}
       >
         <View style={styles.card}>
           <BouncyCheckbox
             text={name}
-            fillColor={colors.green}
-            iconStyle={{ borderColor: colors.green }}
+            textStyle={styles.cardText}
+            fillColor={colors.primary}
+            iconStyle={{ borderColor: colors.primary }}
             isChecked={purchased}
             disabled={true}
             ref={checkboxRef}
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     width: 340,
     borderRadius: 24,
     paddingLeft: 20,
-    backgroundColor: "white",
+    backgroundColor: colors.foreground,
   },
   touchable: {
     borderRadius: 24,
@@ -126,9 +127,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   cardText: {
-    fontSize: 20,
-    fontWeight: "500",
-    color: colors.dark,
+    fontSize: 16,
+    fontWeight: "400",
+    color: colors.text,
   },
   leftAction: {
     flex: 1,
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   actionText: {
-    color: "white",
+    color: colors.text,
     fontSize: 16,
     backgroundColor: "transparent",
     paddingHorizontal: 20,
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   caption: {
-    marginRight: 10,
-    color: colors.gray,
+    marginRight: 20,
+    color: colors.caption,
   },
 });

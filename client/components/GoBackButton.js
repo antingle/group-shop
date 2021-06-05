@@ -11,7 +11,7 @@ export default function GoBackButton({ marginTop = 0 }) {
   const styles = StyleSheet.create({
     icon: {
       fontSize: 30,
-      color: colors.green,
+      color: colors.primary,
     },
     container: {
       marginTop: marginTop,
@@ -24,7 +24,7 @@ export default function GoBackButton({ marginTop = 0 }) {
     <View>
       <TouchableHighlight
         onPress={() => navigation.goBack()}
-        underlayColor={colors.light}
+        underlayColor={colors.background}
         style={styles.container}
       >
         <View style={styles.container}>

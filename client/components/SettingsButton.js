@@ -11,7 +11,7 @@ export default function SettingsButton({ screen = "settings", marginTop = 0 }) {
   const styles = StyleSheet.create({
     icon: {
       fontSize: 30,
-      color: colors.green,
+      color: colors.primary,
     },
     absolute: {
       position: "absolute",
@@ -29,7 +29,7 @@ export default function SettingsButton({ screen = "settings", marginTop = 0 }) {
     <View>
       <TouchableHighlight
         onPress={() => navigation.navigate(screen)}
-        underlayColor={colors.light}
+        underlayColor={colors.background}
         style={styles.container}
       >
         <View style={styles.container}>

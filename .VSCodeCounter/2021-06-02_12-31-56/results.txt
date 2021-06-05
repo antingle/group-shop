@@ -1,0 +1,102 @@
+Date : 2021-06-02 12:31:56
+Directory : /Users/anthony/Documents/GitHub/grocery-list
+Total : 60 files,  48382 codes, 178 comments, 410 blanks, all 48970 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JSON       |          6 |     44,627 |         16 |          5 |     44,648 |
+| JavaScript |         53 |      3,748 |        162 |        401 |      4,311 |
+| Markdown   |          1 |          7 |          0 |          4 |         11 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                  | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                     |         60 |     48,382 |        178 |        410 |     48,970 |
+| backup_api                                                                            |          1 |         27 |          0 |          5 |         32 |
+| client                                                                                |         39 |     44,562 |         72 |        222 |     44,856 |
+| client/.expo-shared                                                                   |          1 |          4 |          0 |          1 |          5 |
+| client/components                                                                     |          8 |        572 |          0 |         41 |        613 |
+| client/contexts                                                                       |          2 |         81 |          7 |         12 |        100 |
+| client/graphql                                                                        |          2 |        250 |          3 |         18 |        271 |
+| client/hooks                                                                          |          2 |         18 |          0 |          8 |         26 |
+| client/navigation                                                                     |          4 |        120 |          0 |         16 |        136 |
+| client/other                                                                          |          3 |         83 |          5 |         13 |        101 |
+| client/screens                                                                        |         12 |      1,480 |         26 |        102 |      1,608 |
+| graphql                                                                               |          8 |        728 |         70 |        121 |        919 |
+| graphql/resolvers                                                                     |          7 |        627 |         70 |        113 |        810 |
+| graphql/resolvers/mutations                                                           |          4 |        552 |         70 |        107 |        729 |
+| models                                                                                |          2 |         42 |          0 |          6 |         48 |
+| util                                                                                  |          6 |        268 |         28 |         41 |        337 |
+| util/validation                                                                       |          4 |        211 |         19 |         35 |        265 |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                              | language   | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/anthony/Documents/GitHub/grocery-list/README.md                                | Markdown   |          7 |          0 |          4 |         11 |
+| /Users/anthony/Documents/GitHub/grocery-list/backup_api/backup.js                     | JavaScript |         27 |          0 |          5 |         32 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/.expo-shared/assets.json          | JSON       |          4 |          0 |          1 |          5 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/App.js                            | JavaScript |         40 |         15 |          8 |         63 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/app.json                          | JSON       |         17 |         16 |          0 |         33 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/babel.config.js                   | JavaScript |          6 |          0 |          1 |          7 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/components/GoBackButton.js        | JavaScript |         33 |          0 |          4 |         37 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/components/Header.js              | JavaScript |         62 |          0 |          5 |         67 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/components/Item.js                | JavaScript |        151 |          0 |          8 |        159 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/components/ListCard.js            | JavaScript |         62 |          0 |          6 |         68 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/components/NewItem.js             | JavaScript |         53 |          0 |          4 |         57 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/components/SettingsButton.js      | JavaScript |         38 |          0 |          4 |         42 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/components/SettingsCard.js        | JavaScript |        105 |          0 |          5 |        110 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/components/SettingsMembersCard.js | JavaScript |         68 |          0 |          5 |         73 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/contexts/AuthContext.js           | JavaScript |         61 |          7 |          8 |         76 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/contexts/ListContext.js           | JavaScript |         20 |          0 |          4 |         24 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/graphql/cache.js                  | JavaScript |          2 |          0 |          2 |          4 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/graphql/graphql.js                | JavaScript |        248 |          3 |         16 |        267 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/hooks/useAuth.js                  | JavaScript |          9 |          0 |          4 |         13 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/hooks/useList.js                  | JavaScript |          9 |          0 |          4 |         13 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/navigation/AppStack.js            | JavaScript |         57 |          0 |          6 |         63 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/navigation/AuthStack.js           | JavaScript |         21 |          0 |          3 |         24 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/navigation/RootStack.js           | JavaScript |         20 |          0 |          3 |         23 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/navigation/Router.js              | JavaScript |         22 |          0 |          4 |         26 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/other/colors.js                   | JavaScript |          7 |          0 |          1 |          8 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/other/helperFunctions.js          | JavaScript |         35 |          0 |          5 |         40 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/other/storage.js                  | JavaScript |         41 |          5 |          7 |         53 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/package-lock.json                 | JSON       |     41,850 |          0 |          1 |     41,851 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/package.json                      | JSON       |         41 |          0 |          1 |         42 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/CodeScreen.js             | JavaScript |         62 |          6 |          6 |         74 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/CreateAccountScreen.js    | JavaScript |        180 |          6 |         13 |        199 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/CreateOrJoinScreen.js     | JavaScript |         94 |          0 |          5 |         99 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/FirstScreen.js            | JavaScript |        128 |          0 |          6 |        134 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/GroceryListScreen.js      | JavaScript |        330 |          8 |         27 |        365 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/ListScreen.js             | JavaScript |        169 |          0 |          9 |        178 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/ListSettingsScreen.js     | JavaScript |        160 |          2 |          7 |        169 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/Loading.js                | JavaScript |          9 |          0 |          2 |         11 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/NameListScreen.js         | JavaScript |         64 |          1 |          6 |         71 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/NameScreen.js             | JavaScript |         60 |          1 |          6 |         67 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/SettingsScreen.js         | JavaScript |        103 |          2 |          5 |        110 |
+| /Users/anthony/Documents/GitHub/grocery-list/client/screens/SignInScreen.js           | JavaScript |        121 |          0 |         10 |        131 |
+| /Users/anthony/Documents/GitHub/grocery-list/graphql/resolvers/index.js               | JavaScript |         14 |          0 |          2 |         16 |
+| /Users/anthony/Documents/GitHub/grocery-list/graphql/resolvers/mutations/index.js     | JavaScript |         10 |          0 |          2 |         12 |
+| /Users/anthony/Documents/GitHub/grocery-list/graphql/resolvers/mutations/item.js      | JavaScript |        150 |         14 |         29 |        193 |
+| /Users/anthony/Documents/GitHub/grocery-list/graphql/resolvers/mutations/list.js      | JavaScript |        241 |         23 |         41 |        305 |
+| /Users/anthony/Documents/GitHub/grocery-list/graphql/resolvers/mutations/user.js      | JavaScript |        151 |         33 |         35 |        219 |
+| /Users/anthony/Documents/GitHub/grocery-list/graphql/resolvers/queries.js             | JavaScript |         45 |          0 |          3 |         48 |
+| /Users/anthony/Documents/GitHub/grocery-list/graphql/resolvers/subscriptions.js       | JavaScript |         16 |          0 |          1 |         17 |
+| /Users/anthony/Documents/GitHub/grocery-list/graphql/type_defs.js                     | JavaScript |        101 |          0 |          8 |        109 |
+| /Users/anthony/Documents/GitHub/grocery-list/models/list.js                           | JavaScript |         22 |          0 |          3 |         25 |
+| /Users/anthony/Documents/GitHub/grocery-list/models/user.js                           | JavaScript |         20 |          0 |          3 |         23 |
+| /Users/anthony/Documents/GitHub/grocery-list/package-lock.json                        | JSON       |      2,686 |          0 |          1 |      2,687 |
+| /Users/anthony/Documents/GitHub/grocery-list/package.json                             | JSON       |         29 |          0 |          1 |         30 |
+| /Users/anthony/Documents/GitHub/grocery-list/server.js                                | JavaScript |         33 |          8 |          9 |         50 |
+| /Users/anthony/Documents/GitHub/grocery-list/util/code_generator.js                   | JavaScript |         15 |          7 |          5 |         27 |
+| /Users/anthony/Documents/GitHub/grocery-list/util/get_index.js                        | JavaScript |         42 |          2 |          1 |         45 |
+| /Users/anthony/Documents/GitHub/grocery-list/util/validation/index.js                 | JavaScript |          8 |          0 |          2 |         10 |
+| /Users/anthony/Documents/GitHub/grocery-list/util/validation/item.js                  | JavaScript |         59 |          5 |          8 |         72 |
+| /Users/anthony/Documents/GitHub/grocery-list/util/validation/list.js                  | JavaScript |         89 |          9 |         15 |        113 |
+| /Users/anthony/Documents/GitHub/grocery-list/util/validation/user.js                  | JavaScript |         55 |          5 |         10 |         70 |
+| Total                                                                                 |            |     48,382 |        178 |        410 |     48,970 |
++---------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

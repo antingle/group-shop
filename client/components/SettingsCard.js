@@ -9,10 +9,10 @@ export default function SettingsCard({
   content,
   onPress,
 }) {
-  const [captionColor, setCaptionColor] = useState(colors.green);
+  const [captionColor, setCaptionColor] = useState(colors.primary);
 
   const handleCopy = () => {
-    setCaptionColor(colors.gray);
+    setCaptionColor(colors.caption);
     Clipboard.setString(content);
   };
 
@@ -24,7 +24,7 @@ export default function SettingsCard({
       width: 340,
       borderRadius: 24,
       paddingLeft: 20,
-      backgroundColor: "white",
+      backgroundColor: colors.foreground,
       marginBottom: 10,
     },
     middleCard: {
@@ -34,7 +34,7 @@ export default function SettingsCard({
       height: 56,
       width: 340,
       borderRadius: 24,
-      backgroundColor: "white",
+      backgroundColor: colors.foreground,
       marginBottom: 10,
     },
     middleView: {
@@ -44,22 +44,27 @@ export default function SettingsCard({
       height: 56,
       width: 340,
       borderRadius: 24,
-      backgroundColor: "white",
+      backgroundColor: colors.foreground,
     },
     cardText: {
       fontSize: 20,
       fontWeight: "400",
-      color: colors.dark,
+      color: colors.text,
+    },
+    grayText: {
+      fontSize: 20,
+      fontWeight: "400",
+      color: colors.caption,
     },
     fieldText: {
       fontSize: 20,
       fontWeight: "500",
-      color: colors.green,
+      color: colors.primary,
     },
     deleteText: {
       fontSize: 20,
       fontWeight: "400",
-      color: colors.red,
+      color: colors.destructive,
     },
     touchable: {
       borderRadius: 24,
@@ -85,7 +90,7 @@ export default function SettingsCard({
       <TouchableHighlight
         onPress={handleCopy}
         style={styles.touchable}
-        underlayColor={colors.dark}
+        underlayColor={colors.text}
       >
         <View style={styles.card}>
           <Text style={styles.fieldText}>{field}</Text>
@@ -98,11 +103,23 @@ export default function SettingsCard({
     return (
       <TouchableHighlight
         style={styles.middleCard}
-        underlayColor={colors.dark}
+        underlayColor={colors.text}
         onPress={onPress}
       >
         <View style={styles.middleView}>
           <Text style={styles.deleteText}>{content}</Text>
+        </View>
+      </TouchableHighlight>
+    );
+  else if (type == "middle")
+    return (
+      <TouchableHighlight
+        style={styles.middleCard}
+        underlayColor={colors.text}
+        onPress={onPress}
+      >
+        <View style={styles.middleView}>
+          <Text style={styles.grayText}>{content}</Text>
         </View>
       </TouchableHighlight>
     );

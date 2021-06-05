@@ -86,7 +86,7 @@ export default function SignInScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "flex-start",
   },
@@ -95,13 +95,13 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     width: 280,
     marginTop: 40,
-    color: colors.green,
+    color: colors.primary,
   },
   title: {
     textAlign: "center",
     fontSize: 40,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
     marginBottom: 12,
     paddingTop: 40,
   },
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginTop: 20,
     width: 280,
-    color: colors.dark,
+    color: colors.text,
   },
   signInButton: {
     alignItems: "center",
@@ -119,12 +119,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 48,
     marginTop: 60,
-    borderColor: colors.green,
-    backgroundColor: colors.green,
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
   },
   signInText: {
     fontSize: 22,
-    color: colors.light,
+    color: colors.text,
     fontWeight: "500",
   },
 });

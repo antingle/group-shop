@@ -303,7 +303,7 @@ export default function ({ route }) {
         <TouchableHighlight
           style={styles.addButton}
           onPress={createNewItem}
-          underlayColor={colors.light}
+          underlayColor={colors.background}
         >
           <View style={styles.addButton}>
             <AntDesign name="plus" style={styles.plus} />
@@ -318,7 +318,7 @@ export default function ({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 40,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
     marginBottom: 12,
     marginTop: 60,
   },
@@ -336,25 +336,25 @@ const styles = StyleSheet.create({
     width: 280,
     marginTop: 20,
     marginBottom: 10,
-    color: colors.green,
+    color: colors.primary,
   },
   nameInput: {
     fontSize: 24,
     paddingTop: 80,
     paddingBottom: 300,
-    color: colors.dark,
+    color: colors.text,
   },
   addButton: {
     width: 90,
     height: 90,
     borderRadius: 45,
-    backgroundColor: colors.green,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
   plus: {
     fontSize: 45,
-    color: colors.light,
+    color: colors.background,
   },
   absolute: {
     position: "absolute",

@@ -45,6 +45,7 @@ export default function CodeScreen({ navigation }) {
         autoCapitalize={"characters"}
         onChangeText={setCode}
         onSubmitEditing={handleSubmit}
+        maxLength={6}
       />
     </View>
   );
@@ -53,13 +54,13 @@ export default function CodeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
   },
   heading: {
     fontSize: 32,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
     textAlign: "center",
     width: 300,
     marginTop: 70,
@@ -68,6 +69,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingTop: 80,
     paddingBottom: 300,
-    color: colors.dark,
+    color: colors.text,
   },
 });

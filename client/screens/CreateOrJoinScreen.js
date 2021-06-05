@@ -40,7 +40,7 @@ export default function CreateOrJoinScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 64,
     fontWeight: "900",
-    color: colors.green,
+    color: colors.primary,
   },
   createButton: {
     alignItems: "center",
@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
     width: 320,
     borderWidth: 2,
     borderRadius: 48,
-    borderColor: colors.green,
-    backgroundColor: colors.light,
+    borderColor: colors.primary,
+    backgroundColor: colors.background,
   },
   joinButton: {
     alignItems: "center",
@@ -76,23 +76,23 @@ const styles = StyleSheet.create({
     width: 320,
     borderWidth: 2,
     borderRadius: 48,
-    borderColor: colors.light,
-    backgroundColor: colors.green,
+    borderColor: colors.background,
+    backgroundColor: colors.primary,
   },
   createText: {
     fontSize: 22,
-    color: colors.green,
+    color: colors.primary,
     fontWeight: "500",
   },
   joinText: {
     fontSize: 22,
-    color: colors.light,
+    color: colors.background,
     fontWeight: "500",
   },
   orText: {
     padding: 12,
     fontSize: 20,
-    color: colors.dark,
+    color: colors.text,
     fontWeight: "500",
   },
 });

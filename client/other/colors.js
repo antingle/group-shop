@@ -1,7 +1,28 @@
-export const colors = {
-  green: "#32C36E",
-  light: "#EDF7F6",
-  dark: "#435058",
-  red: "#990A32",
-  gray: "#ababab",
-};
+import { Appearance } from "react-native";
+
+const colorScheme = Appearance.getColorScheme();
+
+export const colors =
+  colorScheme == "light"
+    ? {
+        // light mode
+        primary: "#32C36E",
+        secondary: "#435058",
+        background: "#EDF7F6",
+        foreground: "#fff",
+        text: "#435058",
+        caption: "#ababab",
+        destructive: "#ff3b30",
+      }
+    : {
+        // dark mode
+        primary: "#32C36E",
+        secondary: "#839189",
+        background: "#1c1c1e",
+        foreground: "#2c2c2e",
+        text: "#EDF7F6",
+        caption: "#ababab",
+        destructive: "#ff3b30",
+      };
+
+// other red: #990A32

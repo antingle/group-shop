@@ -10,12 +10,13 @@ import {
   Alert,
 } from "react-native";
 import Header from "../components/Header";
+import SettingsCard from "../components/SettingsCard";
 import useAuth from "../hooks/useAuth";
 import { colors } from "../other/colors";
 
 export default function SettingsScreen() {
   const [yes, setYes] = useState(false);
-  const { signOut } = useAuth();
+  const { authData, signOut } = useAuth();
 
   const handleSignOut = () => {
     Alert.alert("Are you sure?", "Are you sure you want to sign out?", [
@@ -34,19 +35,13 @@ export default function SettingsScreen() {
     <View style={styles.container}>
       <Header title={"Settings"} />
       <ScrollView>
-        <View style={styles.card}>
-          <Switch onValueChange={() => setYes((prev) => !prev)} value={yes} />
-          <Text style={styles.cardText}>Yes</Text>
-        </View>
-        <TouchableHighlight
-          style={styles.middleCard}
-          underlayColor={colors.dark}
+        <SettingsCard field={"Name: "} content={authData.screen_name} />
+        <SettingsCard
+          type={"middle"}
+          content={"Sign Out"}
           onPress={handleSignOut}
-        >
-          <View style={styles.middleView}>
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </View>
-        </TouchableHighlight>
+        />
+        <SettingsCard type={"warning"} content={"Delete Account"} />
       </ScrollView>
     </View>
   );
@@ -55,55 +50,15 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
   heading: {
     fontSize: 40,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
     paddingTop: 20,
     paddingBottom: 20,
-  },
-  card: {
-    alignItems: "center",
-    flexDirection: "row",
-    height: 56,
-    width: 340,
-    borderRadius: 24,
-    paddingLeft: 20,
-    backgroundColor: "white",
-    marginBottom: 10,
-  },
-  middleCard: {
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    height: 56,
-    width: 340,
-    borderRadius: 24,
-    backgroundColor: "white",
-    marginBottom: 10,
-  },
-  middleView: {
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    height: 56,
-    width: 340,
-    borderRadius: 24,
-    backgroundColor: "white",
-  },
-  cardText: {
-    fontSize: 20,
-    fontWeight: "400",
-    color: colors.dark,
-    marginLeft: 20,
-  },
-  signOutText: {
-    fontSize: 20,
-    fontWeight: "400",
-    color: colors.red,
   },
 });

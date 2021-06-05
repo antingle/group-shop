@@ -18,7 +18,7 @@ export default function Header({
   const styles = StyleSheet.create({
     container: {
       width: Dimensions.get("window").width,
-      backgroundColor: colors.light,
+      backgroundColor: colors.background,
       alignItems: "flex-start",
       justifyContent: "space-between",
       flexDirection: "row",
@@ -28,7 +28,7 @@ export default function Header({
       flex: 1,
       fontSize: titleFontSize,
       fontWeight: "800",
-      color: colors.green,
+      color: colors.primary,
       marginTop: 60,
       marginBottom: 12,
     },

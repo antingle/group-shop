@@ -52,19 +52,19 @@ export default function NameListScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
   },
   heading: {
     fontSize: 32,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
     marginTop: 100,
   },
   nameInput: {
     fontSize: 24,
     paddingTop: 80,
     paddingBottom: 300,
-    color: colors.dark,
+    color: colors.text,
   },
 });

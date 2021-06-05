@@ -57,6 +57,6 @@ export default function AppStack() {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
   },
 });

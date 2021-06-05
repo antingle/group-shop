@@ -25,7 +25,7 @@ export default function FirstScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={["#5ad48d", colors.green]}
+        colors={["#5ad48d", colors.primary]}
         style={styles.gradient}
       />
       <View style={styles.logoContainer}>
@@ -51,7 +51,7 @@ export default function FirstScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.green,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -68,13 +68,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 64,
     fontWeight: "900",
-    color: colors.light,
+    color: colors.text,
   },
   title: {
     textAlign: "center",
     fontSize: 40,
     fontWeight: "900",
-    color: colors.light,
+    color: colors.text,
     marginBottom: 24,
   },
   createButton: {
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     width: 320,
     borderRadius: 48,
     marginBottom: 8,
-    backgroundColor: colors.light,
+    backgroundColor: colors.text,
   },
   signInButton: {
     alignItems: "center",
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     width: 320,
     borderWidth: 3,
     borderRadius: 48,
-    borderColor: colors.light,
+    borderColor: colors.text,
     backgroundColor: "transparent",
   },
   guestButton: {
@@ -102,27 +102,27 @@ const styles = StyleSheet.create({
     height: 60,
     width: 320,
     borderRadius: 48,
-    backgroundColor: colors.dark,
+    backgroundColor: colors.foreground,
   },
   createText: {
     fontSize: 22,
-    color: colors.green,
+    color: colors.primary,
     fontWeight: "500",
   },
   signInText: {
     fontSize: 22,
-    color: colors.light,
+    color: colors.text,
     fontWeight: "500",
   },
   orText: {
     padding: 24,
     fontSize: 20,
-    color: colors.light,
+    color: colors.text,
     fontWeight: "500",
   },
   guestText: {
     fontSize: 22,
-    color: colors.light,
+    color: colors.text,
     fontWeight: "500",
   },
   gradient: {

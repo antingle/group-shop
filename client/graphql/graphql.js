@@ -101,6 +101,7 @@ export const GET_USER_LISTS = gql`
         id
         screen_name
       }
+      last_modified
     }
   }
 `;

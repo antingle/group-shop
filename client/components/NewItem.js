@@ -11,8 +11,8 @@ export default function Item({ onChangeAdd, onAdd }) {
       <View style={styles.card}>
         <BouncyCheckbox
           text=""
-          fillColor={colors.green}
-          iconStyle={{ borderColor: colors.green }}
+          fillColor={colors.primary}
+          iconStyle={{ borderColor: colors.primary }}
           isChecked={false}
           disabled={true}
           ref={checkboxRef}
@@ -38,19 +38,16 @@ const styles = StyleSheet.create({
     width: 340,
     borderRadius: 24,
     paddingLeft: 20,
-    backgroundColor: "white",
+    backgroundColor: colors.foreground,
   },
   touchable: {
     borderRadius: 24,
     marginBottom: 8,
   },
-  cardText: {
-    fontSize: 20,
-    fontWeight: "500",
-    color: colors.dark,
-  },
   textInput: {
     color: "#757575",
     fontSize: 16,
+    fontWeight: "400",
+    color: colors.text,
   },
 });
