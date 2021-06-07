@@ -8,7 +8,7 @@ const resolvers = require("./graphql/resolvers");
 // Subscriptions
 const pubsub = new PubSub();
 
-const PORT = 80 | 5000;
+const PORT = 80;
 
 // Server parameters
 const server = new ApolloServer({
