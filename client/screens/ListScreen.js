@@ -45,11 +45,12 @@ export default function ListScreen({ navigation }) {
       id={item.id}
       name={item.list_name}
       members={item.members}
+      lastModified={item.last_modified}
       navigation={navigation}
     />
   );
 
-  const sortedLists = [...lists].sort(sortByDate);
+  const sortedLists = lists ? [...lists].sort(sortByDate) : null;
 
   if (lists)
     return (
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.caption,
     width: 180,
     height: 60,
     borderRadius: 45,

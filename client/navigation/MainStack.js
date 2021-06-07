@@ -6,7 +6,7 @@ import AppStack from "./AppStack";
 
 const Stack = createStackNavigator();
 
-export default function RootStack() {
+export default function MainStack() {
   return (
     <Stack.Navigator
       mode={"modal"}

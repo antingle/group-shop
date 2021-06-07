@@ -4,8 +4,8 @@ import useAuth from "../hooks/useAuth";
 import Loading from "../screens/Loading";
 import AuthStack from "./AuthStack";
 import { ListProvider } from "../contexts/ListContext";
-import RootStack from "./RootStack";
 import { colors } from "../other/colors";
+import MainStack from "./MainStack";
 
 export default function Router() {
   const { authData, loading, signOut } = useAuth();
@@ -22,7 +22,7 @@ export default function Router() {
     <NavigationContainer theme={theme}>
       {authData ? (
         <ListProvider>
-          <RootStack />
+          <MainStack />
         </ListProvider>
       ) : (
         <AuthStack />

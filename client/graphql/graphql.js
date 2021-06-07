@@ -27,6 +27,7 @@ export const REGISTER = gql`
           id
           screen_name
         }
+        last_modified
       }
     }
   }
@@ -46,6 +47,7 @@ export const LOGIN = gql`
           id
           screen_name
         }
+        last_modified
       }
     }
   }
@@ -85,6 +87,7 @@ export const GET_USER = gql`
           id
           screen_name
         }
+        last_modified
       }
       join_date
     }
@@ -254,7 +257,10 @@ export const ITEM_UPDATES = gql`
   subscription item_updates($listID: ID!) {
     item_updates(listID: $listID) {
       type
-      affector
+      affector {
+        id
+        screen_name
+      }
       item {
         id
         name

@@ -11,7 +11,8 @@ export const colors =
         background: "#EDF7F6",
         foreground: "#fff",
         text: "#435058",
-        caption: "#ababab",
+        caption: "#636366",
+        caption2: "#ababab",
         destructive: "#ff3b30",
       }
     : {
@@ -22,6 +23,7 @@ export const colors =
         foreground: "#2c2c2e",
         text: "#EDF7F6",
         caption: "#ababab",
+        caption2: "#636366",
         destructive: "#ff3b30",
       };
 

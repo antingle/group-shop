@@ -116,7 +116,7 @@ export default function ({ route }) {
     variables: { listID },
     onSubscriptionData: ({ client, subscriptionData }) => {
       const returnedData = subscriptionData.data.item_updates;
-      if (returnedData.affector != authData.screen_name)
+      if (returnedData.affector.id != authData.id)
         switch (returnedData.type) {
           case "add":
             cache.modify({

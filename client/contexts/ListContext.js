@@ -11,6 +11,7 @@ export const ListProvider = ({ children }) => {
   return (
     <ListContext.Provider
       value={{
+        lists,
         creatingList,
         setCreatingList,
         currentListID,

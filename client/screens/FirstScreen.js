@@ -30,7 +30,7 @@ export default function FirstScreen({ navigation }) {
       />
       <View style={styles.logoContainer}>
         <Text style={styles.title}>Welcome to</Text>
-        <Text style={styles.logo}>Group Shopping</Text>
+        <Text style={styles.logo}>Group Shop</Text>
       </View>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.createButton} onPress={handleCreate}>

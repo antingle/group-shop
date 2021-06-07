@@ -72,6 +72,7 @@ export default function CreateAccountScreen({ navigation }) {
       }),
     [navigation, hasUnsavedChanges]
   );
+  if (error) console.log(error.graphQLErrors);
 
   if (loading)
     return (

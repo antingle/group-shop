@@ -1,5 +1,5 @@
 import { useApolloClient } from "@apollo/client";
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import {
   getStorageData,
   removeStorageData,
@@ -30,7 +30,6 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signIn = async (data) => {
-    console.log(data);
     if (!data) return;
     try {
       setStorageData("user", data);
@@ -49,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateLists = async (lists) => {
     let currentLists = await getStorageData("lists");
-    if (!lists || lists.length == 0) {
+    if (lists == null || lists.length == 0) {
       console.log("No lists for this user");
       return;
     } else {

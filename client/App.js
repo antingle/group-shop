@@ -8,11 +8,11 @@ import Router from "./navigation/Router";
 
 export default function App() {
   const httpLink = new HttpLink({
-    uri: "http://192.168.1.110:5000/graphql",
+    uri: "https://group-shop.herokuapp.com/graphql",
   });
 
   const wsLink = new WebSocketLink({
-    uri: "ws://192.168.1.110:5000/subscriptions",
+    uri: "ws://group-shop.herokuapp.com/subscriptions",
     options: {
       reconnect: true,
     },
@@ -34,23 +34,6 @@ export default function App() {
     link: splitLink,
     cache: cache,
   });
-
-  // check user async storage
-  // getStorageData("@user")
-  //   .then((data) => {
-  //     if (data) {
-  //       setAuth(true);
-  //       setUserID(data.id);
-  //       console.log("User:", data.screen_name);
-  //       setIsLoading(false);
-  //     }
-  //   })
-  //   .catch((e) => {
-  //     setIsLoading(false);
-  //     console.log("No data for user", e);
-  //   });
-
-  // if (isLoading) return <SplashScreen />;
 
   return (
     <ApolloProvider client={client}>

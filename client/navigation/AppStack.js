@@ -21,7 +21,7 @@ export default function AppStack() {
   const { error } = useQuery(GET_USER_LISTS, {
     variables: { userID: authData.id },
     onCompleted: async (data) => {
-      returnedData = data.get_user_lists;
+      let returnedData = data.get_user_lists;
       if (returnedData) await updateLists(returnedData);
       setListsLoading(false);
     },

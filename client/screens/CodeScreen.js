@@ -13,7 +13,7 @@ export default function CodeScreen({ navigation }) {
   const [joinList, { loading }] = useMutation(JOIN_LIST, {
     update(proxy, result) {
       try {
-        // let returnedData = result.data.join_list;
+        let returnedData = result.data.join_list;
         // let listArray = [];
         // listArray.push(returnedData);
         // updateLists(listArray);

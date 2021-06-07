@@ -1,21 +1,11 @@
-import { useNavigation } from "@react-navigation/core";
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Switch,
-  ScrollView,
-  TouchableHighlight,
-  Alert,
-} from "react-native";
+import React from "react";
+import { View, StyleSheet, ScrollView, Alert } from "react-native";
 import Header from "../components/Header";
 import SettingsCard from "../components/SettingsCard";
 import useAuth from "../hooks/useAuth";
 import { colors } from "../other/colors";
 
 export default function SettingsScreen() {
-  const [yes, setYes] = useState(false);
   const { authData, signOut } = useAuth();
 
   const handleSignOut = () => {
