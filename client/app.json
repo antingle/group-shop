@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Group Shop",
-    "slug": "grocery-list",
+    "slug": "group-shop",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,9 @@
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aandmstudios.groupshop",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {

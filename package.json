@@ -1,5 +1,5 @@
 {
-  "name": "groupshopping",
+  "name": "group-shop",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ingleanthony/group-shopping.git"
+    "url": "git+https://github.com/ingleanthony/group-shopgit"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ingleanthony/group-shopping/issues"
+    "url": "https://github.com/ingleanthony/group-shop/issues"
   },
-  "homepage": "https://github.com/ingleanthony/group-shopping#readme",
+  "homepage": "https://github.com/ingleanthony/group-shop#readme",
   "dependencies": {
     "apollo-server": "^2.23.0",
     "bcryptjs": "^2.4.3",
