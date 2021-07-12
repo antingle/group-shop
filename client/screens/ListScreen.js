@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   TouchableHighlight,
@@ -13,20 +13,19 @@ import { colors } from "../other/colors.js";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import ListCard from "../components/ListCard.js";
-import CreateOrJoinScreen from "./CreateOrJoinScreen.js";
 import Header from "../components/Header.js";
 import useList from "../hooks/useList.js";
 import { sortByDate } from "../other/helperFunctions.js";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function ListScreen({ navigation }) {
-  const { lists, setCreatingList, refreshLists, loading } = useList();
+  const { lists, setCreatingList, refreshLists, loading, fetchLists } =
+    useList();
   const [selectNewList, setSelectNewList] = useState(false);
-  const isFocused = useIsFocused();
 
   useFocusEffect(
     React.useCallback(() => {
-      refreshLists();
+      fetchLists();
     }, [])
   );
 

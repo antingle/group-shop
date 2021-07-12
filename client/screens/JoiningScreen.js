@@ -44,7 +44,7 @@ export default function JoiningScreen({ navigation, route }) {
       justifyContent: "center",
     },
     image: {
-      height: 240,
+      height: 200,
       resizeMode: "contain",
       marginVertical: 90,
       marginRight: 20,

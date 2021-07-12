@@ -1,10 +1,13 @@
 {
   "expo": {
     "name": "Group Shop",
+    "description": "A great group shopping experience with friends and family!",
     "slug": "group-shop",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "backgroundColor": "#32C36E",
+    "primaryColor": "#32C36E",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

@@ -36,13 +36,28 @@ export const ListProvider = ({ children }) => {
       })
       .then((res) => {
         setLists(res.data.get_user_lists);
-        console.log("lists refreshed!");
       })
       .catch((e) => {
         console.log(e);
       })
       .finally(() => {
         setLoading(false);
+      });
+  };
+
+  const fetchLists = async () => {
+    await client
+      .mutate({
+        mutation: GET_USER_LISTS,
+        variables: {
+          userID: authData.id,
+        },
+      })
+      .then((res) => {
+        setLists(res.data.get_user_lists);
+      })
+      .catch((e) => {
+        console.log(e);
       });
   };
 
@@ -85,6 +100,7 @@ export const ListProvider = ({ children }) => {
         deleteList,
         leaveList,
         refreshLists,
+        fetchLists,
         loading,
       }}
     >

@@ -9,11 +9,11 @@ import { UIManager } from "react-native";
 
 export default function App() {
   const httpLink = new HttpLink({
-    uri: "http://192.168.1.110/graphql",
+    uri: "https://group-shop.herokuapp.com/graphql",
   });
 
   const wsLink = new WebSocketLink({
-    uri: "ws://192.168.1.110/subscriptions",
+    uri: "ws://group-shop.herokuapp.com/subscriptions",
     options: {
       reconnect: true,
     },
