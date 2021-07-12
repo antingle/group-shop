@@ -5,6 +5,7 @@ import { colors } from "../other/colors.js";
 import { Ionicons } from "@expo/vector-icons";
 import useAuth from "../hooks/useAuth.js";
 import { calculateElapsedTime } from "../other/helperFunctions.js";
+import useList from "../hooks/useList.js";
 
 export default function ListCard({
   id,
@@ -14,8 +15,10 @@ export default function ListCard({
   navigation,
 }) {
   const { authData } = useAuth();
-  const handlePress = () => {
-    navigation.navigate("groceryList", { listID: id });
+  const { setCurrentListID, currentListID } = useList();
+  const handlePress = async () => {
+    await setCurrentListID(id);
+    navigation.navigate("listDetail", { listID: currentListID });
   };
 
   const membersArray = members.filter(
@@ -44,10 +47,10 @@ export default function ListCard({
         <Text style={styles.cardText}>{name}</Text>
         <Text style={styles.timeText}>{elapsedTime}</Text>
       </View>
-      <View style={styles.members}>
+      {(members.length > 1) && <View style={styles.members}>
         <Ionicons name="person" style={styles.icon} />
         <Text style={styles.membersText}>{renderMembers()}</Text>
-      </View>
+      </View>}
     </TouchableOpacity>
   );
 }

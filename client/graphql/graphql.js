@@ -72,6 +72,14 @@ export const CREATE_TEMP_USER = gql`
   }
 `;
 
+export const DELETE_USER = gql`
+mutation delete_user($userID: ID!) {
+  delete_user(userID: $userID) {
+    id
+  }
+}
+`
+
 export const GET_USER = gql`
   query get_user($userID: ID!) {
     get_user(userID: $userID) {

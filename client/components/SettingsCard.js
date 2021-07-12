@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
 import { colors } from "../other/colors";
 import Clipboard from "expo-clipboard";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function SettingsCard({
   type = "default",
@@ -72,9 +73,60 @@ export default function SettingsCard({
       marginBottom: 10,
     },
     caption: {
-      textAlign: "right",
-      marginLeft: 60,
+      position: "absolute",
+      right: 25,
       color: captionColor,
+    },
+    editTouchable: {
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.lightButton,
+      position: "absolute",
+      right: 20,
+      borderRadius: 12,
+      width: 60,
+      height: 30,
+    },
+    editButton: {
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.lightButton,
+      borderRadius: 12,
+      width: 60,
+      height: 30,
+    },
+    editText: {
+      fontSize: 15,
+      color: colors.text,
+    },
+    buttonCard: {
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      height: 56,
+      width: 340,
+      borderRadius: 24,
+      backgroundColor: colors.primary,
+      marginBottom: 10,
+    },
+    buttonView: {
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      height: 56,
+      width: 340,
+      borderRadius: 24,
+      backgroundColor: colors.primary,
+    },
+    buttonText: {
+      fontSize: 20,
+      fontWeight: "400",
+      color: colors.foreground,
+    },
+    listIcon: {
+      color: colors.background,
+      fontSize: 24,
+      marginRight: 10,
     },
   });
 
@@ -99,6 +151,22 @@ export default function SettingsCard({
         </View>
       </TouchableHighlight>
     );
+  else if (type == "modifiable")
+    return (
+      <View style={styles.card}>
+        <Text style={styles.fieldText}>{field}</Text>
+        <Text style={styles.cardText}>{content}</Text>
+        <TouchableHighlight
+          style={styles.editTouchable}
+          underlayColor={colors.text}
+          onPress={onPress}
+        >
+          <View style={styles.editButton}>
+            <Text style={styles.editText}>Edit</Text>
+          </View>
+        </TouchableHighlight>
+      </View>
+    );
   else if (type == "warning")
     return (
       <TouchableHighlight
@@ -120,6 +188,19 @@ export default function SettingsCard({
       >
         <View style={styles.middleView}>
           <Text style={styles.grayText}>{content}</Text>
+        </View>
+      </TouchableHighlight>
+    );
+  else if (type == "button")
+    return (
+      <TouchableHighlight
+        onPress={onPress}
+        style={styles.buttonCard}
+        underlayColor={colors.text}
+      >
+        <View style={styles.buttonView}>
+          <Ionicons name="person-add" style={styles.listIcon} />
+          <Text style={styles.buttonText}>{content}</Text>
         </View>
       </TouchableHighlight>
     );

@@ -5,14 +5,15 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { cache } from "./graphql/cache";
 import { AuthProvider } from "./contexts/AuthContext";
 import Router from "./navigation/Router";
+import { UIManager } from "react-native";
 
 export default function App() {
   const httpLink = new HttpLink({
-    uri: "https://group-shop.herokuapp.com/graphql",
+    uri: "http://192.168.1.110/graphql",
   });
 
   const wsLink = new WebSocketLink({
-    uri: "ws://group-shop.herokuapp.com/subscriptions",
+    uri: "ws://192.168.1.110/subscriptions",
     options: {
       reconnect: true,
     },
@@ -34,6 +35,13 @@ export default function App() {
     link: splitLink,
     cache: cache,
   });
+
+  // To allow Android to use LayoutAnimation
+  if (Platform.OS === "android") {
+    if (UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }
 
   return (
     <ApolloProvider client={client}>

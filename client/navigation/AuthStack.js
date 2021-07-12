@@ -5,6 +5,7 @@ import NameScreen from "../screens/NameScreen";
 import FirstScreen from "../screens/FirstScreen";
 import CreateAccountScreen from "../screens/CreateAccountScreen";
 import SignInScreen from "../screens/SignInScreen";
+import GetStartedScreen from "../screens/GetStartedScreen";
 
 export default function AuthStack() {
   const Stack = createStackNavigator();
@@ -14,6 +15,7 @@ export default function AuthStack() {
         headerShown: false,
       }}
     >
+      <Stack.Screen name="getStarted" component={GetStartedScreen} />
       <Stack.Screen name="firstScreen" component={FirstScreen} />
       <Stack.Screen name="createAccount" component={CreateAccountScreen} />
       <Stack.Screen name="signIn" component={SignInScreen} />

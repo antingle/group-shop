@@ -3,14 +3,17 @@ import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { colors } from "../other/colors";
 import GoBackButton from "../components/GoBackButton";
 import SettingsButton from "./SettingsButton";
+import XButton from "./XButton";
 
 export default function Header({
   title,
   headerLeft = "back",
   headerRight,
-  settingsScreen = "settings",
+  settingsScreen = "settings", // can navigate to settings or listsettings
+  backPress = "back", // can navigate to lists or just goback
 }) {
   let titleFontSize = 40;
+  if (title?.length == 9) titleFontSize--;
   if (title?.length > 9) {
     titleFontSize -= title.length - 8;
   }
@@ -44,7 +47,10 @@ export default function Header({
         component = <SettingsButton marginTop={34} screen={settingsScreen} />;
         break;
       case "back":
-        component = <GoBackButton marginTop={35} />;
+        component = <GoBackButton marginTop={35} navigate={backPress} />;
+        break;
+      case "x":
+        component = <XButton marginTop={32} />;
         break;
       default:
         component = null;

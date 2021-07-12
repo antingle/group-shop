@@ -1,11 +1,11 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { View, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, StyleSheet, ScrollView, Alert, Share } from "react-native";
 import Header from "../components/Header";
 import SettingsCard from "../components/SettingsCard";
 import SettingsMembersCard from "../components/SettingsMembersCard";
 import { cache } from "../graphql/cache";
-import { DELETE_LIST, LEAVE_LIST } from "../graphql/graphql";
 import useAuth from "../hooks/useAuth";
 import useList from "../hooks/useList";
 import { colors } from "../other/colors";
@@ -13,13 +13,13 @@ import {
   calculateElapsedTime,
   getFormattedDate,
 } from "../other/helperFunctions";
+import * as Linking from "expo-linking";
 
 export default function ListSettingsScreen() {
   const { authData } = useAuth();
-  const { currentListID } = useList();
+  const { currentListID, deleteList, leaveList } = useList();
+  const navigation = useNavigation();
 
-  const [deleteList] = useMutation(DELETE_LIST);
-  const [leaveList] = useMutation(LEAVE_LIST);
   const readList = cache.readQuery({
     query: gql`
       query readList($listID: String!) {
@@ -53,22 +53,43 @@ export default function ListSettingsScreen() {
           style: "destructive",
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
-          onPress: () => {
+          onPress: async () => {
             try {
-              if (type == "delete")
-                deleteList({ variables: { listID: currentListID } });
-              else if (type == "leave")
-                leaveList({
-                  variables: { listID: currentListID, userID: authData.userID },
-                });
+              if (type == "delete") await deleteList();
+              else if (type == "leave") await leaveList();
             } catch (error) {
               console.log(error);
+            } finally {
+              navigation.navigate("lists");
             }
           },
         },
       ]
     );
   }
+
+  const handleName = () => {
+    Alert.prompt(
+      "Change name",
+      "The list name will change for everyone in this list",
+      (text) => console.log(text),
+      "plain-text",
+      listData.list_name
+    );
+  };
+
+  const handleInvite = async () => {
+    let inviteURL = Linking.createURL("main/join", {
+      queryParams: { code: listData.code },
+    });
+
+    try {
+      console.log(inviteURL);
+      await Share.share({ url: inviteURL });
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const listData = readList.get_list;
   const dateCreated = new Date(listData.created);
@@ -77,9 +98,19 @@ export default function ListSettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title={"List Settings"} />
+      <Header title={"List Settings"} headerLeft={"x"} />
       <ScrollView>
-        <SettingsCard field={"Name: "} content={listData.list_name} />
+        <SettingsCard
+          content={"Invite Members"}
+          type={"button"}
+          onPress={handleInvite}
+        />
+        <SettingsCard
+          field={"Name: "}
+          content={listData.list_name}
+          type={"modifiable"}
+          onPress={handleName}
+        />
         <SettingsCard
           type={"copy"}
           field={"List Code: "}

@@ -3,7 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import ListScreen from "../screens/ListScreen";
 import NameListScreen from "../screens/NameListScreen";
 import CodeScreen from "../screens/CodeScreen";
-import GroceryListScreen from "../screens/GroceryListScreen";
+import ListDetailScreen from "../screens/ListDetailScreen";
 import useAuth from "../hooks/useAuth";
 import { useQuery } from "@apollo/client";
 import { GET_USER_LISTS } from "../graphql/graphql";
@@ -11,11 +11,12 @@ import Loading from "../screens/Loading";
 import { StyleSheet } from "react-native";
 import { colors } from "../other/colors";
 import useList from "../hooks/useList";
+import JoiningScreen from "../screens/JoiningScreen";
 
 export default function AppStack() {
   const Stack = createStackNavigator();
-  const { authData, updateLists } = useAuth();
-  const { creatingList } = useList();
+  const { authData } = useAuth();
+  const { creatingList, updateLists, currentListID } = useList();
   const [listsLoading, setListsLoading] = useState(true);
 
   const { error } = useQuery(GET_USER_LISTS, {
@@ -44,13 +45,14 @@ export default function AppStack() {
         }}
       />
 
-      <Stack.Screen name="groceryList" component={GroceryListScreen} />
+      <Stack.Screen name="listDetail" component={ListDetailScreen} />
       {creatingList ? (
         <>
           <Stack.Screen name="nameList" component={NameListScreen} />
           <Stack.Screen name="code" component={CodeScreen} />
         </>
       ) : null}
+      <Stack.Screen name="join" component={JoiningScreen} />
     </Stack.Navigator>
   );
 }

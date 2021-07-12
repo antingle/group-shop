@@ -1,5 +1,7 @@
-import { useApolloClient } from "@apollo/client";
+import { useApolloClient, useMutation } from "@apollo/client";
 import React, { createContext, useState, useEffect } from "react";
+import { Alert } from "react-native";
+import { DELETE_USER } from "../graphql/graphql";
 import {
   getStorageData,
   removeStorageData,
@@ -21,6 +23,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [lists, setLists] = useState(false);
   let client = useApolloClient();
+
+  // hooks
+  const [delete_user] = useMutation(DELETE_USER);
 
   useEffect(() => {
     getStorageData("user").then((data) => {
@@ -46,17 +51,15 @@ export const AuthProvider = ({ children }) => {
     client.clearStore();
   };
 
-  const updateLists = async (lists) => {
-    let currentLists = await getStorageData("lists");
-    if (lists == null || lists.length == 0) {
-      console.log("No lists for this user");
-      return;
-    } else {
-      await setStorageData("lists", lists);
-      setLists(lists);
+  const deleteUser = async () => {
+    try {
+    delete_user({variables: { userID: authData.id }})
+    signOut();
+    } catch {
+      Alert.alert("Error deleting account");
     }
-  };
-
+  }
+  
   return (
     <AuthContext.Provider
       value={{
@@ -64,8 +67,9 @@ export const AuthProvider = ({ children }) => {
         loading,
         signIn,
         signOut,
-        lists,
-        updateLists,
+        deleteUser,
+        lists, 
+        setLists
       }}
     >
       {children}

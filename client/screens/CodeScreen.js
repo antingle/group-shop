@@ -1,14 +1,20 @@
 import { useMutation } from "@apollo/client";
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import { colors } from "../other/colors.js";
 import { JOIN_LIST } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
 import Header from "../components/Header.js";
+import useList from "../hooks/useList.js";
 
-export default function CodeScreen({ navigation }) {
+export default function CodeScreen({ navigation, route }) {
   const [code, setCode] = React.useState(null);
-  const { authData, updateLists } = useAuth();
+  const { authData } = useAuth();
+  const { setCurrentListID } = useList();
+
+  useEffect(() => {
+    console.log(route.params);
+  }, []);
 
   const [joinList, { loading }] = useMutation(JOIN_LIST, {
     update(proxy, result) {
@@ -18,7 +24,8 @@ export default function CodeScreen({ navigation }) {
         // listArray.push(returnedData);
         // updateLists(listArray);
         // pass params to grocery list
-        navigation.navigate("groceryList", { listID: returnedData.id });
+        setCurrentListID(returnedData.id);
+        navigation.navigate("listDetail");
       } catch (e) {
         console.log(e);
       }
@@ -43,6 +50,7 @@ export default function CodeScreen({ navigation }) {
         placeholder="Enter Code"
         style={styles.nameInput}
         autoCapitalize={"characters"}
+        autoCorrect={false}
         onChangeText={setCode}
         onSubmitEditing={handleSubmit}
         maxLength={6}
@@ -70,5 +78,6 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     paddingBottom: 300,
     color: colors.text,
+    textAlign: "center",
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TouchableHighlight,
@@ -6,21 +6,29 @@ import {
   StyleSheet,
   FlatList,
   TouchableWithoutFeedback,
+  LayoutAnimation,
+  Image,
 } from "react-native";
 import { colors } from "../other/colors.js";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import ListCard from "../components/ListCard.js";
-import useAuth from "../hooks/useAuth.js";
 import CreateOrJoinScreen from "./CreateOrJoinScreen.js";
 import Header from "../components/Header.js";
 import useList from "../hooks/useList.js";
 import { sortByDate } from "../other/helperFunctions.js";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
 export default function ListScreen({ navigation }) {
-  const { lists } = useAuth();
-  const { setCreatingList } = useList();
+  const { lists, setCreatingList, refreshLists, loading } = useList();
   const [selectNewList, setSelectNewList] = useState(false);
+  const isFocused = useIsFocused();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      refreshLists();
+    }, [])
+  );
 
   const newList = () => {
     setSelectNewList((prevState) => !prevState);
@@ -40,72 +48,83 @@ export default function ListScreen({ navigation }) {
     navigation.navigate("code");
   };
 
-  const renderItem = ({ item }) => (
-    <ListCard
-      id={item.id}
-      name={item.list_name}
-      members={item.members}
-      lastModified={item.last_modified}
-      navigation={navigation}
-    />
-  );
+  const renderItem = ({ item }) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    return (
+      <ListCard
+        id={item.id}
+        name={item.list_name}
+        members={item.members}
+        lastModified={item.last_modified}
+        navigation={navigation}
+      />
+    );
+  };
 
   const sortedLists = lists ? [...lists].sort(sortByDate) : null;
 
-  if (lists)
-    return (
-      <TouchableWithoutFeedback
-        onPress={() => setSelectNewList(false)}
-        disabled={!selectNewList}
-      >
-        <View style={styles.container}>
-          <Header title={"Lists"} headerLeft={"settings"} />
-
+  return (
+    <TouchableWithoutFeedback
+      onPress={() => setSelectNewList(false)}
+      disabled={!selectNewList}
+    >
+      <View style={styles.container}>
+        <Header title={"Lists"} headerLeft={"settings"} />
+        {lists?.length > 0 ? (
           <FlatList
             data={sortedLists}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
+            onRefresh={refreshLists}
+            refreshing={loading}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
           />
-          {selectNewList && (
-            <View style={styles.listSelection}>
-              <TouchableHighlight
-                style={styles.listButton}
-                onPress={handleCreate}
-                underlayColor={colors.background}
-              >
-                <View style={styles.listContainer}>
-                  <Ionicons name="create-outline" style={styles.listIcon} />
-                  <Text style={styles.buttonText}>Create List</Text>
-                </View>
-              </TouchableHighlight>
-              <TouchableHighlight
-                style={styles.listButton}
-                onPress={handleJoin}
-                underlayColor={colors.background}
-              >
-                <View style={styles.listContainer}>
-                  <Ionicons name="person-add" style={styles.listIcon} />
-                  <Text style={styles.buttonText}>Join List</Text>
-                </View>
-              </TouchableHighlight>
-            </View>
-          )}
-          <View style={styles.absolute}>
+        ) : (
+          <Image
+            source={require("../assets/emptylists.png")}
+            style={styles.emptyImage}
+          />
+        )}
+        {selectNewList && (
+          <View style={styles.listSelection}>
             <TouchableHighlight
-              style={styles.addButton}
-              onPress={newList}
+              style={styles.listButton}
+              onPress={handleCreate}
               underlayColor={colors.background}
             >
-              <View style={styles.addButton}>
-                <AntDesign name="plus" style={styles.plus} />
-                <Text style={styles.buttonText}>New List</Text>
+              <View style={styles.listContainer}>
+                <Ionicons name="create-outline" style={styles.listIcon} />
+                <Text style={styles.buttonText}>Create List</Text>
+              </View>
+            </TouchableHighlight>
+            <TouchableHighlight
+              style={styles.listButton}
+              onPress={handleJoin}
+              underlayColor={colors.background}
+            >
+              <View style={styles.listContainer}>
+                <Ionicons name="person-add" style={styles.listIcon} />
+                <Text style={styles.buttonText}>Join List</Text>
               </View>
             </TouchableHighlight>
           </View>
+        )}
+        <View style={styles.absolute}>
+          <TouchableHighlight
+            style={styles.addButton}
+            onPress={newList}
+            underlayColor={colors.background}
+          >
+            <View style={styles.addButton}>
+              <AntDesign name="plus" style={styles.plus} />
+              <Text style={styles.buttonText}>New List</Text>
+            </View>
+          </TouchableHighlight>
         </View>
-      </TouchableWithoutFeedback>
-    );
-  else return <CreateOrJoinScreen navigation={navigation} />;
+      </View>
+    </TouchableWithoutFeedback>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -177,5 +196,12 @@ const styles = StyleSheet.create({
     color: colors.background,
     fontSize: 24,
     marginRight: 10,
+  },
+  emptyImage: {
+    height: 300,
+    resizeMode: "contain",
+    flex: 1,
+    marginTop: 150,
+    marginBottom: 250,
   },
 });

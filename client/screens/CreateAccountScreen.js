@@ -12,12 +12,10 @@ export default function CreateAccountScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
   const [name, setName] = React.useState(null);
   const [password, setPassword] = React.useState(null);
-  const [confirmPassword, setConfirmPassword] = React.useState(null);
 
   const nameRef = React.useRef();
   const emailRef = React.useRef();
   const passRef = React.useRef();
-  const confirmPassRef = React.useRef();
 
   const { signIn } = useAuth();
 
@@ -34,13 +32,12 @@ export default function CreateAccountScreen({ navigation }) {
     },
   });
 
-  const hasUnsavedChanges = Boolean(
-    name || email || password || confirmPassword
-  );
+  const hasUnsavedChanges = Boolean(name || email || password);
 
   const handleCreate = () => {
-    console.log({ email, name, password, confirmPassword });
-    register({ variables: { name, email, password, confirmPassword } });
+    register({
+      variables: { name, email, password, confirmPassword: password },
+    });
   };
 
   React.useEffect(
@@ -127,22 +124,8 @@ export default function CreateAccountScreen({ navigation }) {
           autoCompleteType="password"
           secureTextEntry={true}
           textContentType="newPassword"
-          returnKeyType="next"
-          ref={passRef}
-          onSubmitEditing={() => confirmPassRef.current.focus()}
-        />
-        <Text style={styles.heading}>Confirm Password</Text>
-        <TextInput
-          placeholder="Confirm Password"
-          style={styles.textInput}
-          autoCapitalize={"none"}
-          onChangeText={setConfirmPassword}
-          autoCorrect={false}
-          autoCompleteType="password"
-          secureTextEntry={true}
-          textContentType="newPassword"
           returnKeyType="done"
-          ref={confirmPassRef}
+          ref={passRef}
         />
         <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
           <Text style={styles.createText}>Create Account</Text>
@@ -179,6 +162,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: 280,
     color: colors.text,
+    textAlign: "left",
   },
   createButton: {
     alignItems: "center",
@@ -193,7 +177,7 @@ const styles = StyleSheet.create({
   },
   createText: {
     fontSize: 22,
-    color: colors.text,
+    color: colors.background,
     fontWeight: "500",
   },
 });

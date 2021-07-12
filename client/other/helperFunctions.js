@@ -6,7 +6,7 @@ export function calculateElapsedTime(dateSince) {
 
   if (timeElapsed < 1) {
     newTime = timeElapsed * 60;
-    if (newTime < 2) timeUnit = "second ago";
+    if (newTime < 2 && newTime > 0) timeUnit = "second ago";
     else timeUnit = "seconds ago";
   } else if (timeElapsed < 2) {
     timeUnit = "minute ago";

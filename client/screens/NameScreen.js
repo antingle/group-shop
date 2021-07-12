@@ -62,5 +62,6 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     paddingBottom: 300,
     color: colors.text,
+    textAlign: "center"
   },
 });

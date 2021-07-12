@@ -6,9 +6,12 @@ import AuthStack from "./AuthStack";
 import { ListProvider } from "../contexts/ListContext";
 import { colors } from "../other/colors";
 import MainStack from "./MainStack";
+import * as Linking from "expo-linking";
+
+const prefix = Linking.createURL("/");
 
 export default function Router() {
-  const { authData, loading, signOut } = useAuth();
+  const { authData, loading } = useAuth();
   const theme = {
     colors: {
       primary: colors.primary,
@@ -16,10 +19,14 @@ export default function Router() {
     },
   };
 
+  const linking = {
+    prefixes: [prefix],
+  };
+
   if (loading) return <Loading />;
 
   return (
-    <NavigationContainer theme={theme}>
+    <NavigationContainer theme={theme} linking={linking}>
       {authData ? (
         <ListProvider>
           <MainStack />

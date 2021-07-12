@@ -20,14 +20,14 @@ export default function Item({
   purchased,
   onPress,
   onTriggerLeftSwipe,
-  onTriggerRightSwipe,
+  onEndRightSwipe,
 }) {
   const checkboxRef = React.useRef();
   const swipeableRef = React.useRef();
   const { authData } = useAuth();
 
-  const onTriggerRight = () => {
-    onTriggerRightSwipe(id);
+  const onEndRight = () => {
+    onEndRightSwipe(id);
   };
 
   const onTriggerLeft = () => {
@@ -60,7 +60,7 @@ export default function Item({
         <Ionicons
           name="trash"
           size={24}
-          color={colors.text}
+          color={colors.light}
           style={styles.actionIcon}
         />
       </View>
@@ -75,8 +75,8 @@ export default function Item({
       containerStyle={styles.swipeable}
       overshootLeft={false}
       leftThreshold={100}
-      onSwipeableRightWillOpen={onTriggerRight}
-      friction={1.7}
+      onSwipeableRightOpen={onEndRight}
+      friction={1.5}
       overshootFriction={4}
       onSwipeableLeftOpen={onTriggerLeft}
       useNativeAnimations={true}
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   actionText: {
-    color: colors.text,
+    color: colors.dark,
     fontSize: 16,
     backgroundColor: "transparent",
     paddingHorizontal: 20,

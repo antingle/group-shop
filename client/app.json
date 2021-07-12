@@ -8,8 +8,9 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#32C36E"
     },
+    "scheme": "groupshop",
     "updates": {
       "fallbackToCacheTimeout": 0
     },

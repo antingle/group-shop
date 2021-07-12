@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: 280,
     color: colors.text,
+    textAlign: "left",
   },
   signInButton: {
     alignItems: "center",
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
   },
   signInText: {
     fontSize: 22,
-    color: colors.text,
+    color: colors.background,
     fontWeight: "500",
   },
 });
