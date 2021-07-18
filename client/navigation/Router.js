@@ -4,18 +4,32 @@ import useAuth from "../hooks/useAuth";
 import Loading from "../screens/Loading";
 import AuthStack from "./AuthStack";
 import { ListProvider } from "../contexts/ListContext";
-import RootStack from "./RootStack";
+import { colors } from "../other/colors";
+import MainStack from "./MainStack";
+import * as Linking from "expo-linking";
+
+const prefix = Linking.createURL("/");
 
 export default function Router() {
-  const { authData, loading, signOut } = useAuth();
+  const { authData, loading } = useAuth();
+  const theme = {
+    colors: {
+      primary: colors.primary,
+      background: colors.background,
+    },
+  };
+
+  const linking = {
+    prefixes: [prefix],
+  };
 
   if (loading) return <Loading />;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={theme} linking={linking}>
       {authData ? (
         <ListProvider>
-          <RootStack />
+          <MainStack />
         </ListProvider>
       ) : (
         <AuthStack />

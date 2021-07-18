@@ -1,29 +1,21 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { colors } from "../other/colors.js";
 import { REGISTER } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
+import Header from "../components/Header.js";
 
 export default function CreateAccountScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
   const [name, setName] = React.useState(null);
   const [password, setPassword] = React.useState(null);
-  const [confirmPassword, setConfirmPassword] = React.useState(null);
 
   const nameRef = React.useRef();
   const emailRef = React.useRef();
   const passRef = React.useRef();
-  const confirmPassRef = React.useRef();
 
   const { signIn } = useAuth();
 
@@ -40,13 +32,12 @@ export default function CreateAccountScreen({ navigation }) {
     },
   });
 
-  const hasUnsavedChanges = Boolean(
-    name || email || password || confirmPassword
-  );
+  const hasUnsavedChanges = Boolean(name || email || password);
 
   const handleCreate = () => {
-    console.log({ email, name, password, confirmPassword });
-    register({ variables: { name, email, password, confirmPassword } });
+    register({
+      variables: { name, email, password, confirmPassword: password },
+    });
   };
 
   React.useEffect(
@@ -78,6 +69,7 @@ export default function CreateAccountScreen({ navigation }) {
       }),
     [navigation, hasUnsavedChanges]
   );
+  if (error) console.log(error.graphQLErrors);
 
   if (loading)
     return (
@@ -92,8 +84,8 @@ export default function CreateAccountScreen({ navigation }) {
 
   return (
     <KeyboardAwareScrollView>
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Create Account</Text>
+      <View style={styles.container}>
+        <Header title={"Create Account"} />
         <Text style={styles.heading}>Name</Text>
         <TextInput
           autoFocus={true}
@@ -132,27 +124,13 @@ export default function CreateAccountScreen({ navigation }) {
           autoCompleteType="password"
           secureTextEntry={true}
           textContentType="newPassword"
-          returnKeyType="next"
-          ref={passRef}
-          onSubmitEditing={() => confirmPassRef.current.focus()}
-        />
-        <Text style={styles.heading}>Confirm Password</Text>
-        <TextInput
-          placeholder="Confirm Password"
-          style={styles.textInput}
-          autoCapitalize={"none"}
-          onChangeText={setConfirmPassword}
-          autoCorrect={false}
-          autoCompleteType="password"
-          secureTextEntry={true}
-          textContentType="newPassword"
           returnKeyType="done"
-          ref={confirmPassRef}
+          ref={passRef}
         />
         <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
           <Text style={styles.createText}>Create Account</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     </KeyboardAwareScrollView>
   );
 }
@@ -160,7 +138,7 @@ export default function CreateAccountScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "flex-start",
   },
@@ -169,21 +147,22 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     width: 280,
     marginTop: 40,
-    color: colors.green,
+    color: colors.primary,
   },
   title: {
     textAlign: "center",
     fontSize: 40,
     fontWeight: "800",
-    color: colors.green,
-    marginBottom: 12,
-    paddingTop: 40,
+    color: colors.primary,
+    marginBottom: 10,
+    marginTop: 20,
   },
   textInput: {
     fontSize: 24,
     marginTop: 20,
     width: 280,
-    color: colors.dark,
+    color: colors.text,
+    textAlign: "left",
   },
   createButton: {
     alignItems: "center",
@@ -193,12 +172,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 48,
     marginTop: 48,
-    borderColor: colors.green,
-    backgroundColor: colors.green,
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
   },
   createText: {
     fontSize: 22,
-    color: colors.light,
+    color: colors.background,
     fontWeight: "500",
   },
 });

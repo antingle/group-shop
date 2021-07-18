@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
+import Header from "../components/Header.js";
 import { CREATE_TEMP_USER } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
 import { colors } from "../other/colors.js";
@@ -23,12 +24,12 @@ export default function NameScreen({ navigation }) {
   });
 
   const handleSubmit = () => {
-    console.log(name);
     createTempUser({ variables: { name } });
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      <Header headerLeft={"back"} />
       <Text style={styles.heading}>What is your name?</Text>
       <TextInput
         autoFocus={true}
@@ -40,26 +41,27 @@ export default function NameScreen({ navigation }) {
         autoCorrect={false}
         returnKeyType={"done"}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
-    justifyContent: "center",
   },
   heading: {
+    marginTop: 100,
     fontSize: 32,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
   },
   nameInput: {
     fontSize: 24,
     paddingTop: 80,
     paddingBottom: 300,
-    color: colors.dark,
+    color: colors.text,
+    textAlign: "center"
   },
 });

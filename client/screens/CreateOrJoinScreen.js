@@ -1,17 +1,11 @@
-import React, { useContext } from "react";
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
-import { ListContext } from "../contexts/ListContext.js";
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { colors } from "../other/colors.js";
-import SettingsButton from "../components/SettingsButton";
+import useList from "../hooks/useList.js";
+import Header from "../components/Header.js";
 
 export default function CreateOrJoinScreen({ navigation }) {
-  const { setCreatingList } = useContext(ListContext);
+  const { setCreatingList } = useList();
   const handleCreate = async () => {
     await setCreatingList(true);
     console.log("creating list...");
@@ -25,8 +19,8 @@ export default function CreateOrJoinScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <SettingsButton />
+    <View style={styles.container}>
+      <Header headerLeft={"settings"} />
       <View style={styles.logoContainer}>
         <Text style={styles.logo}>Group Shopping</Text>
       </View>
@@ -39,14 +33,14 @@ export default function CreateOrJoinScreen({ navigation }) {
           <Text style={styles.joinText}>Join Grocery List</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -63,7 +57,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 64,
     fontWeight: "900",
-    color: colors.green,
+    color: colors.primary,
   },
   createButton: {
     alignItems: "center",
@@ -72,8 +66,8 @@ const styles = StyleSheet.create({
     width: 320,
     borderWidth: 2,
     borderRadius: 48,
-    borderColor: colors.green,
-    backgroundColor: colors.light,
+    borderColor: colors.primary,
+    backgroundColor: colors.background,
   },
   joinButton: {
     alignItems: "center",
@@ -82,23 +76,23 @@ const styles = StyleSheet.create({
     width: 320,
     borderWidth: 2,
     borderRadius: 48,
-    borderColor: colors.light,
-    backgroundColor: colors.green,
+    borderColor: colors.background,
+    backgroundColor: colors.primary,
   },
   createText: {
     fontSize: 22,
-    color: colors.green,
+    color: colors.primary,
     fontWeight: "500",
   },
   joinText: {
     fontSize: 22,
-    color: colors.light,
+    color: colors.background,
     fontWeight: "500",
   },
   orText: {
     padding: 12,
     fontSize: 20,
-    color: colors.dark,
+    color: colors.text,
     fontWeight: "500",
   },
 });

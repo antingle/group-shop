@@ -1,72 +1,96 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
-  SafeAreaView,
   View,
   TouchableHighlight,
   Text,
   StyleSheet,
   FlatList,
   TouchableWithoutFeedback,
+  LayoutAnimation,
+  Image,
 } from "react-native";
 import { colors } from "../other/colors.js";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import ListCard from "../components/ListCard.js";
-import useAuth from "../hooks/useAuth.js";
-import { ListContext } from "../contexts/ListContext.js";
-import SettingsButton from "../components/SettingsButton.js";
+import Header from "../components/Header.js";
+import useList from "../hooks/useList.js";
+import { sortByDate } from "../other/helperFunctions.js";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function ListScreen({ navigation }) {
-  const { lists } = useAuth();
-  const { setCreatingList } = useContext(ListContext);
-  const [selectList, setSelectList] = useState(false);
+  const { lists, setCreatingList, refreshLists, loading, fetchLists } =
+    useList();
+  const [selectNewList, setSelectNewList] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchLists();
+    }, [])
+  );
 
   const newList = () => {
-    setSelectList((prevState) => !prevState);
+    setSelectNewList((prevState) => !prevState);
   };
 
   const handleCreate = async () => {
     console.log("creating list...");
     await setCreatingList(true);
-    setSelectList(false);
+    setSelectNewList(false);
     navigation.navigate("nameList");
   };
 
   const handleJoin = async () => {
     console.log("joining list...");
     await setCreatingList(true);
-    setSelectList(false);
+    setSelectNewList(false);
     navigation.navigate("code");
   };
 
-  const renderItem = ({ item }) => (
-    <ListCard
-      id={item.id}
-      name={item.list_name}
-      members={item.members}
-      navigation={navigation}
-    />
-  );
+  const renderItem = ({ item }) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    return (
+      <ListCard
+        id={item.id}
+        name={item.list_name}
+        members={item.members}
+        lastModified={item.last_modified}
+        navigation={navigation}
+      />
+    );
+  };
+
+  const sortedLists = lists ? [...lists].sort(sortByDate) : null;
 
   return (
     <TouchableWithoutFeedback
-      onPress={() => setSelectList(false)}
-      disabled={!selectList}
+      onPress={() => setSelectNewList(false)}
+      disabled={!selectNewList}
     >
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.heading}>Lists</Text>
-        <SettingsButton />
-        <FlatList
-          data={lists}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-        />
-        {selectList && (
+      <View style={styles.container}>
+        <Header title={"Lists"} headerLeft={"settings"} />
+        {lists?.length > 0 ? (
+          <FlatList
+            data={sortedLists}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            onRefresh={refreshLists}
+            refreshing={loading}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+          />
+        ) : (
+          <Image
+            source={require("../assets/emptylists.png")}
+            style={styles.emptyImage}
+          />
+        )}
+        {selectNewList && (
           <View style={styles.listSelection}>
             <TouchableHighlight
               style={styles.listButton}
               onPress={handleCreate}
-              underlayColor={colors.light}
+              underlayColor={colors.background}
             >
               <View style={styles.listContainer}>
                 <Ionicons name="create-outline" style={styles.listIcon} />
@@ -76,7 +100,7 @@ export default function ListScreen({ navigation }) {
             <TouchableHighlight
               style={styles.listButton}
               onPress={handleJoin}
-              underlayColor={colors.light}
+              underlayColor={colors.background}
             >
               <View style={styles.listContainer}>
                 <Ionicons name="person-add" style={styles.listIcon} />
@@ -89,7 +113,7 @@ export default function ListScreen({ navigation }) {
           <TouchableHighlight
             style={styles.addButton}
             onPress={newList}
-            underlayColor={colors.light}
+            underlayColor={colors.background}
           >
             <View style={styles.addButton}>
               <AntDesign name="plus" style={styles.plus} />
@@ -97,7 +121,7 @@ export default function ListScreen({ navigation }) {
             </View>
           </TouchableHighlight>
         </View>
-      </SafeAreaView>
+      </View>
     </TouchableWithoutFeedback>
   );
 }
@@ -105,33 +129,33 @@ export default function ListScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
   heading: {
     fontSize: 40,
     fontWeight: "800",
-    color: colors.green,
-    paddingTop: 20,
-    paddingBottom: 10,
+    color: colors.primary,
+    marginTop: 60,
+    marginBottom: 12,
   },
   addButton: {
     width: 180,
     height: 60,
     borderRadius: 45,
-    backgroundColor: colors.green,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
   },
   buttonText: {
     fontSize: 20,
-    color: colors.light,
+    color: colors.background,
   },
   plus: {
     fontSize: 36,
-    color: colors.light,
+    color: colors.background,
     marginRight: 16,
   },
   absolute: {
@@ -152,7 +176,7 @@ const styles = StyleSheet.create({
     width: 180,
     height: 60,
     borderRadius: 45,
-    backgroundColor: colors.dark,
+    backgroundColor: colors.foreground,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
@@ -162,14 +186,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
-    backgroundColor: colors.dark,
+    backgroundColor: colors.caption,
     width: 180,
     height: 60,
     borderRadius: 45,
   },
   listIcon: {
-    color: "white",
+    color: colors.background,
     fontSize: 24,
     marginRight: 10,
+  },
+  emptyImage: {
+    height: 300,
+    resizeMode: "contain",
+    flex: 1,
+    marginTop: 150,
+    marginBottom: 250,
   },
 });

@@ -1,10 +1,11 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import { View, Text, TextInput, StyleSheet, SafeAreaView } from "react-native";
+import { View, Text, TextInput, StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { colors } from "../other/colors.js";
 import { LOGIN } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
+import Header from "../components/Header.js";
 
 export default function SignInScreen({ navigation }) {
   const [email, setEmail] = React.useState(null);
@@ -44,8 +45,8 @@ export default function SignInScreen({ navigation }) {
     </View>;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Sign In</Text>
+    <View style={styles.container}>
+      <Header title={"Sign In"} />
       <Text style={styles.heading}>Email</Text>
       <TextInput
         placeholder="Email"
@@ -78,14 +79,14 @@ export default function SignInScreen({ navigation }) {
       <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "flex-start",
   },
@@ -94,13 +95,13 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     width: 280,
     marginTop: 40,
-    color: colors.green,
+    color: colors.primary,
   },
   title: {
     textAlign: "center",
     fontSize: 40,
     fontWeight: "800",
-    color: colors.green,
+    color: colors.primary,
     marginBottom: 12,
     paddingTop: 40,
   },
@@ -108,7 +109,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginTop: 20,
     width: 280,
-    color: colors.dark,
+    color: colors.text,
+    textAlign: "left",
   },
   signInButton: {
     alignItems: "center",
@@ -118,12 +120,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 48,
     marginTop: 60,
-    borderColor: colors.green,
-    backgroundColor: colors.green,
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
   },
   signInText: {
     fontSize: 22,
-    color: colors.light,
+    color: colors.background,
     fontWeight: "500",
   },
 });

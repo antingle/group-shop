@@ -3,10 +3,10 @@ import React from "react";
 import {
   View,
   Text,
-  SafeAreaView,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Image,
 } from "react-native";
 import { colors } from "../other/colors.js";
 
@@ -24,15 +24,17 @@ export default function FirstScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <LinearGradient
-        colors={["#5ad48d", colors.green]}
+        colors={[colors.foreground, colors.background]}
         style={styles.gradient}
       />
       <View style={styles.logoContainer}>
-        <Text style={styles.title}>Welcome to</Text>
-        <Text style={styles.logo}>Group Shopping</Text>
+        <Text style={styles.logo}>Group</Text>
+        <Text style={styles.logo}>Shop</Text>
       </View>
+
+      {/* <Image source={require('../assets/shoppingcart.svg')} style={styles.image}/> */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
           <Text style={styles.createText}>Create Account</Text>
@@ -45,14 +47,14 @@ export default function FirstScreen({ navigation }) {
           <Text style={styles.guestText}>Continue as Guest</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.green,
+    backgroundColor: colors.foreground,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -69,14 +71,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 64,
     fontWeight: "900",
-    color: colors.light,
+    color: colors.primary,
   },
   title: {
     textAlign: "center",
     fontSize: 40,
     fontWeight: "900",
-    color: colors.light,
-    marginBottom: 24,
+    color: colors.primary,
+    marginBottom: 20,
   },
   createButton: {
     alignItems: "center",
@@ -85,7 +87,7 @@ const styles = StyleSheet.create({
     width: 320,
     borderRadius: 48,
     marginBottom: 8,
-    backgroundColor: colors.light,
+    backgroundColor: colors.primary,
   },
   signInButton: {
     alignItems: "center",
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
     width: 320,
     borderWidth: 3,
     borderRadius: 48,
-    borderColor: colors.light,
+    borderColor: colors.primary,
     backgroundColor: "transparent",
   },
   guestButton: {
@@ -103,32 +105,37 @@ const styles = StyleSheet.create({
     height: 60,
     width: 320,
     borderRadius: 48,
-    backgroundColor: colors.dark,
+    backgroundColor: colors.secondary,
   },
   createText: {
     fontSize: 22,
-    color: colors.green,
+    color: colors.foreground,
     fontWeight: "500",
   },
   signInText: {
     fontSize: 22,
-    color: colors.light,
+    color: colors.primary,
     fontWeight: "500",
   },
   orText: {
     padding: 24,
     fontSize: 20,
-    color: colors.light,
+    color: colors.primary,
     fontWeight: "500",
   },
   guestText: {
-    fontSize: 22,
-    color: colors.light,
+    fontSize: 20,
+    color: colors.foreground,
     fontWeight: "500",
   },
   gradient: {
     height: Dimensions.get("window").height,
     width: Dimensions.get("window").width,
     position: "absolute",
+    opacity: 0.5,
+  },
+  image: {
+    height: 180,
+    resizeMode: "contain",
   },
 });
