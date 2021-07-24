@@ -7,11 +7,16 @@ import { ListProvider } from "../contexts/ListContext";
 import { colors } from "../other/colors";
 import MainStack from "./MainStack";
 import * as Linking from "expo-linking";
+import { useColorScheme } from "react-native";
+import { SchemeProvider } from "../contexts/SchemeContext";
 
 const prefix = Linking.createURL("/");
 
 export default function Router() {
   const { authData, loading } = useAuth();
+
+  const colorScheme = useColorScheme();
+
   const theme = {
     colors: {
       primary: colors.primary,
@@ -32,7 +37,9 @@ export default function Router() {
           <MainStack />
         </ListProvider>
       ) : (
-        <AuthStack />
+        <SchemeProvider>
+          <AuthStack />
+        </SchemeProvider>
       )}
     </NavigationContainer>
   );

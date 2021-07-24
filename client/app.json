@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "Group Shop",
+    "owner": "aandm_studios",
     "description": "A great group shopping experience with friends and family!",
     "slug": "group-shop",
     "version": "1.0.0",

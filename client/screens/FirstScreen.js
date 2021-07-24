@@ -54,7 +54,7 @@ export default function FirstScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.foreground,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },
