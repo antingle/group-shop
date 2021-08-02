@@ -1,13 +1,14 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { colors } from "../other/colors.js";
 import { LOGIN } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
 import Header from "../components/Header.js";
+import useScheme from "../hooks/useScheme.js";
+import LongButton from "../components/LongButton.js";
 
-export default function SignInScreen({ navigation }) {
+export default function SignInScreen() {
+  const { colors, globalStyles } = useScheme();
   const [email, setEmail] = React.useState(null);
   const [password, setPassword] = React.useState(null);
 
@@ -33,6 +34,26 @@ export default function SignInScreen({ navigation }) {
     login({ variables: { email, password } });
   };
 
+  // styles
+  const styles = StyleSheet.create({
+    signInButton: {
+      alignItems: "center",
+      justifyContent: "center",
+      height: 60,
+      width: 320,
+      borderWidth: 2,
+      borderRadius: 48,
+      marginTop: 60,
+      borderColor: colors.primary,
+      backgroundColor: colors.primary,
+    },
+    signInText: {
+      fontSize: 22,
+      color: colors.background,
+      fontWeight: "500",
+    },
+  });
+
   if (loading)
     return (
       <View>
@@ -45,13 +66,13 @@ export default function SignInScreen({ navigation }) {
     </View>;
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.containerTop}>
       <Header title={"Sign In"} />
-      <Text style={styles.heading}>Email</Text>
+      <Text style={globalStyles.inputLabel}>Email</Text>
       <TextInput
         placeholder="Email"
-        style={styles.textInput}
-        autoFocus={false}
+        style={globalStyles.textInput}
+        autoFocus={true}
         autoCapitalize={"none"}
         onChangeText={setEmail}
         autoCorrect={false}
@@ -62,10 +83,10 @@ export default function SignInScreen({ navigation }) {
         ref={emailRef}
         onSubmitEditing={() => passRef.current.focus()}
       />
-      <Text style={styles.heading}>Password</Text>
+      <Text style={globalStyles.inputLabel}>Password</Text>
       <TextInput
         placeholder="Password"
-        style={styles.textInput}
+        style={globalStyles.textInput}
         autoCapitalize={"none"}
         onChangeText={setPassword}
         autoCorrect={false}
@@ -75,57 +96,13 @@ export default function SignInScreen({ navigation }) {
         returnKeyType="done"
         ref={passRef}
       />
-
-      <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
-        <Text style={styles.signInText}>Sign In</Text>
-      </TouchableOpacity>
+      <LongButton
+        text="Sign In"
+        onPressOut={handleSignIn}
+        textColor={colors.background}
+        backgroundColor={colors.primary}
+        marginTop={48}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    justifyContent: "flex-start",
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: "800",
-    width: 280,
-    marginTop: 40,
-    color: colors.primary,
-  },
-  title: {
-    textAlign: "center",
-    fontSize: 40,
-    fontWeight: "800",
-    color: colors.primary,
-    marginBottom: 12,
-    paddingTop: 40,
-  },
-  textInput: {
-    fontSize: 24,
-    marginTop: 20,
-    width: 280,
-    color: colors.text,
-    textAlign: "left",
-  },
-  signInButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    height: 60,
-    width: 320,
-    borderWidth: 2,
-    borderRadius: 48,
-    marginTop: 60,
-    borderColor: colors.primary,
-    backgroundColor: colors.primary,
-  },
-  signInText: {
-    fontSize: 22,
-    color: colors.background,
-    fontWeight: "500",
-  },
-});

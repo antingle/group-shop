@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
-import { colors } from "../other/colors";
 import Clipboard from "expo-clipboard";
 import { Ionicons } from "@expo/vector-icons";
+import useScheme from "../hooks/useScheme";
 
 export default function SettingsCard({
   type = "default",
@@ -10,6 +10,7 @@ export default function SettingsCard({
   content,
   onPress,
 }) {
+  const { colors } = useScheme();
   const [captionColor, setCaptionColor] = useState(colors.primary);
 
   const handleCopy = () => {
@@ -17,6 +18,7 @@ export default function SettingsCard({
     Clipboard.setString(content);
   };
 
+  // styles
   const styles = StyleSheet.create({
     card: {
       alignItems: "center",

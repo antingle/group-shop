@@ -1,17 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableHighlight,
   I18nManager,
+  TextInput,
+  ActivityIndicator,
 } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { Swipeable } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
-import { colors } from "../other/colors.js";
 import { Ionicons } from "@expo/vector-icons";
 import useAuth from "../hooks/useAuth.js";
+import useScheme from "../hooks/useScheme.js";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 export default function Item({
   id,
@@ -21,10 +24,18 @@ export default function Item({
   onPress,
   onTriggerLeftSwipe,
   onEndRightSwipe,
+  onAdd,
+  onChangeAdd,
 }) {
+  const { colors } = useScheme();
   const checkboxRef = React.useRef();
   const swipeableRef = React.useRef();
   const { authData } = useAuth();
+  const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (id.includes("new")) setEditing(true);
+  }, []);
 
   const onEndRight = () => {
     onEndRightSwipe(id);
@@ -41,6 +52,7 @@ export default function Item({
       inputRange: [-101, -100, -50, 0],
       outputRange: [1, 0, 0, -20],
     });
+
     return (
       <View style={styles.leftAction}>
         <Animated.Text style={[styles.actionText]}>
@@ -66,6 +78,67 @@ export default function Item({
       </View>
     );
   };
+
+  // styles
+  const styles = StyleSheet.create({
+    card: {
+      alignItems: "center",
+      flexDirection: "row",
+      height: 50,
+      width: 340,
+      borderRadius: 24,
+      paddingLeft: 20,
+      backgroundColor: colors.foreground,
+    },
+    touchable: {
+      borderRadius: 24,
+    },
+    swipeable: {
+      borderRadius: 24,
+      marginBottom: 8,
+    },
+    cardText: {
+      fontSize: 16,
+      fontWeight: "400",
+      color: colors.text,
+    },
+    leftAction: {
+      flex: 1,
+      backgroundColor: "#fcd703",
+      justifyContent: "center",
+    },
+    rightAction: {
+      alignItems: "center",
+      flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
+      backgroundColor: "#dd2c00",
+      flex: 1,
+      justifyContent: "flex-end",
+    },
+    actionText: {
+      color: colors.dark,
+      fontSize: 16,
+      backgroundColor: "transparent",
+      paddingHorizontal: 20,
+    },
+    actionIcon: {
+      marginHorizontal: 20,
+    },
+    textContainer: {
+      flex: 1,
+      alignItems: "flex-end",
+    },
+    caption: {
+      marginRight: 20,
+      color: colors.caption,
+    },
+    textInput: {
+      color: "#757575",
+      fontSize: 16,
+      fontWeight: "400",
+      color: colors.text,
+      width: "100%",
+    },
+  });
 
   return (
     <Swipeable
@@ -97,63 +170,34 @@ export default function Item({
             disabled={true}
             ref={checkboxRef}
           />
-          {purchased ? (
-            <Text style={styles.caption}>Bought by {member}</Text>
-          ) : (
-            member && <Text style={styles.caption}>{member} is getting...</Text>
+          {editing && (
+            <TextInput
+              style={styles.textInput}
+              autoFocus={true}
+              onChangeText={onChangeAdd}
+              onEndEditing={() => {
+                onAdd();
+                setEditing(false);
+              }}
+              returnKeyType="done"
+              autoCorrect={false}
+              maxLength={30}
+            />
           )}
+          <View style={styles.textContainer}>
+            {purchased ? (
+              <Text style={styles.caption}>
+                <FontAwesome5 name="shopping-bag" color={colors.caption} />{" "}
+                {member}
+              </Text>
+            ) : (
+              member && (
+                <Text style={styles.caption}>{member} is getting...</Text>
+              )
+            )}
+          </View>
         </View>
       </TouchableHighlight>
     </Swipeable>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    height: 50,
-    width: 340,
-    borderRadius: 24,
-    paddingLeft: 20,
-    backgroundColor: colors.foreground,
-  },
-  touchable: {
-    borderRadius: 24,
-  },
-  swipeable: {
-    borderRadius: 24,
-    marginBottom: 8,
-  },
-  cardText: {
-    fontSize: 16,
-    fontWeight: "400",
-    color: colors.text,
-  },
-  leftAction: {
-    flex: 1,
-    backgroundColor: "#fcd703",
-    justifyContent: "center",
-  },
-  rightAction: {
-    alignItems: "center",
-    flexDirection: I18nManager.isRTL ? "row-reverse" : "row",
-    backgroundColor: "#dd2c00",
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  actionText: {
-    color: colors.dark,
-    fontSize: 16,
-    backgroundColor: "transparent",
-    paddingHorizontal: 20,
-  },
-  actionIcon: {
-    marginHorizontal: 20,
-  },
-  caption: {
-    marginRight: 20,
-    color: colors.caption,
-  },
-});

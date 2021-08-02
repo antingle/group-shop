@@ -5,7 +5,8 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { cache } from "./graphql/cache";
 import { AuthProvider } from "./contexts/AuthContext";
 import Router from "./navigation/Router";
-import { UIManager } from "react-native";
+import { UIManager, View } from "react-native";
+import { SchemeProvider } from "./contexts/SchemeContext";
 
 export default function App() {
   const httpLink = new HttpLink({
@@ -46,7 +47,9 @@ export default function App() {
   return (
     <ApolloProvider client={client}>
       <AuthProvider>
-        <Router />
+        <SchemeProvider>
+          <Router />
+        </SchemeProvider>
       </AuthProvider>
     </ApolloProvider>
   );

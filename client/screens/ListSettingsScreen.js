@@ -1,21 +1,22 @@
 import { gql } from "@apollo/client";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { View, StyleSheet, ScrollView, Alert, Share } from "react-native";
+import { View, ScrollView, Alert, Share } from "react-native";
 import Header from "../components/Header";
 import SettingsCard from "../components/SettingsCard";
 import SettingsMembersCard from "../components/SettingsMembersCard";
 import { cache } from "../graphql/cache";
 import useAuth from "../hooks/useAuth";
 import useList from "../hooks/useList";
-import { colors } from "../other/colors";
 import {
   calculateElapsedTime,
   getFormattedDate,
 } from "../other/helperFunctions";
 import * as Linking from "expo-linking";
+import useScheme from "../hooks/useScheme";
 
 export default function ListSettingsScreen() {
+  const { globalStyles } = useScheme();
   const { authData } = useAuth();
   const { currentListID, deleteList, leaveList } = useList();
   const navigation = useNavigation();
@@ -97,7 +98,7 @@ export default function ListSettingsScreen() {
   const timeElapsed = calculateElapsedTime(dateModified);
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.container}>
       <Header title={"List Settings"} headerLeft={"x"} />
       <ScrollView>
         <SettingsCard
@@ -141,19 +142,3 @@ export default function ListSettingsScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  heading: {
-    fontSize: 40,
-    fontWeight: "800",
-    color: colors.primary,
-    paddingTop: 20,
-    paddingBottom: 20,
-  },
-});

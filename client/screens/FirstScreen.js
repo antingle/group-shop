@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  Image,
 } from "react-native";
-import { colors } from "../other/colors.js";
+import useScheme from "../hooks/useScheme.js";
 
 export default function FirstScreen({ navigation }) {
+  const { colors, globalStyles } = useScheme();
   const handleCreate = () => {
     navigation.navigate("createAccount");
   };
@@ -23,18 +23,101 @@ export default function FirstScreen({ navigation }) {
     navigation.navigate("name");
   };
 
+  // styles
+  const styles = StyleSheet.create({
+    buttonsContainer: {
+      flex: 1,
+      alignItems: "center",
+    },
+    logoContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    logo: {
+      textAlign: "center",
+      fontSize: 64,
+      fontWeight: "900",
+      color: colors.theme,
+    },
+    logoBack: {
+      backgroundColor: colors.primary,
+      borderRadius: 48,
+      width: 320,
+      paddingVertical: 40,
+    },
+    title: {
+      textAlign: "center",
+      fontSize: 40,
+      fontWeight: "900",
+      color: colors.primary,
+      marginBottom: 20,
+    },
+    createButton: {
+      alignItems: "center",
+      justifyContent: "center",
+      height: 60,
+      width: 320,
+      borderRadius: 48,
+      marginBottom: 8,
+      backgroundColor: colors.primary,
+    },
+    signInButton: {
+      alignItems: "center",
+      justifyContent: "center",
+      height: 60,
+      width: 320,
+      borderWidth: 3,
+      borderRadius: 48,
+      borderColor: colors.primary,
+      backgroundColor: "transparent",
+    },
+    guestButton: {
+      alignItems: "center",
+      justifyContent: "center",
+      height: 60,
+      width: 320,
+      borderRadius: 48,
+      backgroundColor: colors.secondary,
+    },
+    createText: {
+      fontSize: 22,
+      color: colors.foreground,
+      fontWeight: "500",
+    },
+    signInText: {
+      fontSize: 22,
+      color: colors.primary,
+      fontWeight: "500",
+    },
+    orText: {
+      padding: 24,
+      fontSize: 20,
+      color: colors.caption,
+      fontWeight: "500",
+    },
+    guestText: {
+      fontSize: 20,
+      color: colors.foreground,
+      fontWeight: "500",
+    },
+    gradient: {
+      height: Dimensions.get("window").height,
+      width: Dimensions.get("window").width,
+      position: "absolute",
+      opacity: 0.5,
+    },
+  });
+
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={[colors.foreground, colors.background]}
-        style={styles.gradient}
-      />
+    <View style={globalStyles.container}>
       <View style={styles.logoContainer}>
-        <Text style={styles.logo}>Group</Text>
-        <Text style={styles.logo}>Shop</Text>
+        <View style={styles.logoBack}>
+          <Text style={styles.logo}>Group</Text>
+          <Text style={styles.logo}>Shop</Text>
+        </View>
       </View>
 
-      {/* <Image source={require('../assets/shoppingcart.svg')} style={styles.image}/> */}
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.createButton} onPress={handleCreate}>
           <Text style={styles.createText}>Create Account</Text>
@@ -50,92 +133,3 @@ export default function FirstScreen({ navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonsContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-  logoContainer: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logo: {
-    textAlign: "center",
-    fontSize: 64,
-    fontWeight: "900",
-    color: colors.primary,
-  },
-  title: {
-    textAlign: "center",
-    fontSize: 40,
-    fontWeight: "900",
-    color: colors.primary,
-    marginBottom: 20,
-  },
-  createButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    height: 60,
-    width: 320,
-    borderRadius: 48,
-    marginBottom: 8,
-    backgroundColor: colors.primary,
-  },
-  signInButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    height: 60,
-    width: 320,
-    borderWidth: 3,
-    borderRadius: 48,
-    borderColor: colors.primary,
-    backgroundColor: "transparent",
-  },
-  guestButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    height: 60,
-    width: 320,
-    borderRadius: 48,
-    backgroundColor: colors.secondary,
-  },
-  createText: {
-    fontSize: 22,
-    color: colors.foreground,
-    fontWeight: "500",
-  },
-  signInText: {
-    fontSize: 22,
-    color: colors.primary,
-    fontWeight: "500",
-  },
-  orText: {
-    padding: 24,
-    fontSize: 20,
-    color: colors.primary,
-    fontWeight: "500",
-  },
-  guestText: {
-    fontSize: 20,
-    color: colors.foreground,
-    fontWeight: "500",
-  },
-  gradient: {
-    height: Dimensions.get("window").height,
-    width: Dimensions.get("window").width,
-    position: "absolute",
-    opacity: 0.5,
-  },
-  image: {
-    height: 180,
-    resizeMode: "contain",
-  },
-});

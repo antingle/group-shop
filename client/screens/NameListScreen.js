@@ -1,13 +1,14 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import { Text, TextInput, StyleSheet, View } from "react-native";
+import { Text, TextInput, View } from "react-native";
 import Header from "../components/Header.js";
 import { CREATE_LIST } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
 import useList from "../hooks/useList.js";
-import { colors } from "../other/colors.js";
+import useScheme from "../hooks/useScheme.js";
 
 export default function NameListScreen({ navigation }) {
+  const { globalStyles } = useScheme();
   const [listName, setListName] = React.useState(null);
   const { authData } = useAuth();
   const { updateLists, setCurrentListID } = useList();
@@ -33,41 +34,20 @@ export default function NameListScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.containerTop}>
       <Header />
-      <Text style={styles.heading}>What is your list for?</Text>
+      <Text style={globalStyles.heading}>What is your list for?</Text>
       <TextInput
         autoFocus={true}
         placeholder="Shopping List Name"
-        style={styles.nameInput}
+        style={globalStyles.nameInput}
         autoCapitalize={"words"}
         onChangeText={setListName}
         onSubmitEditing={handleSubmit}
         autoCorrect={false}
         returnKeyType={"done"}
-        maxLength={35}
+        maxLength={30}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-  },
-  heading: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: colors.primary,
-    marginTop: 100,
-  },
-  nameInput: {
-    fontSize: 24,
-    paddingTop: 80,
-    paddingBottom: 300,
-    color: colors.text,
-    textAlign: "center"
-  },
-});

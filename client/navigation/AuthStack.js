@@ -9,6 +9,13 @@ import GetStartedScreen from "../screens/GetStartedScreen";
 
 export default function AuthStack() {
   const Stack = createStackNavigator();
+
+  const forFade = ({ current }) => ({
+    cardStyle: {
+      opacity: current.progress,
+    },
+  });
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -16,7 +23,13 @@ export default function AuthStack() {
       }}
     >
       <Stack.Screen name="getStarted" component={GetStartedScreen} />
-      <Stack.Screen name="firstScreen" component={FirstScreen} />
+      <Stack.Screen
+        name="firstScreen"
+        component={FirstScreen}
+        options={{
+          cardStyleInterpolator: forFade,
+        }}
+      />
       <Stack.Screen name="createAccount" component={CreateAccountScreen} />
       <Stack.Screen name="signIn" component={SignInScreen} />
       <Stack.Screen name="name" component={NameScreen} />

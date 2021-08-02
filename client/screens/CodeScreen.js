@@ -1,13 +1,14 @@
 import { useMutation } from "@apollo/client";
 import React, { useEffect } from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
-import { colors } from "../other/colors.js";
+import { View, Text, TextInput } from "react-native";
 import { JOIN_LIST } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
 import Header from "../components/Header.js";
 import useList from "../hooks/useList.js";
+import useScheme from "../hooks/useScheme.js";
 
 export default function CodeScreen({ navigation, route }) {
+  const { globalStyles } = useScheme();
   const [code, setCode] = React.useState(null);
   const { authData } = useAuth();
   const { setCurrentListID } = useList();
@@ -42,13 +43,13 @@ export default function CodeScreen({ navigation, route }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.containerTop}>
       <Header />
-      <Text style={styles.heading}>What is the Grocery List Code?</Text>
+      <Text style={globalStyles.heading}>What is the List Code?</Text>
       <TextInput
         autoFocus={true}
         placeholder="Enter Code"
-        style={styles.nameInput}
+        style={globalStyles.nameInput}
         autoCapitalize={"characters"}
         autoCorrect={false}
         onChangeText={setCode}
@@ -58,26 +59,3 @@ export default function CodeScreen({ navigation, route }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-  },
-  heading: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: colors.primary,
-    textAlign: "center",
-    width: 300,
-    marginTop: 70,
-  },
-  nameInput: {
-    fontSize: 24,
-    paddingTop: 80,
-    paddingBottom: 300,
-    color: colors.text,
-    textAlign: "center",
-  },
-});

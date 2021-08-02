@@ -1,14 +1,9 @@
 import React from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
+import useScheme from "../hooks/useScheme";
 
 export default function Loading() {
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  });
+  const { globalStyles } = useScheme();
 
-  return <View style={styles.container}>{/* <ActivityIndicator /> */}</View>;
+  return <View style={globalStyles.container}>{<ActivityIndicator />}</View>;
 }

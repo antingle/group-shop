@@ -1,16 +1,17 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import { View, Text, TextInput } from "react-native";
 import Header from "../components/Header.js";
 import { CREATE_TEMP_USER } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
-import { colors } from "../other/colors.js";
+import useScheme from "../hooks/useScheme.js";
 
-export default function NameScreen({ navigation }) {
+export default function NameScreen() {
+  const { globalStyles } = useScheme();
   const [name, setName] = React.useState(null);
   const { signIn } = useAuth();
 
-  const [createTempUser, { loading, error }] = useMutation(CREATE_TEMP_USER, {
+  const [createTempUser] = useMutation(CREATE_TEMP_USER, {
     update(proxy, result) {
       try {
         const userData = result.data.create_temp_user;
@@ -28,40 +29,20 @@ export default function NameScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={globalStyles.containerTop}>
       <Header headerLeft={"back"} />
-      <Text style={styles.heading}>What is your name?</Text>
+      <Text style={globalStyles.heading}>What is your name?</Text>
       <TextInput
         autoFocus={true}
         placeholder="Your name here"
-        style={styles.nameInput}
+        style={globalStyles.nameInput}
         autoCapitalize={"words"}
         onChangeText={setName}
         onSubmitEditing={handleSubmit}
         autoCorrect={false}
+        maxLength={30}
         returnKeyType={"done"}
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-  },
-  heading: {
-    marginTop: 100,
-    fontSize: 32,
-    fontWeight: "800",
-    color: colors.primary,
-  },
-  nameInput: {
-    fontSize: 24,
-    paddingTop: 80,
-    paddingBottom: 300,
-    color: colors.text,
-    textAlign: "center"
-  },
-});

@@ -32,8 +32,14 @@ export function getFormattedDate(date) {
   return date.toLocaleDateString(undefined, options);
 }
 
-export function sortByDate(a, b) {
+export function sortByDateDescending(a, b) {
   const date1 = new Date(a.last_modified);
   const date2 = new Date(b.last_modified);
   return date2 - date1;
+}
+
+export function sortByDateAscending(a, b) {
+  const date1 = new Date(a.last_modified);
+  const date2 = new Date(b.last_modified);
+  return date1 - date2;
 }

@@ -1,18 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   SectionList,
   StyleSheet,
   Text,
   TouchableHighlight,
-  KeyboardAvoidingView,
-  Platform,
-  LayoutAnimation,
   SafeAreaView,
+  LayoutAnimation,
 } from "react-native";
 import Item from "../components/Item";
-import NewItem from "../components/NewItem";
-import { colors } from "../other/colors.js";
 import { useQuery, useMutation, gql, useSubscription } from "@apollo/client";
 import {
   GET_LIST,
@@ -29,27 +25,25 @@ import useAuth from "../hooks/useAuth";
 import useList from "../hooks/useList";
 import Header from "../components/Header";
 import Loading from "./Loading";
-import { sortByDate } from "../other/helperFunctions";
+import {
+  sortByDateAscending,
+  sortByDateDescending,
+} from "../other/helperFunctions";
 import { useFocusEffect } from "@react-navigation/native";
+import useScheme from "../hooks/useScheme";
 
-const DATA = [
-  { data: [] },
-  {
-    title: "Purchased",
-    data: [],
-  },
-];
+const DATA = [{ data: [] }, { title: "Purchased", data: [] }];
 
 export default function ListDetailScreen() {
-  // refreshes SectionList state (could be temporary fix)
-  const [adding, setAdding] = useState("");
+  const { colors } = useScheme();
   const [refreshing, setRefreshing] = useState(false);
+  const [adding, setAdding] = useState("");
 
+  const [dataChanged, setDataChanged] = useState(false);
   const listRef = useRef();
   const { authData } = useAuth();
   const { setCreatingList, currentListID } = useList();
   const userID = authData.id;
-  // gets id and name from the join or create screen
 
   useEffect(() => {
     setCreatingList(false);
@@ -57,70 +51,45 @@ export default function ListDetailScreen() {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (!loading) refetch();
+      if (!loading) {
+        try {
+          refetch();
+          replaceData();
+        } catch (e) {
+          console.log(e);
+        }
+      }
     }, [])
   );
 
   // get list query to use on first load
   const { data, loading, error, refetch } = useQuery(GET_LIST, {
     variables: { listID: currentListID },
+    onCompleted: () => {
+      replaceData();
+    },
   });
 
-  const readList = cache.readQuery({
-    query: gql`
-      query readList($listID: String!) {
-        get_list(listID: $listID) {
-          items {
-            id
-            name
-            member
-            purchased
-            last_modified
-          }
-        }
-      }
-    `,
-    variables: { listID: currentListID },
-  });
+  // renders SectionList
+  const renderItem = useCallback(
+    ({ item }) => {
+      return (
+        <Item
+          id={item.id}
+          name={item.name}
+          member={item.member}
+          onPress={(id, purchased) => onPurchase(id, purchased)}
+          purchased={item.purchased}
+          onTriggerLeftSwipe={(id, member) => onTriggerLeftSwipe(id, member)}
+          onEndRightSwipe={(id) => onRemove(id)}
+          onAdd={onAdd}
+          onChangeAdd={onChangeAdd}
+        />
+      );
+    },
+    [onAdd, onChangeAdd]
+  );
 
-  const createNewItem = () => {
-    const newItem = {
-      __typename: "Item",
-      id: `new${Math.random() * 10000}`,
-      name: "",
-      member: null,
-      purchased: false,
-      last_modified: new Date().toString(),
-    };
-
-    cache.modify({
-      id: `List:${currentListID}`,
-      fields: {
-        items(existingItemRefs) {
-          const newItemRef = cache.writeFragment({
-            data: newItem,
-
-            fragment: gql`
-              fragment NewItem on Item {
-                id
-                name
-                member
-                purchased
-                last_modified
-              }
-            `,
-          });
-          return [...existingItemRefs, newItemRef];
-        },
-      },
-    });
-
-    listRef.current.scrollToLocation({
-      itemIndex: DATA[0].data.length,
-      sectionIndex: 0,
-      viewPosition: 0.5,
-    });
-  };
   useSubscription(ITEM_UPDATES, {
     variables: { listID: currentListID },
     onSubscriptionData: ({ subscriptionData }) => {
@@ -203,42 +172,106 @@ export default function ListDetailScreen() {
       </SafeAreaView>
     );
 
+  // replace complete list with data prop
+  const replaceData = () => {
+    const unpurchasedItems = data.get_list.items
+      .filter((item) => !item.purchased)
+      .sort(sortByDateAscending);
+
+    const purchasedItems = data.get_list.items
+      .filter((item) => item.purchased)
+      .sort(sortByDateDescending);
+    DATA[0].data = unpurchasedItems;
+    DATA[1].data = purchasedItems;
+    setDataChanged((prev) => !prev);
+  };
+
+  const purchaseStateChange = (id, method) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (method === "purchase") {
+      const index = DATA[0].data.findIndex((item) => item.id == id);
+      const items = DATA[0].data.splice(index, 1);
+      const item = {};
+      Object.assign(item, items[0]);
+      item.purchased = true;
+      item.member = authData.screen_name;
+      DATA[1].data.unshift(item);
+    } else if (method === "unpurchase") {
+      const index = DATA[1].data.findIndex((item) => item.id == id);
+      const items = DATA[1].data.splice(index, 1);
+      const item = {};
+      Object.assign(item, items[0]);
+      item.purchased = false;
+      item.member = null;
+      DATA[0].data.push(item);
+    }
+    setDataChanged((prev) => !prev);
+  };
+
+  const createNewItem = () => {
+    const newItem = {
+      __typename: "Item",
+      id: `new${Math.random() * 10000}`,
+      name: "",
+      member: null,
+      purchased: false,
+      last_modified: new Date().toString(),
+    };
+
+    // cache.modify({
+    //   id: `List:${currentListID}`,
+    //   fields: {
+    //     items(existingItemRefs) {
+    //       const newItemRef = cache.writeFragment({
+    //         data: newItem,
+
+    //         fragment: gql`
+    //           fragment NewItem on Item {
+    //             id
+    //             name
+    //             member
+    //             purchased
+    //             last_modified
+    //           }
+    //         `,
+    //       });
+    //       return [...existingItemRefs, newItemRef];
+    //     },
+    //   },
+    // });
+
+    DATA[0].data.push(newItem);
+    setDataChanged((prev) => !prev);
+
+    listRef.current.scrollToLocation({
+      itemIndex: DATA[0].data.length,
+      sectionIndex: 0,
+      viewPosition: 1,
+    });
+  };
+
   function onAdd() {
     // don't add if item is empty
-    if (adding === "") {
-      cache.modify({
-        id: `List:${currentListID}`,
-        fields: {
-          items(existingItemRefs, { readField }) {
-            return existingItemRefs.filter(
-              (itemRef) => !readField("id", itemRef).includes("new")
-            );
-          },
-        },
-      });
+    let index = DATA[0].data.findIndex(({ id }) => id.includes("new"));
+    if (adding == "") {
+      DATA[0].data.splice(index, 1);
+      // cache.modify({
+      //   id: `List:${currentListID}`,
+      //   fields: {
+      //     items(existingItemRefs, { readField }) {
+      //       return existingItemRefs.filter(
+      //         (itemRef) => !readField("id", itemRef).includes("new")
+      //       );
+      //     },
+      //   },
+      // });
     } else {
+      DATA[0].data[index].name = adding;
       addItem({ variables: { name: adding, listID: currentListID, userID } });
+      console.log(DATA[0].data[index]);
       setAdding("");
     }
-  }
-
-  function onPurchase(id, purchased) {
-    let method = purchased ? "unpurchase" : "purchase";
-    Haptics.impactAsync("light");
-    cache.modify({
-      id: `Item:${id}`,
-      fields: {
-        purchased(value) {
-          return !value;
-        },
-        last_modified(date) {
-          return new Date();
-        },
-      },
-    });
-    purchaseItem({
-      variables: { listID: currentListID, itemID: id, userID, method },
-    });
+    setDataChanged((prev) => !prev);
   }
 
   // pass state in when changing text when adding new item
@@ -246,8 +279,37 @@ export default function ListDetailScreen() {
     setAdding(text);
   }
 
+  function onPurchase(id, purchased) {
+    let method = purchased ? "unpurchase" : "purchase";
+    purchaseStateChange(id, method);
+    Haptics.impactAsync("light");
+    // cache.modify({
+    //   id: `Item:${id}`,
+    //   fields: {
+    //     purchased(value) {
+    //       return !value;
+    //     },
+    //     last_modified(date) {
+    //       return new Date();
+    //     },
+    //   },
+    // });
+    purchaseItem({
+      variables: { listID: currentListID, itemID: id, userID, method },
+    });
+  }
+
   function onRemove(id) {
+    let array = DATA[0].data;
+    let index = array.findIndex((item) => item.id == id);
+    if (index == -1) {
+      array = DATA[1].data;
+      let index = array.findIndex((item) => item.id == id);
+    }
+    array.splice(index, 1);
     Haptics.impactAsync("medium");
+
+    // might need to keep this cache so we dont get an angry warning from graphql
     cache.modify({
       id: `List:${currentListID}`,
       fields: {
@@ -263,6 +325,14 @@ export default function ListDetailScreen() {
 
   function onTriggerLeftSwipe(id, member) {
     let method = member === authData.screen_name ? "unclaim" : "claim";
+    let index = DATA[0].data.findIndex((item) => item.id == id);
+
+    let item = {};
+    Object.assign(item, DATA[0].data[index]);
+    item.member = method == "claim" ? authData.screen_name : null;
+    DATA[0].data[index] = item;
+
+    setDataChanged((prev) => !prev);
     claimItem({
       variables: { listID: currentListID, itemID: id, userID, method },
     });
@@ -278,51 +348,63 @@ export default function ListDetailScreen() {
       console.log(e);
     } finally {
       setRefreshing(false);
+      setDataChanged((prev) => !prev);
     }
   };
 
-  console.log("--*-- re-rendered --*--");
-  let unpurchasedItems = readList.get_list.items.filter(
-    (item) => !item.purchased
-  );
-  let purchasedItems = readList.get_list.items.filter((item) => item.purchased);
-  if (DATA[0].data != unpurchasedItems.sort(sortByDate))
-    DATA[0].data = unpurchasedItems.sort(sortByDate);
+  // console.log("--*-- re-rendered --*--");
 
-  if (DATA[1].data != purchasedItems.sort(sortByDate)) {
-    DATA[1].data = purchasedItems.sort(sortByDate);
+  // styles
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    title: {
+      textAlign: "center",
+      fontSize: 40,
+      fontWeight: "800",
+      color: colors.primary,
+      marginBottom: 12,
+      marginTop: 60,
+    },
+    heading: {
+      fontSize: 28,
+      fontWeight: "800",
+      width: 280,
+      marginTop: 20,
+      marginBottom: 10,
+      color: colors.primary,
+    },
+    nameInput: {
+      fontSize: 24,
+      paddingTop: 80,
+      paddingBottom: 300,
+      color: colors.text,
+    },
+    addButton: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    plus: {
+      fontSize: 45,
+      color: colors.background,
+    },
+    absolute: {
+      position: "absolute",
+      bottom: 40,
+      right: 40,
+    },
+  });
 
-    // Remove "Purchased" heading if no items purchased
-    if (DATA[1].data.length == 0) DATA[1].title = null;
-    else DATA[1].title = "Purchased";
-  }
-
-  // renders SectionList (newitem is rendered when adding a new item)
-  const renderItem = ({ item }) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    return item.id.includes("new") ? (
-      <NewItem
-        id={DATA[0].data.length}
-        onChangeAdd={onChangeAdd}
-        onAdd={onAdd}
-      />
-    ) : (
-      <Item
-        id={item.id}
-        name={item.name}
-        member={item.member}
-        onPress={(id, purchased) => onPurchase(id, purchased)}
-        purchased={item.purchased}
-        onTriggerLeftSwipe={(id, member) => onTriggerLeftSwipe(id, member)}
-        onEndRightSwipe={(id) => onRemove(id)}
-      />
-    );
-  };
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Header
         title={data.get_list.list_name}
         headerLeft={"back"}
@@ -341,8 +423,10 @@ export default function ListDetailScreen() {
         ref={listRef}
         showsVerticalScrollIndicator={false}
         showsHorizontalScrollIndicator={false}
+        initialNumToRender={15}
         onRefresh={refreshList}
         refreshing={refreshing}
+        extraData={dataChanged}
       />
       <View style={styles.absolute}>
         <TouchableHighlight
@@ -355,55 +439,6 @@ export default function ListDetailScreen() {
           </View>
         </TouchableHighlight>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
-
-// Styles for grocery list
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    textAlign: "center",
-    fontSize: 40,
-    fontWeight: "800",
-    color: colors.primary,
-    marginBottom: 12,
-    marginTop: 60,
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: "800",
-    width: 280,
-    marginTop: 20,
-    marginBottom: 10,
-    color: colors.primary,
-  },
-  nameInput: {
-    fontSize: 24,
-    paddingTop: 80,
-    paddingBottom: 300,
-    color: colors.text,
-  },
-  addButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  plus: {
-    fontSize: 45,
-    color: colors.background,
-  },
-  absolute: {
-    position: "absolute",
-    bottom: 40,
-    right: 40,
-  },
-});

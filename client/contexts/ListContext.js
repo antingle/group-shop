@@ -1,5 +1,6 @@
 import { useApolloClient } from "@apollo/client";
 import React, { createContext, useState } from "react";
+import { LayoutAnimation } from "react-native";
 import { DELETE_LIST, GET_USER_LISTS, LEAVE_LIST } from "../graphql/graphql";
 import useAuth from "../hooks/useAuth";
 import { getStorageData, setStorageData } from "../other/storage";
@@ -35,6 +36,7 @@ export const ListProvider = ({ children }) => {
         },
       })
       .then((res) => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setLists(res.data.get_user_lists);
       })
       .catch((e) => {

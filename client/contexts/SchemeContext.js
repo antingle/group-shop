@@ -1,10 +1,5 @@
 import React, { createContext } from "react";
-import {
-  Appearance,
-  Dimensions,
-  StyleSheet,
-  useColorScheme,
-} from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 
 export const SchemeContext = createContext();
 
@@ -15,7 +10,7 @@ export const SchemeProvider = ({ children }) => {
     theme == "light"
       ? {
           // light mode
-          primary: "#32C36E",
+          primary: "#32D274",
           primaryShade: "#5effa2",
           secondary: "#435058",
           background: "#EDF7F6",
@@ -31,7 +26,7 @@ export const SchemeProvider = ({ children }) => {
         }
       : {
           // dark mode
-          primary: "#32C36E",
+          primary: "#32D274",
           primaryShade: "#5effa2",
           secondary: "#839189",
           background: "#1c1c1e",
@@ -46,64 +41,66 @@ export const SchemeProvider = ({ children }) => {
           dark: "#2c2c2e",
         };
 
-  const styles = StyleSheet.create({
+  const globalStyles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.primary,
+      backgroundColor: colors.background,
       alignItems: "center",
       justifyContent: "center",
     },
-    buttonsContainer: {
+    containerTop: {
       flex: 1,
+      backgroundColor: colors.background,
       alignItems: "center",
-    },
-    logoContainer: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    logo: {
       textAlign: "center",
-      fontSize: 64,
-      fontWeight: "900",
-      color: colors.theme,
     },
     title: {
       textAlign: "center",
       fontSize: 40,
       fontWeight: "900",
-      color: colors.theme,
+      color: colors.primary,
       marginBottom: 20,
     },
-    startButton: {
-      alignItems: "center",
-      justifyContent: "center",
-      position: "absolute",
-      bottom: 40,
-      height: 60,
-      width: 320,
-      borderRadius: 48,
-      backgroundColor: colors.theme,
-    },
-    startText: {
-      fontSize: 22,
+    heading: {
+      fontSize: 32,
+      fontWeight: "800",
       color: colors.primary,
-      fontWeight: "500",
+      marginTop: 100,
     },
-    gradient: {
-      height: Dimensions.get("screen").height,
-      width: Dimensions.get("screen").width,
-      position: "absolute",
+    nameInput: {
+      fontSize: 24,
+      paddingTop: 80,
+      paddingBottom: 300,
+      color: colors.text,
+      textAlign: "center",
     },
-    image: {
-      height: 240,
-      resizeMode: "contain",
-      marginVertical: 90,
-      marginRight: 20,
+    caption: {
+      color: colors.caption,
+      maxWidth: 340,
+      textAlign: "center",
+    },
+    inputLabel: {
+      fontSize: 28,
+      fontWeight: "800",
+      width: 280,
+      marginTop: 40,
+      color: colors.primary,
+    },
+    textInput: {
+      fontSize: 24,
+      marginTop: 20,
+      width: 280,
+      color: colors.text,
+      textAlign: "left",
+    },
+    errorText: {
+      color: colors.destructive,
+      fontSize: 16,
     },
   });
 
   return (
-    <SchemeContext.Provider value={{ colors, styles, theme }}>
+    <SchemeContext.Provider value={{ colors, globalStyles, theme }}>
       {children}
     </SchemeContext.Provider>
   );

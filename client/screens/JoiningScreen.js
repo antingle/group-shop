@@ -4,9 +4,10 @@ import { View, Text, StyleSheet, Image, Alert } from "react-native";
 import { JOIN_LIST } from "../graphql/graphql";
 import useAuth from "../hooks/useAuth";
 import useList from "../hooks/useList";
-import { colors } from "../other/colors";
+import useScheme from "../hooks/useScheme";
 
 export default function JoiningScreen({ navigation, route }) {
+  const { colors } = useScheme();
   const code = route.params.code;
   const { authData } = useAuth();
   const { setCurrentListID } = useList();
@@ -37,6 +38,7 @@ export default function JoiningScreen({ navigation, route }) {
     joinList({ variables: { code, userID: authData.id } });
   }, []);
 
+  // styles
   const styles = StyleSheet.create({
     container: {
       flex: 1,

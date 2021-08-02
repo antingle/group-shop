@@ -1,11 +1,12 @@
 import React from "react";
-import { View, StyleSheet, ScrollView, Alert, Text } from "react-native";
+import { View, ScrollView, Alert, Text } from "react-native";
 import Header from "../components/Header";
 import SettingsCard from "../components/SettingsCard";
 import useAuth from "../hooks/useAuth";
-import { colors } from "../other/colors";
+import useScheme from "../hooks/useScheme";
 
 export default function SettingsScreen() {
+  const { globalStyles } = useScheme();
   const { authData, signOut, deleteUser } = useAuth();
 
   const handleSignOut = () => {
@@ -22,56 +23,61 @@ export default function SettingsScreen() {
   };
 
   const handleDelete = () => {
-    Alert.alert("Are you sure?", "Are you sure you want to delete your account? You will be removed from all lists and all your data will be erased.", [
-      { text: "Cancel", style: "cancel", onPress: () => {} },
-      {
-        text: "Delete Account",
-        style: "destructive",
-        // If the user confirmed, then we dispatch the action we blocked earlier
-        // This will continue the action that had triggered the removal of the screen
-        onPress: () => deleteUser(),
-      },
-    ]);
+    Alert.alert(
+      "Are you sure?",
+      "Are you sure you want to delete your account? You will be removed from all lists and all your data will be erased.",
+      [
+        { text: "Cancel", style: "cancel", onPress: () => {} },
+        {
+          text: "Delete Account",
+          style: "destructive",
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: () => deleteUser(),
+        },
+      ]
+    );
   };
 
   const handleName = () => {
-    Alert.prompt("Change name", "Your name is what other people see", (text) => console.log(text), 'plain-text', authData.screen_name);
-  }
+    Alert.prompt(
+      "Change name",
+      "Your name is what other people see",
+      (text) => console.log(text),
+      "plain-text",
+      authData.screen_name
+    );
+  };
 
   return (
-    <View style={styles.container}>
-      <Header title={"Settings"} headerLeft={"x"}/>
+    <View style={globalStyles.container}>
+      <Header title={"Settings"} headerLeft={"x"} />
       <ScrollView>
-        <SettingsCard field={"Name: "} content={authData.screen_name} type={"modifiable"} onPress={handleName}/>
-        {(authData.email != null) && <SettingsCard
-          type={"middle"}
-          content={"Sign Out"}
-          onPress={handleSignOut}
-        />}
-        <SettingsCard type={"warning"} content={"Delete Account"} onPress={handleDelete}/>
-        <Text style={styles.caption}>You are currently a guest user, so signing out will mean deleting your account.</Text>
+        <SettingsCard
+          field={"Name: "}
+          content={authData.screen_name}
+          type={"modifiable"}
+          onPress={handleName}
+        />
+        {authData.email != null && (
+          <SettingsCard
+            type={"middle"}
+            content={"Sign Out"}
+            onPress={handleSignOut}
+          />
+        )}
+        <SettingsCard
+          type={"warning"}
+          content={"Delete Account"}
+          onPress={handleDelete}
+        />
+        {!authData.email && (
+          <Text style={globalStyles.caption}>
+            You are currently a guest user, so signing out will mean deleting
+            your account.
+          </Text>
+        )}
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  heading: {
-    fontSize: 40,
-    fontWeight: "800",
-    color: colors.primary,
-    paddingTop: 20,
-    paddingBottom: 20,
-  },
-  caption: {
-    color: colors.caption,
-    maxWidth: 340,
-    textAlign: "center"
-  }
-});

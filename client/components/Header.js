@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { colors } from "../other/colors";
 import GoBackButton from "../components/GoBackButton";
+import useScheme from "../hooks/useScheme";
 import SettingsButton from "./SettingsButton";
 import XButton from "./XButton";
 
@@ -12,12 +12,15 @@ export default function Header({
   settingsScreen = "settings", // can navigate to settings or listsettings
   backPress = "back", // can navigate to lists or just goback
 }) {
+  const { colors } = useScheme();
+
   let titleFontSize = 40;
   if (title?.length == 9) titleFontSize--;
   if (title?.length > 9) {
     titleFontSize -= title.length - 8;
   }
 
+  // styles
   const styles = StyleSheet.create({
     container: {
       width: Dimensions.get("window").width,
