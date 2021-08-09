@@ -6,6 +6,7 @@ import useAuth from "../hooks/useAuth.js";
 import Header from "../components/Header.js";
 import useScheme from "../hooks/useScheme.js";
 import LongButton from "../components/LongButton.js";
+import Loading from "./Loading.js";
 
 export default function SignInScreen() {
   const { colors, globalStyles } = useScheme();
@@ -54,12 +55,7 @@ export default function SignInScreen() {
     },
   });
 
-  if (loading)
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+  if (loading) return <Loading />;
   if (error)
     <View>
       <Text>{error}</Text>

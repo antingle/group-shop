@@ -47,6 +47,9 @@ const getStorageKey = (itemStored) => {
     case "lists":
       key = "@lists";
       break;
+    case "theme":
+      key = "@theme";
+      break;
   }
   return key;
 };

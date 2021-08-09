@@ -2,6 +2,7 @@ import React from "react";
 import { View, ScrollView, Alert, Text } from "react-native";
 import Header from "../components/Header";
 import SettingsCard from "../components/SettingsCard";
+import SidePicker from "../components/SidePicker";
 import useAuth from "../hooks/useAuth";
 import useScheme from "../hooks/useScheme";
 
@@ -59,6 +60,7 @@ export default function SettingsScreen() {
           type={"modifiable"}
           onPress={handleName}
         />
+        <SidePicker />
         {authData.email != null && (
           <SettingsCard
             type={"middle"}

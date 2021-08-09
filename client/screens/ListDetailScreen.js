@@ -4,9 +4,9 @@ import {
   SectionList,
   StyleSheet,
   Text,
-  TouchableHighlight,
   SafeAreaView,
   LayoutAnimation,
+  KeyboardAvoidingView,
 } from "react-native";
 import Item from "../components/Item";
 import { useQuery, useMutation, gql, useSubscription } from "@apollo/client";
@@ -31,19 +31,22 @@ import {
 } from "../other/helperFunctions";
 import { useFocusEffect } from "@react-navigation/native";
 import useScheme from "../hooks/useScheme";
-
-const DATA = [{ data: [] }, { title: "Purchased", data: [] }];
+import AnimatedPressable from "../components/AnimatedPressable";
 
 export default function ListDetailScreen() {
-  const { colors } = useScheme();
+  const { globalStyles, colors } = useScheme();
   const [refreshing, setRefreshing] = useState(false);
   const [adding, setAdding] = useState("");
-
   const [dataChanged, setDataChanged] = useState(false);
   const listRef = useRef();
   const { authData } = useAuth();
   const { setCreatingList, currentListID } = useList();
   const userID = authData.id;
+
+  const DATA = useCallback(
+    [{ data: [] }, { title: "Purchased", data: [] }],
+    [loading, data]
+  );
 
   useEffect(() => {
     setCreatingList(false);
@@ -52,12 +55,11 @@ export default function ListDetailScreen() {
   useFocusEffect(
     React.useCallback(() => {
       if (!loading) {
-        try {
-          refetch();
-          replaceData();
-        } catch (e) {
-          console.log(e);
-        }
+        refetch()
+          .then((data) => {
+            replaceData(data);
+          })
+          .catch((e) => console.log(e));
       }
     }, [])
   );
@@ -65,8 +67,8 @@ export default function ListDetailScreen() {
   // get list query to use on first load
   const { data, loading, error, refetch } = useQuery(GET_LIST, {
     variables: { listID: currentListID },
-    onCompleted: () => {
-      replaceData();
+    onCompleted: (data) => {
+      replaceData(data);
     },
   });
 
@@ -97,29 +99,35 @@ export default function ListDetailScreen() {
       if (returnedData.affector.id != authData.id)
         switch (returnedData.type) {
           case "add":
-            cache.modify({
-              id: `List:${currentListID}`,
-              fields: {
-                items(existingItemRefs, { readField }) {
-                  const newItemRef = cache.writeFragment({
-                    data: returnedData.item,
+            // cache.modify({
+            //   id: `List:${currentListID}`,
+            //   fields: {
+            //     items(existingItemRefs, { readField }) {
+            //       const newItemRef = cache.writeFragment({
+            //         data: returnedData.item,
 
-                    fragment: gql`
-                      fragment NewItem on Item {
-                        id
-                        name
-                        member
-                        purchased
-                        last_modified
-                      }
-                    `,
-                  });
-                  return [...existingItemRefs, newItemRef];
-                },
-              },
-            });
+            //         fragment: gql`
+            //           fragment NewItem on Item {
+            //             id
+            //             name
+            //             member
+            //             purchased
+            //             last_modified
+            //           }
+            //         `,
+            //       });
+            //       return [...existingItemRefs, newItemRef];
+            //     },
+            //   },
+            // });
+            DATA[0].data.push(returnedData.item);
+            LayoutAnimation.configureNext(
+              LayoutAnimation.Presets.easeInEaseOut
+            );
+            setDataChanged((prevState) => !prevState);
             break;
           case "remove":
+            removeStateChange(returnedData.item.id);
             cache.modify({
               id: `List:${currentListID}`,
               fields: {
@@ -131,49 +139,38 @@ export default function ListDetailScreen() {
                 },
               },
             });
+            break;
+          case "purchase":
+          case "unpurchase":
+            purchaseStateChange(returnedData.item.id, returnedData.type);
+            break;
+          case "claim":
+          case "unclaim":
+            claimStateChange(
+              returnedData.item.id,
+              returnedData.item.member,
+              returnedData.type
+            );
         }
     },
   });
 
   const [addItem] = useMutation(ADD_ITEM, {
-    ignoreResults: true,
     update(cache, result) {
-      cache.modify({
-        id: `List:${currentListID}`,
-        fields: {
-          items(existingItemRefs, { readField }) {
-            return existingItemRefs
-              .filter((itemRef) => "new" !== readField("id", itemRef))
-              .push(result.data);
-          },
-        },
-      });
+      let index = DATA[0].data.findIndex(({ id }) => id.includes("new"));
+      DATA[0].data[index] = result.data.add_item;
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setDataChanged((prev) => !prev);
     },
   });
 
-  const [purchaseItem] = useMutation(PURCHASE_ITEM, {
-    ignoreResults: true,
-  });
-
-  const [claimItem] = useMutation(CLAIM_ITEM, {
-    ignoreResults: true,
-  });
-
-  const [removeItem] = useMutation(REMOVE_ITEM, {
-    ignoreResults: true,
-  });
-
-  if (loading) return <Loading />;
-
-  if (error)
-    return (
-      <SafeAreaView>
-        <Text>{JSON.stringify(error)}</Text>
-      </SafeAreaView>
-    );
+  // mutations on items
+  const [purchaseItem] = useMutation(PURCHASE_ITEM);
+  const [claimItem] = useMutation(CLAIM_ITEM);
+  const [removeItem] = useMutation(REMOVE_ITEM);
 
   // replace complete list with data prop
-  const replaceData = () => {
+  const replaceData = (data = data) => {
     const unpurchasedItems = data.get_list.items
       .filter((item) => !item.purchased)
       .sort(sortByDateAscending);
@@ -181,13 +178,32 @@ export default function ListDetailScreen() {
     const purchasedItems = data.get_list.items
       .filter((item) => item.purchased)
       .sort(sortByDateDescending);
+
     DATA[0].data = unpurchasedItems;
     DATA[1].data = purchasedItems;
+
+    // if items that are older than a week then create new section
+    if (DATA[1].data) {
+      const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
+      const weekAgo = DATA[1].data.filter(
+        ({ last_modified }) => new Date() - new Date(last_modified) > ONE_WEEK
+      );
+      const newPurchased = DATA[1].data.filter(
+        ({ last_modified }) => new Date() - new Date(last_modified) < ONE_WEEK
+      );
+      if (weekAgo?.length > 0) {
+        DATA[2] = { title: "Over A Week Ago", data: [...weekAgo] };
+        DATA[1].data = newPurchased;
+      }
+    }
+
+    if (DATA[1].data.length == 0) DATA[1].title = null;
+    else DATA[1].title = "Purchased";
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setDataChanged((prev) => !prev);
   };
 
   const purchaseStateChange = (id, method) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (method === "purchase") {
       const index = DATA[0].data.findIndex((item) => item.id == id);
       const items = DATA[0].data.splice(index, 1);
@@ -197,15 +213,54 @@ export default function ListDetailScreen() {
       item.member = authData.screen_name;
       DATA[1].data.unshift(item);
     } else if (method === "unpurchase") {
-      const index = DATA[1].data.findIndex((item) => item.id == id);
-      const items = DATA[1].data.splice(index, 1);
+      let index = DATA[1].data.findIndex((item) => item.id == id);
+      let items;
+      if (index == -1) {
+        index = DATA[2]?.data.findIndex((item) => item.id == id);
+        if (index == -1) return;
+        items = DATA[2].data.splice(index, 1);
+      } else items = DATA[1].data.splice(index, 1);
       const item = {};
       Object.assign(item, items[0]);
       item.purchased = false;
       item.member = null;
       DATA[0].data.push(item);
     }
-    setDataChanged((prev) => !prev);
+    if (DATA[1].data.length == 0) DATA[1].title = null;
+    else DATA[1].title = "Purchased";
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    // setDataChanged((prev) => !prev);
+  };
+
+  const removeStateChange = (id) => {
+    let array = DATA[0].data;
+    let index = array.findIndex((item) => item.id == id);
+    if (index == -1) {
+      array = DATA[1].data;
+      index = array.findIndex((item) => item.id == id);
+      if (index == -1) {
+        array = DATA[2]?.data;
+        index = array.findIndex((item) => item.id == id);
+        if (index == -1) return;
+      }
+    }
+    array.splice(index, 1);
+    if (DATA[1].data.length == 0) DATA[1].title = null;
+    else DATA[1].title = "Purchased";
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  };
+
+  const claimStateChange = (id, member, method) => {
+    let index = DATA[0].data.findIndex((item) => item.id == id);
+    if (index == -1) return;
+
+    let item = {};
+    Object.assign(item, DATA[0].data[index]);
+    item.member = method == "claim" ? member : null;
+    DATA[0].data[index] = item;
+
+    setDataChanged((prevState) => !prevState);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
 
   const createNewItem = () => {
@@ -241,12 +296,13 @@ export default function ListDetailScreen() {
     // });
 
     DATA[0].data.push(newItem);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setDataChanged((prev) => !prev);
 
     listRef.current.scrollToLocation({
       itemIndex: DATA[0].data.length,
       sectionIndex: 0,
-      viewPosition: 1,
+      viewPosition: 0.4,
     });
   };
 
@@ -266,11 +322,10 @@ export default function ListDetailScreen() {
       //   },
       // });
     } else {
-      DATA[0].data[index].name = adding;
       addItem({ variables: { name: adding, listID: currentListID, userID } });
-      console.log(DATA[0].data[index]);
       setAdding("");
     }
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setDataChanged((prev) => !prev);
   }
 
@@ -300,13 +355,7 @@ export default function ListDetailScreen() {
   }
 
   function onRemove(id) {
-    let array = DATA[0].data;
-    let index = array.findIndex((item) => item.id == id);
-    if (index == -1) {
-      array = DATA[1].data;
-      let index = array.findIndex((item) => item.id == id);
-    }
-    array.splice(index, 1);
+    removeStateChange(id);
     Haptics.impactAsync("medium");
 
     // might need to keep this cache so we dont get an angry warning from graphql
@@ -324,25 +373,19 @@ export default function ListDetailScreen() {
   }
 
   function onTriggerLeftSwipe(id, member) {
-    let method = member === authData.screen_name ? "unclaim" : "claim";
-    let index = DATA[0].data.findIndex((item) => item.id == id);
-
-    let item = {};
-    Object.assign(item, DATA[0].data[index]);
-    item.member = method == "claim" ? authData.screen_name : null;
-    DATA[0].data[index] = item;
-
-    setDataChanged((prev) => !prev);
+    const method = member == authData.screen_name ? "unclaim" : "claim";
+    claimStateChange(id, authData.screen_name, method);
     claimItem({
       variables: { listID: currentListID, itemID: id, userID, method },
     });
     Haptics.impactAsync("light");
   }
 
-  const refreshList = () => {
+  const refreshList = async () => {
     try {
       setRefreshing(true);
-      refetch();
+      Haptics.impactAsync();
+      await refetch();
       console.log("refreshed the list!");
     } catch (e) {
       console.log(e);
@@ -385,15 +428,15 @@ export default function ListDetailScreen() {
       color: colors.text,
     },
     addButton: {
-      width: 80,
-      height: 80,
+      width: 75,
+      height: 75,
       borderRadius: 40,
       backgroundColor: colors.primary,
       alignItems: "center",
       justifyContent: "center",
     },
     plus: {
-      fontSize: 45,
+      fontSize: 40,
       color: colors.background,
     },
     absolute: {
@@ -403,8 +446,20 @@ export default function ListDetailScreen() {
     },
   });
 
+  if (loading) return <Loading />;
+
+  if (error)
+    return (
+      <SafeAreaView>
+        <Text>{JSON.stringify(error)}</Text>
+      </SafeAreaView>
+    );
+
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
       <Header
         title={data.get_list.list_name}
         headerLeft={"back"}
@@ -426,19 +481,20 @@ export default function ListDetailScreen() {
         initialNumToRender={15}
         onRefresh={refreshList}
         refreshing={refreshing}
-        extraData={dataChanged}
+        getItemLayout={(_, index) => ({
+          length: 56,
+          offset: 56 * index, // THIS IS HARDCODDEDDE!!!!!!
+          index,
+        })}
+        ListFooterComponent={<View style={{ paddingBottom: 40 }}></View>}
       />
       <View style={styles.absolute}>
-        <TouchableHighlight
-          style={styles.addButton}
-          onPress={createNewItem}
-          underlayColor={colors.background}
-        >
-          <View style={styles.addButton}>
+        <AnimatedPressable onPress={createNewItem}>
+          <View style={[styles.addButton, globalStyles.shadow]}>
             <AntDesign name="plus" style={styles.plus} />
           </View>
-        </TouchableHighlight>
+        </AnimatedPressable>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

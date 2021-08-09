@@ -1,4 +1,5 @@
 import { useMutation } from "@apollo/client";
+import { StackActions } from "@react-navigation/native";
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Image, Alert } from "react-native";
 import { JOIN_LIST } from "../graphql/graphql";
@@ -17,7 +18,7 @@ export default function JoiningScreen({ navigation, route }) {
       try {
         let returnedData = result.data.join_list;
         setCurrentListID(returnedData.id);
-        navigation.navigate("listDetail");
+        navigation.dispatch(StackActions.replace("listDetail"));
       } catch (e) {
         console.log(e);
       }

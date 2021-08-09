@@ -6,7 +6,6 @@ import {
   TouchableHighlight,
   I18nManager,
   TextInput,
-  ActivityIndicator,
 } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { Swipeable } from "react-native-gesture-handler";
@@ -84,7 +83,7 @@ export default function Item({
     card: {
       alignItems: "center",
       flexDirection: "row",
-      height: 50,
+      height: 48,
       width: 340,
       borderRadius: 24,
       paddingLeft: 20,
@@ -157,7 +156,7 @@ export default function Item({
       <TouchableHighlight
         style={styles.touchable}
         underlayColor={colors.primary}
-        activeOpacity={0.6}
+        activeOpacity={0.7}
         onPress={() => onPress(id, purchased)}
       >
         <View style={styles.card}>
@@ -187,7 +186,8 @@ export default function Item({
           <View style={styles.textContainer}>
             {purchased ? (
               <Text style={styles.caption}>
-                <FontAwesome5 name="shopping-bag" color={colors.caption} />{" "}
+                <FontAwesome5 name="shopping-bag" color={colors.caption} />
+                {"  "}
                 {member}
               </Text>
             ) : (

@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   View,
-  TouchableHighlight,
   Text,
   StyleSheet,
   FlatList,
   TouchableWithoutFeedback,
   LayoutAnimation,
   Image,
-  Pressable,
+  Animated,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,46 +17,25 @@ import useList from "../hooks/useList.js";
 import { sortByDateDescending } from "../other/helperFunctions.js";
 import { useFocusEffect } from "@react-navigation/native";
 import useScheme from "../hooks/useScheme.js";
+import AnimatedPressable from "../components/AnimatedPressable.js";
 
 export default function ListScreen({ navigation }) {
-  const { colors } = useScheme();
+  const { globalStyles, colors } = useScheme();
   const { lists, setCreatingList, refreshLists, loading, fetchLists } =
     useList();
   const [selectNewList, setSelectNewList] = useState(false);
-  const [position, setPosition] = useState(false);
+  const joinButtonAnimated = useRef(new Animated.Value(0)).current;
+  const createButtonAnimated = useRef(new Animated.Value(0)).current;
 
   useFocusEffect(
     React.useCallback(() => {
-      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setSelectNewList(false);
       fetchLists();
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }, [])
   );
 
-  const handleNewList = () => {
-    LayoutAnimation.configureNext({
-      duration: 150,
-      create: { type: "easeOut", property: "scaleY" },
-      delete: { type: "easeOut", property: "scaleY" },
-    });
-    setSelectNewList((prevState) => !prevState);
-    setPosition(selectNewList);
-  };
-
-  const handleCreate = async () => {
-    console.log("creating list...");
-    await setCreatingList(true);
-    setSelectNewList(false);
-    navigation.navigate("nameList");
-  };
-
-  const handleJoin = async () => {
-    console.log("joining list...");
-    await setCreatingList(true);
-    setSelectNewList(false);
-    navigation.navigate("code");
-  };
-
-  const renderItem = ({ item }) => {
+  const renderItem = useCallback(({ item }) => {
     return (
       <ListCard
         id={item.id}
@@ -67,6 +45,52 @@ export default function ListScreen({ navigation }) {
         navigation={navigation}
       />
     );
+  }, []);
+
+  const animation = (toValue) =>
+    Animated.stagger(100, [
+      Animated.spring(joinButtonAnimated, {
+        toValue: toValue,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(createButtonAnimated, {
+        toValue: toValue,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+  const translateYJoin = joinButtonAnimated.interpolate({
+    inputRange: [0, 1],
+    outputRange: [50, 0],
+  });
+
+  const translateYCreate = createButtonAnimated.interpolate({
+    inputRange: [0, 1],
+    outputRange: [50, 0],
+  });
+
+  const handleNewList = () => {
+    if (selectNewList == false) {
+      setSelectNewList(true);
+      animation(1);
+    } else {
+      animation(0);
+      setTimeout(() => setSelectNewList((prev) => !prev), 350);
+    }
+  };
+
+  const handleCreate = async () => {
+    await setCreatingList(true);
+    setSelectNewList(false);
+    navigation.navigate("nameList");
+  };
+
+  const handleJoin = async () => {
+    await setCreatingList(true);
+    setSelectNewList(false);
+    navigation.navigate("code");
   };
 
   const sortedLists = lists ? [...lists].sort(sortByDateDescending) : null;
@@ -92,6 +116,8 @@ export default function ListScreen({ navigation }) {
       alignItems: "center",
       justifyContent: "center",
       flexDirection: "row",
+      height: 60,
+      width: 180,
     },
     buttonText: {
       fontSize: 20,
@@ -108,26 +134,15 @@ export default function ListScreen({ navigation }) {
     },
     listSelection: {
       position: "absolute",
-      bottom: 34,
+      bottom: 103,
       width: 180,
-      height: 200,
+      height: 130,
       borderRadius: 45,
       backgroundColor: "transparent",
       alignItems: "center",
-      justifyContent: "flex-start",
-      zIndex: 10,
+      justifyContent: "space-around",
     },
     listButton: {
-      width: 180,
-      height: 60,
-      borderRadius: 45,
-      backgroundColor: colors.foreground,
-      alignItems: "center",
-      justifyContent: "center",
-      flexDirection: "row",
-      marginBottom: 7,
-    },
-    listContainer: {
       alignItems: "center",
       justifyContent: "center",
       flexDirection: "row",
@@ -135,6 +150,7 @@ export default function ListScreen({ navigation }) {
       width: 180,
       height: 60,
       borderRadius: 45,
+      zIndex: 10,
     },
     listIcon: {
       color: colors.background,
@@ -172,54 +188,43 @@ export default function ListScreen({ navigation }) {
         )}
         {selectNewList && (
           <View style={styles.listSelection}>
-            <Pressable
-              style={({ pressed }) => [
-                {
-                  width: pressed ? 170 : 180,
-                  height: pressed ? 55 : 60,
-                },
-                styles.listButton,
-              ]}
-              onPressOut={handleCreate}
+            <Animated.View
+              style={{
+                opacity: createButtonAnimated,
+                transform: [{ translateY: translateYCreate }],
+              }}
             >
-              <View style={styles.listContainer}>
-                <Ionicons name="create-outline" style={styles.listIcon} />
-                <Text style={styles.buttonText}>Create List</Text>
-              </View>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                {
-                  width: pressed ? 170 : 180,
-                  height: pressed ? 55 : 60,
-                },
-                styles.listButton,
-              ]}
-              onPressOut={handleJoin}
+              <AnimatedPressable onPress={handleCreate}>
+                <View style={[styles.listButton, globalStyles.shadow]}>
+                  <Ionicons name="create-outline" style={styles.listIcon} />
+                  <Text style={styles.buttonText}>Create List</Text>
+                </View>
+              </AnimatedPressable>
+            </Animated.View>
+
+            <Animated.View
+              style={{
+                opacity: joinButtonAnimated,
+                transform: [{ translateY: translateYJoin }],
+              }}
             >
-              <View style={styles.listContainer}>
-                <Ionicons name="person-add" style={styles.listIcon} />
-                <Text style={styles.buttonText}>Join List</Text>
-              </View>
-            </Pressable>
+              <AnimatedPressable onPress={handleJoin}>
+                <View style={[styles.listButton, globalStyles.shadow]}>
+                  <Ionicons name="person-add" style={styles.listIcon} />
+                  <Text style={styles.buttonText}>Join List</Text>
+                </View>
+              </AnimatedPressable>
+            </Animated.View>
           </View>
         )}
+
         <View style={styles.absolute}>
-          <Pressable
-            style={({ pressed }) => [
-              {
-                width: pressed ? 170 : 180,
-                height: pressed ? 55 : 60,
-              },
-              styles.addButton,
-            ]}
-            onPressOut={handleNewList}
-          >
-            <View style={styles.addButton}>
+          <AnimatedPressable onPress={handleNewList}>
+            <View style={[styles.addButton, globalStyles.shadow]}>
               <AntDesign name="plus" style={styles.plus} />
               <Text style={styles.buttonText}>New List</Text>
             </View>
-          </Pressable>
+          </AnimatedPressable>
         </View>
       </View>
     </TouchableWithoutFeedback>

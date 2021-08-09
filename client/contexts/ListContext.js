@@ -4,6 +4,7 @@ import { LayoutAnimation } from "react-native";
 import { DELETE_LIST, GET_USER_LISTS, LEAVE_LIST } from "../graphql/graphql";
 import useAuth from "../hooks/useAuth";
 import { getStorageData, setStorageData } from "../other/storage";
+import * as Haptics from "expo-haptics";
 
 export const ListContext = createContext();
 
@@ -28,6 +29,7 @@ export const ListProvider = ({ children }) => {
 
   const refreshLists = async () => {
     setLoading(true);
+    Haptics.impactAsync();
     await client
       .mutate({
         mutation: GET_USER_LISTS,

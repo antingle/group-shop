@@ -19,7 +19,6 @@ export function calculateElapsedTime(dateSince) {
     if (newTime < 2) timeUnit = "day ago";
     else timeUnit = "days ago";
   }
-
   return `${parseInt(newTime)} ${timeUnit}`;
 }
 

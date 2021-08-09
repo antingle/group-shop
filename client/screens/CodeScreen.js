@@ -6,16 +6,15 @@ import useAuth from "../hooks/useAuth.js";
 import Header from "../components/Header.js";
 import useList from "../hooks/useList.js";
 import useScheme from "../hooks/useScheme.js";
+import Loading from "./Loading";
 
-export default function CodeScreen({ navigation, route }) {
+export default function CodeScreen({ navigation }) {
   const { globalStyles } = useScheme();
   const [code, setCode] = React.useState(null);
   const { authData } = useAuth();
   const { setCurrentListID } = useList();
 
-  useEffect(() => {
-    console.log(route.params);
-  }, []);
+  useEffect(() => {}, []);
 
   const [joinList, { loading }] = useMutation(JOIN_LIST, {
     update(proxy, result) {
@@ -41,6 +40,8 @@ export default function CodeScreen({ navigation, route }) {
       console.log(err);
     }
   };
+
+  if (loading) return <Loading />;
 
   return (
     <View style={globalStyles.containerTop}>

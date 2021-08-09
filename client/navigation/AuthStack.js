@@ -10,9 +10,9 @@ import GetStartedScreen from "../screens/GetStartedScreen";
 export default function AuthStack() {
   const Stack = createStackNavigator();
 
-  const forFade = ({ current }) => ({
+  const forFade = ({ current: { progress } }) => ({
     cardStyle: {
-      opacity: current.progress,
+      opacity: progress,
     },
   });
 
@@ -27,6 +27,9 @@ export default function AuthStack() {
         name="firstScreen"
         component={FirstScreen}
         options={{
+          transitionSpec: {
+            open: { animation: "timing", config: { duration: 1000 } },
+          },
           cardStyleInterpolator: forFade,
         }}
       />

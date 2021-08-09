@@ -1,13 +1,35 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { StyleSheet, useColorScheme } from "react-native";
+import {
+  getStorageData,
+  removeStorageData,
+  setStorageData,
+} from "../other/storage";
 
 export const SchemeContext = createContext();
 
 export const SchemeProvider = ({ children }) => {
-  let theme = useColorScheme();
+  const systemTheme = useColorScheme();
+  const [themeSetting, setThemeSetting] = useState("auto");
+  const [theme, setTheme] = useState(systemTheme);
+
+  // on app launch
+  useEffect(() => {
+    getStorageData("theme").then((storedTheme) => {
+      if (storedTheme) setThemeSetting(storedTheme);
+    });
+  }, []);
+
+  // configure if theme is manually set or system set
+  useEffect(() => {
+    if (themeSetting != "auto") {
+      setTheme(themeSetting);
+    } else setTheme(systemTheme);
+    setStorageData("theme", themeSetting);
+  }, [themeSetting, systemTheme]);
 
   const colors =
-    theme == "light"
+    theme != "dark"
       ? {
           // light mode
           primary: "#32D274",
@@ -23,6 +45,7 @@ export const SchemeProvider = ({ children }) => {
           theme: "#EDF7F6",
           light: "#EDF7F6",
           dark: "#2c2c2e",
+          black: "#000",
         }
       : {
           // dark mode
@@ -39,6 +62,7 @@ export const SchemeProvider = ({ children }) => {
           theme: "#2c2c2e",
           light: "#EDF7F6",
           dark: "#2c2c2e",
+          black: "#000",
         };
 
   const globalStyles = StyleSheet.create({
@@ -97,10 +121,22 @@ export const SchemeProvider = ({ children }) => {
       color: colors.destructive,
       fontSize: 16,
     },
+    shadow: {
+      shadowColor: colors.black,
+      shadowOffset: {
+        width: 0,
+        height: 10,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 15,
+      elevation: 20,
+    },
   });
 
   return (
-    <SchemeContext.Provider value={{ colors, globalStyles, theme }}>
+    <SchemeContext.Provider
+      value={{ colors, globalStyles, theme, themeSetting, setThemeSetting }}
+    >
       {children}
     </SchemeContext.Provider>
   );

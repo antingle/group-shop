@@ -27,8 +27,15 @@ export default function AppStack() {
       setListsLoading(false);
     },
   });
+
   if (listsLoading) return <Loading />;
   if (error) console.log(error);
+
+  const forFade = ({ current: { progress } }) => ({
+    cardStyle: {
+      opacity: progress,
+    },
+  });
 
   return (
     <Stack.Navigator
@@ -52,7 +59,13 @@ export default function AppStack() {
           <Stack.Screen name="code" component={CodeScreen} />
         </>
       ) : null}
-      <Stack.Screen name="join" component={JoiningScreen} />
+      <Stack.Screen
+        name="join"
+        component={JoiningScreen}
+        options={{
+          cardStyleInterpolator: forFade,
+        }}
+      />
     </Stack.Navigator>
   );
 }

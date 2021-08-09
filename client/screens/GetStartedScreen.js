@@ -42,7 +42,7 @@ export default function GetStartedScreen({ navigation }) {
       position: "absolute",
     },
     image: {
-      height: 240,
+      height: 200,
       resizeMode: "contain",
       marginVertical: 90,
       marginRight: 20,

@@ -17,7 +17,7 @@ export default function Header({
   let titleFontSize = 40;
   if (title?.length == 9) titleFontSize--;
   if (title?.length > 9) {
-    titleFontSize -= title.length - 8;
+    titleFontSize -= Math.sqrt(title.length * 3);
   }
 
   // styles
@@ -25,9 +25,11 @@ export default function Header({
     container: {
       width: Dimensions.get("window").width,
       backgroundColor: colors.background,
-      alignItems: "flex-start",
+      alignItems: "center",
       justifyContent: "space-between",
       flexDirection: "row",
+      marginTop: 60,
+      marginBottom: 12,
     },
     title: {
       textAlign: "center",
@@ -35,12 +37,10 @@ export default function Header({
       fontSize: titleFontSize,
       fontWeight: "800",
       color: colors.primary,
-      marginTop: 60,
-      marginBottom: 12,
     },
     sideHeader: {
       alignItems: "center",
-      width: 100,
+      width: 90,
     },
   });
 
@@ -67,7 +67,9 @@ export default function Header({
     <View>
       <View style={styles.container}>
         <View style={styles.sideHeader}>{headerLeft}</View>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title} ellipsizeMode="tail" numberOfLines={2}>
+          {title}
+        </Text>
         <View style={styles.sideHeader}>{headerRight}</View>
       </View>
     </View>

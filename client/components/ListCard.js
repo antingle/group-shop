@@ -1,11 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import useAuth from "../hooks/useAuth.js";
 import { calculateElapsedTime } from "../other/helperFunctions.js";
 import useList from "../hooks/useList.js";
 import useScheme from "../hooks/useScheme";
+import AnimatedPressable from "./AnimatedPressable.js";
 
 export default function ListCard({
   id,
@@ -41,14 +42,6 @@ export default function ListCard({
     return renderedMembers;
   };
 
-  const renderName = () => {
-    let adjustedName = name;
-    if (name != null && name.length > 20) {
-      adjustedName = name.substring(0, 20) + "...";
-    }
-    return adjustedName;
-  };
-
   const elapsedTime = calculateElapsedTime(new Date(lastModified));
 
   // styles
@@ -63,18 +56,19 @@ export default function ListCard({
       marginBottom: 12,
     },
     topContainer: {
-      width: 340,
+      paddingHorizontal: 32,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-around",
-      marginBottom: 16,
     },
-    cardText: {
+    cardTitle: {
       fontSize: 24,
       fontWeight: "700",
       color: colors.text,
+      flex: 3,
     },
     members: {
+      marginTop: 16,
       alignItems: "center",
       justifyContent: "center",
       flexDirection: "row",
@@ -89,24 +83,32 @@ export default function ListCard({
       color: colors.caption,
     },
     timeText: {
+      textAlign: "right",
       fontSize: 14,
       fontWeight: "400",
       color: colors.caption2,
+      flex: 2,
     },
   });
 
   return (
-    <TouchableOpacity style={styles.card} onPress={handlePress}>
-      <View style={styles.topContainer}>
-        <Text style={styles.cardText}>{renderName()}</Text>
-        <Text style={styles.timeText}>{elapsedTime}</Text>
-      </View>
-      {members.length > 1 && (
-        <View style={styles.members}>
-          <Ionicons name="person" style={styles.icon} />
-          <Text style={styles.membersText}>{renderMembers()}</Text>
+    <AnimatedPressable onPress={handlePress}>
+      <View style={styles.card}>
+        <View style={styles.topContainer}>
+          <Text style={styles.cardTitle} numberOfLines={2} ellipsizeMode="tail">
+            {name}
+          </Text>
+          <Text style={styles.timeText}>{elapsedTime}</Text>
         </View>
-      )}
-    </TouchableOpacity>
+        {members.length > 1 && (
+          <View style={styles.members}>
+            <Ionicons name="person" style={styles.icon} />
+            <Text style={styles.membersText} numberOfLines={1}>
+              {renderMembers()}
+            </Text>
+          </View>
+        )}
+      </View>
+    </AnimatedPressable>
   );
 }

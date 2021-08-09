@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableHighlight } from "react-native";
 import Clipboard from "expo-clipboard";
 import { Ionicons } from "@expo/vector-icons";
 import useScheme from "../hooks/useScheme";
+import AnimatedPressable from "./AnimatedPressable";
 
 export default function SettingsCard({
   type = "default",
@@ -101,16 +102,7 @@ export default function SettingsCard({
       fontSize: 15,
       color: colors.text,
     },
-    buttonCard: {
-      alignItems: "center",
-      justifyContent: "center",
-      flexDirection: "row",
-      height: 56,
-      width: 340,
-      borderRadius: 24,
-      backgroundColor: colors.primary,
-      marginBottom: 10,
-    },
+
     buttonView: {
       alignItems: "center",
       justifyContent: "center",
@@ -118,6 +110,7 @@ export default function SettingsCard({
       height: 56,
       width: 340,
       borderRadius: 24,
+      marginBottom: 10,
       backgroundColor: colors.primary,
     },
     buttonText: {
@@ -195,15 +188,11 @@ export default function SettingsCard({
     );
   else if (type == "button")
     return (
-      <TouchableHighlight
-        onPress={onPress}
-        style={styles.buttonCard}
-        underlayColor={colors.text}
-      >
+      <AnimatedPressable onPress={onPress}>
         <View style={styles.buttonView}>
           <Ionicons name="person-add" style={styles.listIcon} />
           <Text style={styles.buttonText}>{content}</Text>
         </View>
-      </TouchableHighlight>
+      </AnimatedPressable>
     );
 }

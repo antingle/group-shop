@@ -7,6 +7,7 @@ import useAuth from "../hooks/useAuth.js";
 import Header from "../components/Header.js";
 import useScheme from "../hooks/useScheme.js";
 import LongButton from "../components/LongButton.js";
+import Loading from "./Loading.js";
 
 export default function CreateAccountScreen({ navigation }) {
   const { colors, globalStyles } = useScheme();
@@ -103,12 +104,7 @@ export default function CreateAccountScreen({ navigation }) {
   );
   if (error) console.log(error.graphQLErrors);
 
-  if (loading)
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+  if (loading) return <Loading />;
   if (error)
     <View>
       <Text>{JSON.stringify(error)}</Text>
