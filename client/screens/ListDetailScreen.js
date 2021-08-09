@@ -44,7 +44,7 @@ export default function ListDetailScreen() {
   const userID = authData.id;
 
   const DATA = useCallback(
-    [{ data: [] }, { title: "Purchased", data: [] }],
+    [{ data: [] }, { title: null, data: [] }],
     [loading, data]
   );
 
@@ -54,10 +54,10 @@ export default function ListDetailScreen() {
 
   useFocusEffect(
     React.useCallback(() => {
-      if (!loading) {
+      if (!loading && data) {
         refetch()
           .then((data) => {
-            replaceData(data);
+            replaceData(data.data);
           })
           .catch((e) => console.log(e));
       }
