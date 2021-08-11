@@ -3,8 +3,8 @@ import React, { createContext, useState, useEffect } from "react";
 import { Alert } from "react-native";
 import { DELETE_USER } from "../graphql/graphql";
 import {
+  clearStorageData,
   getStorageData,
-  removeStorageData,
   setStorageData,
 } from "../other/storage";
 
@@ -18,7 +18,8 @@ authData:
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children, setToken }) => {
+  // setToken passed down from main App
   const [authData, setAuthData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lists, setLists] = useState(false);
@@ -27,9 +28,14 @@ export const AuthProvider = ({ children }) => {
   // hooks
   const [delete_user] = useMutation(DELETE_USER);
 
+  // check if someone is logged in on app mount
   useEffect(() => {
     getStorageData("user").then((data) => {
       if (data != null) setAuthData(data);
+      setLoading(false);
+    });
+    getStorageData("token").then((data) => {
+      if (data != null) setToken(data);
       setLoading(false);
     });
   }, []);
@@ -37,29 +43,30 @@ export const AuthProvider = ({ children }) => {
   const signIn = async (data) => {
     if (!data) return;
     try {
-      setStorageData("user", data);
-      setAuthData(data);
+      setStorageData("user", data.user);
+      setStorageData("token", data.token);
+      setAuthData(data.user);
+      setToken(data.token);
     } catch (error) {
       console.log(error);
     }
   };
   const signOut = async () => {
-    removeStorageData("user");
-    removeStorageData("lists");
+    clearStorageData(); // clears all keys
     setLists(false);
     setAuthData(null);
-    client.clearStore();
+    client.resetStore();
   };
 
   const deleteUser = async () => {
     try {
-    delete_user({variables: { userID: authData.id }})
-    signOut();
+      delete_user();
+      signOut();
     } catch {
       Alert.alert("Error deleting account");
     }
-  }
-  
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -68,8 +75,8 @@ export const AuthProvider = ({ children }) => {
         signIn,
         signOut,
         deleteUser,
-        lists, 
-        setLists
+        lists,
+        setLists,
       }}
     >
       {children}

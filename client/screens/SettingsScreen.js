@@ -7,7 +7,7 @@ import useAuth from "../hooks/useAuth";
 import useScheme from "../hooks/useScheme";
 
 export default function SettingsScreen() {
-  const { globalStyles } = useScheme();
+  const { globalStyles, setThemeSetting } = useScheme();
   const { authData, signOut, deleteUser } = useAuth();
 
   const handleSignOut = () => {
@@ -18,7 +18,10 @@ export default function SettingsScreen() {
         style: "destructive",
         // If the user confirmed, then we dispatch the action we blocked earlier
         // This will continue the action that had triggered the removal of the screen
-        onPress: () => signOut(),
+        onPress: () => {
+          setThemeSetting("auto");
+          signOut();
+        },
       },
     ]);
   };
@@ -34,7 +37,10 @@ export default function SettingsScreen() {
           style: "destructive",
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
-          onPress: () => deleteUser(),
+          onPress: () => {
+            setThemeSetting("auto");
+            deleteUser();
+          },
         },
       ]
     );

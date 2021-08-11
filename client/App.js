@@ -5,19 +5,32 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { cache } from "./graphql/cache";
 import { AuthProvider } from "./contexts/AuthContext";
 import Router from "./navigation/Router";
-import { UIManager, View } from "react-native";
 import { SchemeProvider } from "./contexts/SchemeContext";
+import { setContext } from "@apollo/client/link/context";
 
 export default function App() {
+  const [token, setToken] = React.useState(null); // stores token
+
   const httpLink = new HttpLink({
-    uri: "https://group-shop.herokuapp.com/graphql",
+    uri: "https://group-shop-production.herokuapp.com/graphql",
+    credentials: "include",
   });
 
   const wsLink = new WebSocketLink({
-    uri: "ws://group-shop.herokuapp.com/subscriptions",
+    uri: "ws://group-shop-production.herokuapp.com/subscriptions",
     options: {
       reconnect: true,
     },
+  });
+
+  const authLink = setContext((_, { headers }) => {
+    // return the headers to the context so httpLink can read them
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
+      },
+    };
   });
 
   const splitLink = split(
@@ -33,20 +46,13 @@ export default function App() {
   );
 
   const client = new ApolloClient({
-    link: splitLink,
+    link: authLink.concat(splitLink),
     cache: cache,
   });
 
-  // To allow Android to use LayoutAnimation
-  if (Platform.OS === "android") {
-    if (UIManager.setLayoutAnimationEnabledExperimental) {
-      UIManager.setLayoutAnimationEnabledExperimental(true);
-    }
-  }
-
   return (
     <ApolloProvider client={client}>
-      <AuthProvider>
+      <AuthProvider setToken={setToken}>
         <SchemeProvider>
           <Router />
         </SchemeProvider>

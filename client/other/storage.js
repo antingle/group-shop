@@ -23,33 +23,27 @@ export const setStorageData = async (itemStored, value) => {
   }
 };
 
-export const removeStorageData = async (itemStored) => {
+export const removeStorageData = (itemStored) => {
   try {
     const key = getStorageKey(itemStored);
-    await AsyncStorage.removeItem(key);
+    AsyncStorage.removeItem(key);
   } catch (e) {
     console.log(e);
   }
+};
+export const clearStorageData = () => {
+  AsyncStorage.clear();
 };
 
 /*
   storage keys in use:
     "@user"
     "@lists"
+    "@theme"
+    "@token"
+    -- all list IDs for offline use
 */
 
 const getStorageKey = (itemStored) => {
-  let key;
-  switch (itemStored) {
-    case "user":
-      key = "@user";
-      break;
-    case "lists":
-      key = "@lists";
-      break;
-    case "theme":
-      key = "@theme";
-      break;
-  }
-  return key;
+  return String("@" + itemStored);
 };

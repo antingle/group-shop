@@ -3,9 +3,7 @@ import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import { LOGIN } from "../graphql/graphql.js";
 import useAuth from "../hooks/useAuth.js";
-import Header from "../components/Header.js";
 import useScheme from "../hooks/useScheme.js";
-import LongButton from "../components/LongButton.js";
 import Loading from "./Loading.js";
 
 export default function SignInScreen() {
@@ -21,10 +19,8 @@ export default function SignInScreen() {
   const [login, { loading, error }] = useMutation(LOGIN, {
     update(proxy, result) {
       try {
-        const userData = result.data.login;
-        const listData = userData.lists;
-        delete userData.lists; // delete is not an ideal operation
-        signIn(userData);
+        const loginData = result.data.login;
+        signIn(loginData);
       } catch (e) {
         console.log(e); // in future, display error messages on this screen
       }
@@ -62,13 +58,11 @@ export default function SignInScreen() {
     </View>;
 
   return (
-    <View style={globalStyles.containerTop}>
-      <Header title={"Sign In"} />
+    <View style={globalStyles.containerTop2}>
       <Text style={globalStyles.inputLabel}>Email</Text>
       <TextInput
         placeholder="Email"
         style={globalStyles.textInput}
-        autoFocus={true}
         autoCapitalize={"none"}
         onChangeText={setEmail}
         autoCorrect={false}
@@ -92,13 +86,13 @@ export default function SignInScreen() {
         returnKeyType="done"
         ref={passRef}
       />
-      <LongButton
+      {/* <LongButton
         text="Sign In"
-        onPressOut={handleSignIn}
+        onPress={handleSignIn}
         textColor={colors.background}
         backgroundColor={colors.primary}
         marginTop={48}
-      />
+      /> */}
     </View>
   );
 }

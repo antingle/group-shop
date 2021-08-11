@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableWithoutFeedback,
   LayoutAnimation,
-  Image,
   Animated,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -18,6 +17,8 @@ import { sortByDateDescending } from "../other/helperFunctions.js";
 import { useFocusEffect } from "@react-navigation/native";
 import useScheme from "../hooks/useScheme.js";
 import AnimatedPressable from "../components/AnimatedPressable.js";
+import EmptyList from "../components/EmptyList.js";
+import Loading from "./Loading.js";
 
 export default function ListScreen({ navigation }) {
   const { globalStyles, colors } = useScheme();
@@ -34,7 +35,6 @@ export default function ListScreen({ navigation }) {
       LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     }, [])
   );
-
   const renderItem = useCallback(({ item }) => {
     return (
       <ListCard
@@ -141,6 +141,7 @@ export default function ListScreen({ navigation }) {
       backgroundColor: "transparent",
       alignItems: "center",
       justifyContent: "space-around",
+      zIndex: 10,
     },
     listButton: {
       alignItems: "center",
@@ -170,7 +171,7 @@ export default function ListScreen({ navigation }) {
     <TouchableWithoutFeedback onPress={handleNewList} disabled={!selectNewList}>
       <View style={styles.container}>
         <Header title={"Lists"} headerLeft={"settings"} />
-        {lists?.length > 0 ? (
+        {!loading ? (
           <FlatList
             data={sortedLists}
             renderItem={renderItem}
@@ -179,13 +180,12 @@ export default function ListScreen({ navigation }) {
             refreshing={loading}
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
+            ListEmptyComponent={EmptyList}
           />
         ) : (
-          <Image
-            source={require("../assets/emptylists.png")}
-            style={styles.emptyImage}
-          />
+          <Loading />
         )}
+
         {selectNewList && (
           <View style={styles.listSelection}>
             <Animated.View

@@ -16,18 +16,12 @@ export const REGISTER = gql`
         confirm_password: $confirmPassword
       }
     ) {
-      id
-      email
-      screen_name
-      lists {
+      token
+      user {
         id
-        list_name
-        owned
-        members {
-          id
-          screen_name
-        }
-        last_modified
+        email
+        screen_name
+        join_date
       }
     }
   }
@@ -36,49 +30,38 @@ export const REGISTER = gql`
 export const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
-      id
-      email
-      screen_name
-      lists {
+      token
+      user {
         id
-        list_name
-        owned
-        members {
-          id
-          screen_name
-        }
-        last_modified
+        email
+        screen_name
+        join_date
       }
     }
   }
 `;
 
 export const CREATE_TEMP_USER = gql`
-  mutation create_temp_user($name: String!) {
-    create_temp_user(screen_name: $name) {
-      id
-      email
-      screen_name
-      lists {
+  mutation create_temp_user($screen_name: String!) {
+    create_temp_user(screen_name: $screen_name) {
+      token
+      user {
         id
-        list_name
-        owned
-        members {
-          id
-          screen_name
-        }
+        email
+        screen_name
+        join_date
       }
     }
   }
 `;
 
 export const DELETE_USER = gql`
-mutation delete_user($userID: ID!) {
-  delete_user(userID: $userID) {
-    id
+  mutation delete_user {
+    delete_user {
+      id
+    }
   }
-}
-`
+`;
 
 export const GET_USER = gql`
   query get_user($userID: ID!) {
@@ -143,8 +126,8 @@ export const GET_LIST = gql`
 `;
 
 export const JOIN_LIST = gql`
-  mutation join_list($code: String!, $userID: ID!) {
-    join_list(code: $code, userID: $userID) {
+  mutation join_list($code: String!) {
+    join_list(code: $code) {
       id
       owner
       list_name
@@ -160,8 +143,8 @@ export const JOIN_LIST = gql`
 `;
 
 export const CREATE_LIST = gql`
-  mutation create_list($listName: String!, $userID: ID!) {
-    create_list(list_name: $listName, userID: $userID) {
+  mutation create_list($listName: String!) {
+    create_list(list_name: $listName) {
       id
       owner
       list_name
@@ -185,8 +168,8 @@ export const DELETE_LIST = gql`
 `;
 
 export const LEAVE_LIST = gql`
-  mutation leave_list($listID: ID!, $userID: ID!) {
-    leave_list(listID: $listID, userID: $userID) {
+  mutation leave_list($listID: ID!) {
+    leave_list(listID: $listID) {
       id
     }
   }
@@ -194,8 +177,8 @@ export const LEAVE_LIST = gql`
 
 //======= ITEM ACTIONS =======//
 export const ADD_ITEM = gql`
-  mutation add_item($name: String!, $listID: ID!, $userID: ID!) {
-    add_item(name: $name, listID: $listID, userID: $userID) {
+  mutation add_item($name: String!, $listID: ID!) {
+    add_item(name: $name, listID: $listID) {
       id
       name
       member
@@ -206,18 +189,8 @@ export const ADD_ITEM = gql`
 `;
 
 export const PURCHASE_ITEM = gql`
-  mutation purchase_item(
-    $listID: ID!
-    $itemID: ID!
-    $userID: ID!
-    $method: String!
-  ) {
-    purchase_item(
-      listID: $listID
-      itemID: $itemID
-      userID: $userID
-      method: $method
-    ) {
+  mutation purchase_item($listID: ID!, $itemID: ID!, $method: String!) {
+    purchase_item(listID: $listID, itemID: $itemID, method: $method) {
       id
       name
       member
@@ -228,8 +201,8 @@ export const PURCHASE_ITEM = gql`
 `;
 
 export const REMOVE_ITEM = gql`
-  mutation remove_item($listID: ID!, $itemID: ID!, $userID: ID!) {
-    remove_item(listID: $listID, itemID: $itemID, userID: $userID) {
+  mutation remove_item($listID: ID!, $itemID: ID!) {
+    remove_item(listID: $listID, itemID: $itemID) {
       id
       name
       member
@@ -240,18 +213,8 @@ export const REMOVE_ITEM = gql`
 `;
 
 export const CLAIM_ITEM = gql`
-  mutation claim_item(
-    $listID: ID!
-    $itemID: ID!
-    $userID: ID!
-    $method: String!
-  ) {
-    claim_item(
-      listID: $listID
-      itemID: $itemID
-      userID: $userID
-      method: $method
-    ) {
+  mutation claim_item($listID: ID!, $itemID: ID!, $method: String!) {
+    claim_item(listID: $listID, itemID: $itemID, method: $method) {
       id
       name
       member

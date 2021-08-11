@@ -37,11 +37,18 @@ export default function ListDetailScreen() {
   const { globalStyles, colors } = useScheme();
   const [refreshing, setRefreshing] = useState(false);
   const [adding, setAdding] = useState("");
+  const [listName, setListName] = useState("");
   const [dataChanged, setDataChanged] = useState(false);
   const listRef = useRef();
   const { authData } = useAuth();
-  const { setCreatingList, currentListID } = useList();
-  const userID = authData.id;
+  const {
+    creatingList,
+    setCreatingList,
+    currentListID,
+    storeItems,
+    getItems,
+    getListName,
+  } = useList();
 
   const DATA = useCallback(
     [{ data: [] }, { title: null, data: [] }],
@@ -49,7 +56,12 @@ export default function ListDetailScreen() {
   );
 
   useEffect(() => {
+    // if new list made, name is not in lists object yet
+    if (!creatingList) {
+      setListName(getListName());
+    }
     setCreatingList(false);
+    getLocalData(); // for offline and faster loading
   }, [currentListID]);
 
   useFocusEffect(
@@ -61,6 +73,7 @@ export default function ListDetailScreen() {
           })
           .catch((e) => console.log(e));
       }
+      return () => storeItems(DATA); // for offline
     }, [])
   );
 
@@ -68,6 +81,8 @@ export default function ListDetailScreen() {
   const { data, loading, error, refetch } = useQuery(GET_LIST, {
     variables: { listID: currentListID },
     onCompleted: (data) => {
+      if (!data) return;
+      setListName(data.get_list.list_name);
       replaceData(data);
     },
   });
@@ -120,14 +135,14 @@ export default function ListDetailScreen() {
             //     },
             //   },
             // });
-            DATA[0].data.push(returnedData.item);
+            DATA[0].data.push(returnedData.item[0]);
             LayoutAnimation.configureNext(
               LayoutAnimation.Presets.easeInEaseOut
             );
             setDataChanged((prevState) => !prevState);
             break;
           case "remove":
-            removeStateChange(returnedData.item.id);
+            removeStateChange(returnedData.item[0].id);
             cache.modify({
               id: `List:${currentListID}`,
               fields: {
@@ -142,13 +157,13 @@ export default function ListDetailScreen() {
             break;
           case "purchase":
           case "unpurchase":
-            purchaseStateChange(returnedData.item.id, returnedData.type);
+            purchaseStateChange(returnedData.item[0].id, returnedData.type);
             break;
           case "claim":
           case "unclaim":
             claimStateChange(
-              returnedData.item.id,
-              returnedData.item.member,
+              returnedData.item[0].id,
+              returnedData.item[0].member,
               returnedData.type
             );
         }
@@ -168,6 +183,16 @@ export default function ListDetailScreen() {
   const [purchaseItem] = useMutation(PURCHASE_ITEM);
   const [claimItem] = useMutation(CLAIM_ITEM);
   const [removeItem] = useMutation(REMOVE_ITEM);
+
+  const getLocalData = () => {
+    getItems().then((dataStored) => {
+      if (!dataStored) return;
+      if (dataStored[0]) DATA[0] = dataStored[0];
+      if (dataStored[1]) DATA[1] = dataStored[1];
+      if (dataStored[2]) DATA[2] = dataStored[2];
+      setDataChanged((prevState) => !prevState);
+    });
+  };
 
   // replace complete list with data prop
   const replaceData = (data = data) => {
@@ -228,6 +253,7 @@ export default function ListDetailScreen() {
     }
     if (DATA[1].data.length == 0) DATA[1].title = null;
     else DATA[1].title = "Purchased";
+    setDataChanged((prevState) => !prevState);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     // setDataChanged((prev) => !prev);
   };
@@ -247,6 +273,7 @@ export default function ListDetailScreen() {
     array.splice(index, 1);
     if (DATA[1].data.length == 0) DATA[1].title = null;
     else DATA[1].title = "Purchased";
+    setDataChanged((prevState) => !prevState);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
 
@@ -322,7 +349,7 @@ export default function ListDetailScreen() {
       //   },
       // });
     } else {
-      addItem({ variables: { name: adding, listID: currentListID, userID } });
+      addItem({ variables: { name: adding, listID: currentListID } });
       setAdding("");
     }
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -350,7 +377,7 @@ export default function ListDetailScreen() {
     //   },
     // });
     purchaseItem({
-      variables: { listID: currentListID, itemID: id, userID, method },
+      variables: { listID: currentListID, itemID: id, method },
     });
   }
 
@@ -369,14 +396,14 @@ export default function ListDetailScreen() {
         },
       },
     });
-    removeItem({ variables: { listID: currentListID, itemID: id, userID } });
+    removeItem({ variables: { listID: currentListID, itemID: id } });
   }
 
   function onTriggerLeftSwipe(id, member) {
     const method = member == authData.screen_name ? "unclaim" : "claim";
     claimStateChange(id, authData.screen_name, method);
     claimItem({
-      variables: { listID: currentListID, itemID: id, userID, method },
+      variables: { listID: currentListID, itemID: id, method },
     });
     Haptics.impactAsync("light");
   }
@@ -447,13 +474,7 @@ export default function ListDetailScreen() {
   });
 
   if (loading) return <Loading />;
-
-  if (error)
-    return (
-      <SafeAreaView>
-        <Text>{JSON.stringify(error)}</Text>
-      </SafeAreaView>
-    );
+  if (error) console.log(error);
 
   return (
     <KeyboardAvoidingView
@@ -461,7 +482,7 @@ export default function ListDetailScreen() {
       style={styles.container}
     >
       <Header
-        title={data.get_list.list_name}
+        title={listName}
         headerLeft={"back"}
         backPress={"lists"}
         headerRight={"settings"}

@@ -7,13 +7,13 @@ import AuthStack from "./AuthStack";
 import { ListProvider } from "../contexts/ListContext";
 import MainStack from "./MainStack";
 import * as Linking from "expo-linking";
-import { useColorScheme } from "react-native";
+import { Platform, UIManager, useColorScheme } from "react-native";
 
 // for deep linking in app
 const prefix = Linking.createURL("/");
 
 export default function Router() {
-  const { authData, loading } = useAuth();
+  const { authData } = useAuth();
   const { colors } = useScheme();
   const colorScheme = useColorScheme();
 
@@ -27,11 +27,18 @@ export default function Router() {
     },
   };
 
+  // To allow Android to use LayoutAnimation
+  if (Platform.OS === "android") {
+    if (UIManager.setLayoutAnimationEnabledExperimental) {
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+  }
+
   const linking = {
     prefixes: [prefix],
   };
 
-  if (loading) return <Loading />;
+  // if (loading) return <Loading />;
 
   return (
     <NavigationContainer theme={theme} linking={linking}>

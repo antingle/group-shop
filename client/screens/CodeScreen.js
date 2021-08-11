@@ -35,7 +35,7 @@ export default function CodeScreen({ navigation }) {
   const handleSubmit = async () => {
     try {
       // get userID from storage
-      await joinList({ variables: { code, userID: authData.id } });
+      await joinList({ variables: { code } });
     } catch (err) {
       console.log(err);
     }

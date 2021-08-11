@@ -3,40 +3,30 @@ import { StackActions } from "@react-navigation/native";
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, Image, Alert } from "react-native";
 import { JOIN_LIST } from "../graphql/graphql";
-import useAuth from "../hooks/useAuth";
 import useList from "../hooks/useList";
 import useScheme from "../hooks/useScheme";
+import ErrorMessage from "../components/ErrorMessage.js";
 
 export default function JoiningScreen({ navigation, route }) {
   const { colors } = useScheme();
   const code = route.params.code;
-  const { authData } = useAuth();
-  const { setCurrentListID } = useList();
+  const { setCurrentListID, setCreatingList } = useList();
 
-  const [joinList] = useMutation(JOIN_LIST, {
+  const [joinList, { error }] = useMutation(JOIN_LIST, {
     update(proxy, result) {
       try {
         let returnedData = result.data.join_list;
         setCurrentListID(returnedData.id);
+        setCreatingList(true);
         navigation.dispatch(StackActions.replace("listDetail"));
       } catch (e) {
         console.log(e);
       }
     },
-    onError: (error) => {
-      Alert.alert(error.message, "You may already be a part of this list", [
-        {
-          text: "OK",
-          onPress: () => {
-            navigation.navigate("lists");
-          },
-        },
-      ]);
-    },
   });
 
   useEffect(() => {
-    joinList({ variables: { code, userID: authData.id } });
+    joinList({ variables: { code } });
   }, []);
 
   // styles
@@ -48,6 +38,7 @@ export default function JoiningScreen({ navigation, route }) {
     },
     image: {
       height: 200,
+      width: 200,
       resizeMode: "contain",
       marginVertical: 90,
       marginRight: 20,
@@ -63,6 +54,7 @@ export default function JoiningScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      <ErrorMessage error={error} onDismiss={() => navigation.goBack()} />
       <Text style={styles.heading}>Joining List...</Text>
       <Image
         source={require("../assets/shoppingcartgray.png")}

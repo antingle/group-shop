@@ -1,16 +1,26 @@
 import React from "react";
-import { Text, StyleSheet, Pressable } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  Pressable,
+  View,
+  ActivityIndicator,
+} from "react-native";
+import AnimatedPressable from "./AnimatedPressable";
 
 export default function LongButton({
   text,
-  onPressOut,
+  onPress,
   backgroundColor,
   borderColor = backgroundColor,
   textColor,
   marginTop = 0,
+  loading = false,
+  ...props
 }) {
   const styles = StyleSheet.create({
     buttonContainer: {
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
       height: 60,
@@ -28,23 +38,21 @@ export default function LongButton({
       width: "100%",
     },
     buttonText: {
-      fontSize: 22,
+      fontSize: 24,
       color: textColor,
-      fontWeight: "500",
+      fontFamily: "Avenir-Heavy",
     },
   });
 
   return (
-    <Pressable
-      style={({ pressed }) => [
-        {
-          opacity: pressed ? 0.5 : 1,
-        },
-        styles.buttonContainer,
-      ]}
-      onPressOut={onPressOut}
-    >
-      <Text style={styles.buttonText}>{text}</Text>
-    </Pressable>
+    <AnimatedPressable onPress={onPress} disabled={loading} {...props}>
+      <View style={styles.buttonContainer}>
+        {!loading ? (
+          <Text style={styles.buttonText}>{text}</Text>
+        ) : (
+          <ActivityIndicator color={textColor} style={{ marginLeft: 12 }} />
+        )}
+      </View>
+    </AnimatedPressable>
   );
 }

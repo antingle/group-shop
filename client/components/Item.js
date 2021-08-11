@@ -148,8 +148,8 @@ export default function Item({
       overshootLeft={false}
       leftThreshold={100}
       onSwipeableRightOpen={onEndRight}
-      friction={1.5}
-      overshootFriction={4}
+      friction={1}
+      overshootFriction={8}
       onSwipeableLeftOpen={onTriggerLeft}
       useNativeAnimations={true}
     >

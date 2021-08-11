@@ -26,7 +26,7 @@ export default function NameListScreen({ navigation }) {
 
   const handleSubmit = () => {
     try {
-      createList({ variables: { userID: authData.id, listName } });
+      createList({ variables: { listName } });
     } catch (e) {
       console.log(e);
     }

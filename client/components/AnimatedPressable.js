@@ -5,6 +5,7 @@ export default function AnimatedPressable({
   children,
   onPress,
   disabled = false,
+  style,
 }) {
   const animation = useRef(new Animated.Value(0)).current;
   const scale = animation.interpolate({
@@ -27,7 +28,7 @@ export default function AnimatedPressable({
   };
 
   return (
-    <Animated.View style={{ transform: [{ scale }] }}>
+    <Animated.View style={[{ transform: [{ scale }] }, style]}>
       <Pressable
         onPressOut={onPressOut}
         onPressIn={onPressIn}
