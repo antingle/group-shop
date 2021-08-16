@@ -33,6 +33,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/shoppingcartgray.png",
+          "color": "#2ddb74"
+        }
+      ]
+    ]
   }
 }

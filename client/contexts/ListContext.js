@@ -29,10 +29,8 @@ export const ListProvider = ({ children }) => {
   }, []);
 
   const updateLists = async (lists) => {
-    if (lists == null || lists.length == 0) {
-      console.log("No lists for this user");
-      return;
-    } else {
+    if (lists == null || lists.length == 0) return;
+    else {
       await setStorageData("lists", lists);
       setLists(lists);
     }
@@ -98,7 +96,7 @@ export const ListProvider = ({ children }) => {
   };
 
   const storeItems = (items) => {
-    if (!items[0].data && !items[1].data) return;
+    if (items != null && !items[0].data && !items[1].data) return;
     setStorageData(currentListID, items);
   };
 

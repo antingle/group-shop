@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { StyleSheet, useColorScheme } from "react-native";
+import { Dimensions, StyleSheet, useColorScheme } from "react-native";
 import {
   getStorageData,
   removeStorageData,
@@ -32,7 +32,7 @@ export const SchemeProvider = ({ children }) => {
     theme != "dark"
       ? {
           // light mode
-          primary: "#32D274",
+          primary: "#2ddb74",
           primaryShade: "#5effa2",
           secondary: "#435058",
           background: "#EDF7F6",
@@ -49,7 +49,7 @@ export const SchemeProvider = ({ children }) => {
         }
       : {
           // dark mode
-          primary: "#32D274",
+          primary: "#2ddb74",
           primaryShade: "#5effa2",
           secondary: "#839189",
           background: "#1c1c1e",
@@ -78,10 +78,11 @@ export const SchemeProvider = ({ children }) => {
       alignItems: "center",
       textAlign: "center",
     },
-    containerTop2: {
+    evenContainer: {
       flex: 1,
-      backgroundColor: colors.foreground,
+      backgroundColor: colors.background,
       alignItems: "center",
+      justifyContent: "space-evenly",
       textAlign: "center",
     },
     row: {
@@ -116,13 +117,12 @@ export const SchemeProvider = ({ children }) => {
     inputLabel: {
       fontSize: 18,
       width: 300,
-      marginTop: 16,
+      marginTop: "1%",
       color: colors.primary,
       fontFamily: "Avenir",
     },
     textInput: {
       fontSize: 20,
-      marginTop: 8,
       width: 290,
       color: colors.text,
       textAlign: "left",

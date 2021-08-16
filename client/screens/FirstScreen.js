@@ -7,6 +7,7 @@ import {
   LayoutAnimation,
   Pressable,
   TextInput,
+  StatusBar,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Logo from "../components/Logo.js";
@@ -109,7 +110,7 @@ function FirstScreen({ navigation }) {
     const re = /\S+@\S+\.\S+/;
     if (name != null && name != "") setNameError(null);
     if (re.test(email)) setEmailError(null);
-    if (password != null && password.length >= 8) setPasswordError(null);
+    if (password != null && password.length >= 7) setPasswordError(null);
   };
 
   const handleSubmit = () => {
@@ -127,26 +128,25 @@ function FirstScreen({ navigation }) {
   // styles
   const styles = StyleSheet.create({
     keyboardContainer: {
-      flex: 1,
       backgroundColor: colors.foreground,
     },
     container: {
+      flex: 1,
       backgroundColor: colors.foreground,
       alignItems: "center",
       justifyContent: "flex-start",
     },
-    buttonsContainer: {
+    topContainer: {
+      justifyContent: "space-between",
       alignItems: "center",
-      marginTop: 20,
+      height: "40%",
     },
     logoContainer: {
+      flex: 1,
       alignItems: "center",
-      justifyContent: "space-evenly",
+      justifyContent: "center",
       backgroundColor: colors.foreground,
       width: Dimensions.get("screen").width,
-      height: 250,
-      paddingTop: 30,
-      marginBottom: 16,
     },
     logoContainerFill: {
       backgroundColor: colors.primary,
@@ -165,33 +165,6 @@ function FirstScreen({ navigation }) {
       fontSize: 40,
       fontWeight: "900",
       color: colors.primary,
-    },
-    createButton: {
-      alignItems: "center",
-      justifyContent: "center",
-      height: 60,
-      width: 320,
-      borderRadius: 48,
-      marginBottom: 8,
-      backgroundColor: colors.primary,
-    },
-    signInButton: {
-      alignItems: "center",
-      justifyContent: "center",
-      height: 60,
-      width: 320,
-      borderWidth: 3,
-      borderRadius: 48,
-      borderColor: colors.primary,
-      backgroundColor: "transparent",
-    },
-    guestButton: {
-      alignItems: "center",
-      justifyContent: "center",
-      height: 60,
-      width: 320,
-      borderRadius: 48,
-      backgroundColor: colors.secondary,
     },
     createText: {
       fontSize: 22,
@@ -231,43 +204,56 @@ function FirstScreen({ navigation }) {
       textDecorationLine: "none",
       fontFamily: "Avenir",
     },
+    bottomContainer: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "flex-start",
+      textAlign: "center",
+      backgroundColor: colors.foreground,
+    },
   });
 
   return (
-    <KeyboardAwareScrollView
-      scrollEnabled={false}
-      showsVerticalScrollIndicator={false}
-      style={styles.keyboardContainer}
-    >
+    <View style={styles.container}>
       <ErrorMessage error={graphqlError} />
-      <View style={styles.container}>
-        <Pressable
-          style={styles.logoContainer}
-          onPress={() => navigation.goBack()}
-        >
-          <SharedElement id="bg" style={StyleSheet.absoluteFillObject}>
-            <View
-              style={[StyleSheet.absoluteFillObject, styles.logoContainerFill]}
-            />
-          </SharedElement>
-          <View style={styles.logoText}>
-            <SharedElement id="group">
-              <Text style={styles.logo}>Group</Text>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.container}
+        scrollEnabled={false}
+        showsVerticalScrollIndicator={false}
+        style={styles.keyboardContainer}
+        keyboardOpeningTime={0}
+      >
+        <View style={styles.topContainer}>
+          <Pressable
+            style={styles.logoContainer}
+            onPress={() => navigation.goBack()}
+          >
+            <SharedElement id="bg" style={StyleSheet.absoluteFillObject}>
+              <View
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  styles.logoContainerFill,
+                ]}
+              />
             </SharedElement>
-            <SharedElement id="shop">
-              <Text style={styles.logo}>Shop</Text>
-            </SharedElement>
-          </View>
+            <View style={styles.logoText}>
+              <SharedElement id="group">
+                <Text style={styles.logo}>Group</Text>
+              </SharedElement>
+              <SharedElement id="shop">
+                <Text style={styles.logo}>Shop</Text>
+              </SharedElement>
+            </View>
 
-          <SharedElement id="logo" style={{ marginRight: 10 }}>
-            <Logo />
-          </SharedElement>
-        </Pressable>
-        <TwoPicker
-          onPressLeft={() => handlePicker("Sign Up")}
-          onPressRight={() => handlePicker("Sign In")}
-        />
-        {/* {signUp == "Sign Up" ? <CreateAccountScreen /> : <SignInScreen />} */}
+            <SharedElement id="logo" style={{ marginRight: 10 }}>
+              <Logo />
+            </SharedElement>
+          </Pressable>
+          <TwoPicker
+            onPressLeft={() => handlePicker("Sign Up")}
+            onPressRight={() => handlePicker("Sign In")}
+          />
+        </View>
         {signUp == "Sign Up" && (
           <View>
             <Text style={globalStyles.inputLabel}>Name</Text>
@@ -309,10 +295,7 @@ function FirstScreen({ navigation }) {
           <Text style={globalStyles.inputLabel}>Password</Text>
           <TextInput
             placeholder="Password"
-            style={[
-              globalStyles.textInput,
-              { marginBottom: signUp == "Sign Up" ? 0 : 32 },
-            ]}
+            style={globalStyles.textInput}
             autoCapitalize={"none"}
             onChangeText={setPassword}
             onChange={updateValidation}
@@ -325,45 +308,48 @@ function FirstScreen({ navigation }) {
           />
           <Text style={globalStyles.errorText}>{passwordError}</Text>
         </View>
-        {signUp == "Sign Up" && (
-          <View style={[globalStyles.row, { marginTop: 16, marginBottom: 24 }]}>
-            <BouncyCheckbox
-              text="Get great deals from our newsletter"
-              textStyle={styles.checkboxText}
-              fillColor={colors.primary}
-              iconStyle={{ borderColor: colors.primary }}
-            />
-            <AnimatedPressable>
-              <AntDesign
-                name="questioncircleo"
-                size={24}
-                color={colors.primary}
-                style={{ marginLeft: 12 }}
+        <View style={styles.bottomContainer}>
+          {signUp == "Sign Up" && (
+            <View style={globalStyles.row}>
+              <BouncyCheckbox
+                text="Subscribe to our newsletter"
+                textStyle={styles.checkboxText}
+                fillColor={colors.primary}
+                iconStyle={{ borderColor: colors.primary }}
               />
-            </AnimatedPressable>
-          </View>
-        )}
+              <AnimatedPressable>
+                <AntDesign
+                  name="questioncircleo"
+                  size={24}
+                  color={colors.primary}
+                  style={{ marginLeft: 12 }}
+                />
+              </AnimatedPressable>
+            </View>
+          )}
 
-        <LongButton
-          text={signUp}
-          loading={loading}
-          onPress={handleSubmit}
-          textColor={colors.theme}
-          backgroundColor={colors.primary}
-        />
-        {signUp == "Sign Up" && <Text style={styles.orText}>Or</Text>}
-        {signUp == "Sign Up" && (
-          <Pressable
-            onPress={() => navigation.navigate("name")}
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.5 : 1,
-            })}
-          >
-            <Text style={styles.guestText}>Continue as Guest</Text>
-          </Pressable>
-        )}
-      </View>
-    </KeyboardAwareScrollView>
+          <LongButton
+            text={signUp}
+            loading={loading}
+            onPress={handleSubmit}
+            textColor={colors.theme}
+            backgroundColor={colors.primary}
+            style={{ marginTop: "5%" }}
+          />
+          {signUp == "Sign Up" && <Text style={styles.orText}>Or</Text>}
+          {signUp == "Sign Up" && (
+            <Pressable
+              onPress={() => navigation.navigate("name")}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}
+            >
+              <Text style={styles.guestText}>Continue as Guest</Text>
+            </Pressable>
+          )}
+        </View>
+      </KeyboardAwareScrollView>
+    </View>
   );
 }
 

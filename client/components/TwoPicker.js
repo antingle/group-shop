@@ -41,7 +41,7 @@ export default function TwoPicker({ onPressLeft, onPressRight }) {
 
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
+      marginVertical: "3%",
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",

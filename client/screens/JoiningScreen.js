@@ -54,7 +54,10 @@ export default function JoiningScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-      <ErrorMessage error={error} onDismiss={() => navigation.goBack()} />
+      <ErrorMessage
+        error={error}
+        onDismiss={() => navigation.dispatch(StackActions.replace("lists"))}
+      />
       <Text style={styles.heading}>Joining List...</Text>
       <Image
         source={require("../assets/shoppingcartgray.png")}

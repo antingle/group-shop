@@ -6,6 +6,7 @@ import {
   TouchableHighlight,
   I18nManager,
   TextInput,
+  Dimensions,
 } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { Swipeable } from "react-native-gesture-handler";
@@ -84,7 +85,7 @@ export default function Item({
       alignItems: "center",
       flexDirection: "row",
       height: 48,
-      width: 340,
+      width: Dimensions.get("screen").width * 0.9,
       borderRadius: 24,
       paddingLeft: 20,
       backgroundColor: colors.foreground,
@@ -168,6 +169,7 @@ export default function Item({
             isChecked={purchased}
             disabled={true}
             ref={checkboxRef}
+            style={{ maxWidth: member ? "60%" : "90%" }}
           />
           {editing && (
             <TextInput
@@ -180,7 +182,7 @@ export default function Item({
               }}
               returnKeyType="done"
               autoCorrect={false}
-              maxLength={30}
+              maxLength={70}
             />
           )}
           <View style={styles.textContainer}>

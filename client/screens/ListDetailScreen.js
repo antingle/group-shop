@@ -4,12 +4,12 @@ import {
   SectionList,
   StyleSheet,
   Text,
-  SafeAreaView,
   LayoutAnimation,
   KeyboardAvoidingView,
+  Dimensions,
 } from "react-native";
 import Item from "../components/Item";
-import { useQuery, useMutation, gql, useSubscription } from "@apollo/client";
+import { useQuery, useMutation, useSubscription } from "@apollo/client";
 import {
   GET_LIST,
   ADD_ITEM,
@@ -32,6 +32,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import useScheme from "../hooks/useScheme";
 import AnimatedPressable from "../components/AnimatedPressable";
+import * as Notifications from "expo-notifications";
 
 export default function ListDetailScreen() {
   const { globalStyles, colors } = useScheme();
@@ -50,10 +51,7 @@ export default function ListDetailScreen() {
     getListName,
   } = useList();
 
-  const DATA = useCallback(
-    [{ data: [] }, { title: null, data: [] }],
-    [loading, data]
-  );
+  const DATA = useRef([{ data: [] }, { title: null, data: [] }]).current;
 
   useEffect(() => {
     // if new list made, name is not in lists object yet
@@ -221,6 +219,7 @@ export default function ListDetailScreen() {
         DATA[1].data = newPurchased;
       }
     }
+    if (DATA[2]?.data.length < 1) DATA[2] = { title: null, data: [] };
 
     if (DATA[1].data.length == 0) DATA[1].title = null;
     else DATA[1].title = "Purchased";
@@ -412,13 +411,12 @@ export default function ListDetailScreen() {
     try {
       setRefreshing(true);
       Haptics.impactAsync();
-      await refetch();
+      await refetch().then((data) => replaceData(data.data));
       console.log("refreshed the list!");
     } catch (e) {
       console.log(e);
     } finally {
       setRefreshing(false);
-      setDataChanged((prev) => !prev);
     }
   };
 
@@ -507,7 +505,7 @@ export default function ListDetailScreen() {
           offset: 56 * index, // THIS IS HARDCODDEDDE!!!!!!
           index,
         })}
-        ListFooterComponent={<View style={{ paddingBottom: 40 }}></View>}
+        ListFooterComponent={<View style={{ height: 40, width: 300 }}></View>}
       />
       <View style={styles.absolute}>
         <AnimatedPressable onPress={createNewItem}>

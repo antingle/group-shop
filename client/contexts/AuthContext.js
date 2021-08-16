@@ -1,12 +1,14 @@
 import { useApolloClient, useMutation } from "@apollo/client";
-import React, { createContext, useState, useEffect } from "react";
-import { Alert } from "react-native";
+import React, { createContext, useState, useEffect, useRef } from "react";
+import { Alert, Platform } from "react-native";
 import { DELETE_USER } from "../graphql/graphql";
 import {
   clearStorageData,
   getStorageData,
   setStorageData,
 } from "../other/storage";
+import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 
 /*
 authData:
@@ -18,15 +20,29 @@ authData:
 
 export const AuthContext = createContext();
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 export const AuthProvider = ({ children, setToken }) => {
   // setToken passed down from main App
   const [authData, setAuthData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [lists, setLists] = useState(false);
-  let client = useApolloClient();
 
-  // hooks
+  // notifications
+  const [expoPushToken, setExpoPushToken] = useState("");
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+
+  // graphql
   const [delete_user] = useMutation(DELETE_USER);
+  const client = useApolloClient();
 
   // check if someone is logged in on app mount
   useEffect(() => {
@@ -36,9 +52,73 @@ export const AuthProvider = ({ children, setToken }) => {
     });
     getStorageData("token").then((data) => {
       if (data != null) setToken(data);
-      setLoading(false);
     });
+
+    // notifications
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener((notification) => {
+        setNotification(notification);
+        console.log(notification);
+      });
+
+    responseListener.current =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        console.log(response);
+      });
+
+    return () => {
+      Notifications.removeNotificationSubscription(
+        notificationListener.current
+      );
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
+
+  // recieve push notification token
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Constants.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
+    }
+
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+
+    return token;
+  }
+
+  async function schedulePushNotification() {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Guess what??",
+        body: "Ma balls are thicc",
+        data: { data: "goes here" },
+      },
+      trigger: { seconds: 2 },
+    });
+  }
 
   const signIn = async (data) => {
     if (!data) return;
@@ -77,6 +157,7 @@ export const AuthProvider = ({ children, setToken }) => {
         deleteUser,
         lists,
         setLists,
+        schedulePushNotification,
       }}
     >
       {children}

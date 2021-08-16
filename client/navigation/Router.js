@@ -13,7 +13,7 @@ import { Platform, UIManager, useColorScheme } from "react-native";
 const prefix = Linking.createURL("/");
 
 export default function Router() {
-  const { authData } = useAuth();
+  const { authData, loading } = useAuth();
   const { colors } = useScheme();
   const colorScheme = useColorScheme();
 
@@ -38,7 +38,7 @@ export default function Router() {
     prefixes: [prefix],
   };
 
-  // if (loading) return <Loading />;
+  if (loading) return <Loading />;
 
   return (
     <NavigationContainer theme={theme} linking={linking}>

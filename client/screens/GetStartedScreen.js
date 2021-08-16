@@ -1,4 +1,3 @@
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { View, Text, StyleSheet, Dimensions, Animated } from "react-native";
 import Logo from "../components/Logo";
@@ -7,7 +6,7 @@ import useScheme from "../hooks/useScheme";
 import { SharedElement } from "react-navigation-shared-element";
 import { useFocusEffect } from "@react-navigation/native";
 
-function GetStartedScreen({ navigation, route }) {
+function GetStartedScreen({ navigation }) {
   const { colors, globalStyles } = useScheme();
   const getStartedAnimation = React.useRef(new Animated.Value(0)).current;
   const welcomeAnimation = React.useRef(new Animated.Value(0)).current;
@@ -42,11 +41,8 @@ function GetStartedScreen({ navigation, route }) {
       flex: 1,
       backgroundColor: colors.foreground,
       alignItems: "center",
-      justifyContent: "center",
-    },
-    buttonsContainer: {
-      flex: 1,
-      alignItems: "center",
+      justifyContent: "space-evenly",
+      paddingVertical: "10%",
     },
     logoContainer: {
       alignItems: "center",
@@ -103,7 +99,10 @@ function GetStartedScreen({ navigation, route }) {
       </SharedElement>
       <LongButton
         style={[
-          { transform: [{ translateY }], opacity: getStartedAnimation },
+          {
+            transform: [{ translateY }],
+            opacity: getStartedAnimation,
+          },
           globalStyles.shadow,
         ]}
         text="Get Started"
