@@ -181,6 +181,9 @@ export default function ListScreen({ navigation }) {
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             ListEmptyComponent={EmptyList}
+            ListFooterComponent={
+              <View style={{ height: 100, width: 300 }}></View>
+            }
           />
         ) : (
           <Loading />

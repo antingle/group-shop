@@ -77,7 +77,7 @@ export default function ErrorMessage({ error, onDismiss }) {
       textAlign: "center",
     },
     message: {
-      fontFamily: "Avenir",
+      fontFamily: "Avenir-Medium",
       fontSize: 18,
       color: colors.text,
       marginBottom: 32,

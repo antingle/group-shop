@@ -1,21 +1,24 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, Pressable, StyleSheet, Animated } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  Animated,
+  Dimensions,
+} from "react-native";
 import useScheme from "../hooks/useScheme";
 
-export default function SidePicker() {
+export default function ThemePicker() {
   const { colors, setThemeSetting, themeSetting } = useScheme();
   const selector = useRef();
-  const auto = useRef();
-  const light = useRef();
-  const dark = useRef();
   const translateX = useRef(new Animated.Value(0)).current;
-  const xValues = useRef({});
+  const xValues = useRef({}).current;
 
   useEffect(() => {
-    auto.current.measure((x) => (xValues.current.auto = x));
-    light.current.measure((x) => (xValues.current.light = x));
-    dark.current.measure((x) => (xValues.current.dark = x));
-    setTimeout(() => animateToTheme(themeSetting, 100), 50); // Hacky way of doing it?
+    setTimeout(() => {
+      animateToTheme(themeSetting, 100);
+    }, 50); // Hacky way of doing it?
   }, []);
 
   const handlePress = (theme) => {
@@ -26,14 +29,13 @@ export default function SidePicker() {
   const animateToTheme = (theme, speed = 14) => {
     let value = 0;
 
-    if (theme == "auto") value = xValues.current.auto;
-    else if (theme == "light") value = xValues.current.light;
-    else if (theme == "dark") value = xValues.current.dark;
+    if (theme == "auto") value = xValues.auto;
+    else if (theme == "light") value = xValues.light;
+    else if (theme == "dark") value = xValues.dark;
     else return;
-
     Animated.spring(translateX, {
       useNativeDriver: true,
-      toValue: value - 40,
+      toValue: value + (xValues.light - xValues.dark) / 2 - 3,
       speed,
     }).start();
   };
@@ -54,7 +56,7 @@ export default function SidePicker() {
     },
     selector: {
       backgroundColor: colors.primary,
-      width: 80,
+      width: 85,
       position: "absolute",
       height: 36,
       borderRadius: 24,
@@ -91,9 +93,9 @@ export default function SidePicker() {
         />
         <Pressable
           style={styles.selection}
-          ref={auto}
           hitSlop={10}
           onPress={() => handlePress("auto")}
+          onLayout={(e) => (xValues.auto = e.nativeEvent.layout.x)}
         >
           <Text
             style={[
@@ -108,9 +110,9 @@ export default function SidePicker() {
         </Pressable>
         <Pressable
           style={styles.selection}
-          ref={light}
           hitSlop={10}
           onPress={() => handlePress("light")}
+          onLayout={(e) => (xValues.light = e.nativeEvent.layout.x)}
         >
           <Text
             style={[
@@ -125,9 +127,9 @@ export default function SidePicker() {
         </Pressable>
         <Pressable
           style={styles.selection}
-          ref={dark}
           hitSlop={10}
           onPress={() => handlePress("dark")}
+          onLayout={(e) => (xValues.dark = e.nativeEvent.layout.x)}
         >
           <Text
             style={[

@@ -7,7 +7,7 @@ import AuthStack from "./AuthStack";
 import { ListProvider } from "../contexts/ListContext";
 import MainStack from "./MainStack";
 import * as Linking from "expo-linking";
-import { Platform, UIManager, useColorScheme } from "react-native";
+import { Platform, UIManager, useColorScheme, View } from "react-native";
 
 // for deep linking in app
 const prefix = Linking.createURL("/");
@@ -40,15 +40,18 @@ export default function Router() {
 
   if (loading) return <Loading />;
 
+  // This view wrapping the navigation container prevents flashing of expo background color on certain transitions
   return (
-    <NavigationContainer theme={theme} linking={linking}>
-      {authData ? (
-        <ListProvider>
-          <MainStack />
-        </ListProvider>
-      ) : (
-        <AuthStack />
-      )}
-    </NavigationContainer>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <NavigationContainer theme={theme} linking={linking}>
+        {authData ? (
+          <ListProvider>
+            <MainStack />
+          </ListProvider>
+        ) : (
+          <AuthStack />
+        )}
+      </NavigationContainer>
+    </View>
   );
 }

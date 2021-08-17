@@ -100,7 +100,11 @@ export default function ListSettingsScreen() {
   return (
     <View style={globalStyles.container}>
       <Header title={"List Settings"} headerLeft={"x"} />
-      <ScrollView>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ alignItems: "center" }}
+      >
         <SettingsCard
           content={"Invite Members"}
           type={"button"}

@@ -2,7 +2,7 @@ import React from "react";
 import { View, ScrollView, Alert, Text } from "react-native";
 import Header from "../components/Header";
 import SettingsCard from "../components/SettingsCard";
-import SidePicker from "../components/SidePicker";
+import ThemePicker from "../components/ThemePicker";
 import useAuth from "../hooks/useAuth";
 import useScheme from "../hooks/useScheme";
 
@@ -59,14 +59,17 @@ export default function SettingsScreen() {
   return (
     <View style={globalStyles.container}>
       <Header title={"Settings"} headerLeft={"x"} />
-      <ScrollView>
+      <ScrollView
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
+      >
         <SettingsCard
           field={"Name: "}
           content={authData.screen_name}
           type={"modifiable"}
           onPress={handleName}
         />
-        <SidePicker />
+        <ThemePicker />
         {authData.email != null && (
           <SettingsCard
             type={"middle"}

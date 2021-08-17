@@ -12,12 +12,12 @@ export default function App() {
   const [token, setToken] = React.useState(null); // stores token
 
   const httpLink = new HttpLink({
-    uri: "https://group-shop-production.herokuapp.com/graphql",
+    uri: "https://group-shop-dev.herokuapp.com/graphql",
     credentials: "include",
   });
 
   const wsLink = new WebSocketLink({
-    uri: "ws://group-shop-production.herokuapp.com/subscriptions",
+    uri: "ws://group-shop-dev.herokuapp.com/subscriptions",
     options: {
       reconnect: true,
     },

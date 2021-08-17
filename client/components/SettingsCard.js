@@ -11,7 +11,7 @@ export default function SettingsCard({
   content,
   onPress,
 }) {
-  const { colors } = useScheme();
+  const { colors, measurements } = useScheme();
   const [captionColor, setCaptionColor] = useState(colors.primary);
 
   const handleCopy = () => {
@@ -25,7 +25,7 @@ export default function SettingsCard({
       alignItems: "center",
       flexDirection: "row",
       height: 56,
-      width: 340,
+      width: measurements.item.width,
       borderRadius: 24,
       paddingLeft: 20,
       backgroundColor: colors.foreground,
@@ -36,7 +36,7 @@ export default function SettingsCard({
       justifyContent: "center",
       flexDirection: "row",
       height: 56,
-      width: 340,
+      width: measurements.item.width,
       borderRadius: 24,
       backgroundColor: colors.foreground,
       marginBottom: 10,
@@ -46,7 +46,7 @@ export default function SettingsCard({
       justifyContent: "center",
       flexDirection: "row",
       height: 56,
-      width: 340,
+      width: "100%",
       borderRadius: 24,
       backgroundColor: colors.foreground,
     },
@@ -74,6 +74,7 @@ export default function SettingsCard({
       borderRadius: 24,
       height: 56,
       marginBottom: 10,
+      width: measurements.item.width,
     },
     caption: {
       position: "absolute",
@@ -107,8 +108,8 @@ export default function SettingsCard({
       alignItems: "center",
       justifyContent: "center",
       flexDirection: "row",
+      width: measurements.item.width,
       height: 56,
-      width: 340,
       borderRadius: 24,
       marginBottom: 10,
       backgroundColor: colors.primary,

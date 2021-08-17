@@ -35,7 +35,7 @@ import AnimatedPressable from "../components/AnimatedPressable";
 import * as Notifications from "expo-notifications";
 
 export default function ListDetailScreen() {
-  const { globalStyles, colors } = useScheme();
+  const { globalStyles, colors, measurements } = useScheme();
   const [refreshing, setRefreshing] = useState(false);
   const [adding, setAdding] = useState("");
   const [listName, setListName] = useState("");
@@ -476,8 +476,9 @@ export default function ListDetailScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : ""}
       style={styles.container}
+      contentContainerStyle={styles.container}
     >
       <Header
         title={listName}
@@ -501,8 +502,8 @@ export default function ListDetailScreen() {
         onRefresh={refreshList}
         refreshing={refreshing}
         getItemLayout={(_, index) => ({
-          length: 56,
-          offset: 56 * index, // THIS IS HARDCODDEDDE!!!!!!
+          length: measurements.item.height + measurements.item.margin,
+          offset: (measurements.item.height + measurements.item.margin) * index, // THIS IS HARDCODDEDDE!!!!!!
           index,
         })}
         ListFooterComponent={<View style={{ height: 40, width: 300 }}></View>}

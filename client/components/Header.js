@@ -1,5 +1,12 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  SafeAreaView,
+  StatusBar,
+} from "react-native";
 import GoBackButton from "../components/GoBackButton";
 import useScheme from "../hooks/useScheme";
 import SettingsButton from "./SettingsButton";
@@ -28,8 +35,8 @@ export default function Header({
       alignItems: "center",
       justifyContent: "space-between",
       flexDirection: "row",
-      marginTop: 60,
-      marginBottom: 12,
+      marginBottom: 16,
+      marginTop: StatusBar.currentHeight,
     },
     title: {
       textAlign: "center",
@@ -40,20 +47,20 @@ export default function Header({
     },
     sideHeader: {
       alignItems: "center",
-      width: 90,
+      width: "20%",
     },
   });
 
   const renderComponent = (component) => {
     switch (component) {
       case "settings":
-        component = <SettingsButton marginTop={34} screen={settingsScreen} />;
+        component = <SettingsButton screen={settingsScreen} />;
         break;
       case "back":
-        component = <GoBackButton marginTop={35} navigate={backPress} />;
+        component = <GoBackButton navigate={backPress} />;
         break;
       case "x":
-        component = <XButton marginTop={32} />;
+        component = <XButton />;
         break;
       default:
         component = null;
@@ -64,7 +71,7 @@ export default function Header({
   headerRight = renderComponent(headerRight);
 
   return (
-    <View>
+    <SafeAreaView>
       <View style={styles.container}>
         <View style={styles.sideHeader}>{headerLeft}</View>
         <Text style={styles.title} ellipsizeMode="tail" numberOfLines={2}>
@@ -72,6 +79,6 @@ export default function Header({
         </Text>
         <View style={styles.sideHeader}>{headerRight}</View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }

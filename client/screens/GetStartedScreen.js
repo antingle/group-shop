@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Dimensions, Animated } from "react-native";
+import { View, Text, StyleSheet, Animated, SafeAreaView } from "react-native";
 import Logo from "../components/Logo";
 import LongButton from "../components/LongButton";
 import useScheme from "../hooks/useScheme";
@@ -51,26 +51,20 @@ function GetStartedScreen({ navigation }) {
     logo: {
       textAlign: "center",
       fontSize: 75,
-      fontWeight: "900",
       color: colors.theme,
-      fontFamily: "Avenir-Heavy",
+      fontFamily: "Avenir-Black",
     },
     title: {
       textAlign: "center",
       fontSize: 32,
       color: colors.theme,
-      marginBottom: 24,
-      fontFamily: "Avenir",
-    },
-    gradient: {
-      height: Dimensions.get("screen").height,
-      width: Dimensions.get("screen").width,
-      position: "absolute",
+      marginVertical: 24,
+      fontFamily: "Avenir-Light",
     },
   });
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <SharedElement id="bg" style={StyleSheet.absoluteFillObject}>
         <View
           style={[
@@ -98,21 +92,16 @@ function GetStartedScreen({ navigation }) {
         <Logo size={200} style={{ marginVertical: 42 }} />
       </SharedElement>
       <LongButton
-        style={[
-          {
-            transform: [{ translateY }],
-            opacity: getStartedAnimation,
-          },
-          globalStyles.shadow,
-        ]}
+        style={{
+          transform: [{ translateY }],
+          opacity: getStartedAnimation,
+        }}
         text="Get Started"
         onPress={() => navigation.navigate("firstScreen")}
         textColor={colors.primary}
         backgroundColor={colors.theme}
-        marginBottom={0}
-        st
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

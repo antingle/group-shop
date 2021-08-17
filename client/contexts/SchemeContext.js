@@ -5,6 +5,9 @@ import {
   removeStorageData,
   setStorageData,
 } from "../other/storage";
+import { useFonts } from "expo-font";
+import AppLoading from "expo-app-loading";
+import { useRef } from "react/cjs/react.development";
 
 export const SchemeContext = createContext();
 
@@ -12,6 +15,13 @@ export const SchemeProvider = ({ children }) => {
   const systemTheme = useColorScheme();
   const [themeSetting, setThemeSetting] = useState("auto");
   const [theme, setTheme] = useState(systemTheme);
+  let [fontsLoaded] = useFonts({
+    "Avenir-Book": require("../assets/fonts/Avenir-Book.ttf"),
+    "Avenir-Light": require("../assets/fonts/Avenir-Light.ttf"),
+    "Avenir-Medium": require("../assets/fonts/Avenir-Medium.ttf"),
+    "Avenir-Heavy": require("../assets/fonts/Avenir-Heavy.ttf"),
+    "Avenir-Black": require("../assets/fonts/Avenir-Black.ttf"),
+  });
 
   // on app launch
   useEffect(() => {
@@ -119,21 +129,21 @@ export const SchemeProvider = ({ children }) => {
       width: 300,
       marginTop: "1%",
       color: colors.primary,
-      fontFamily: "Avenir",
+      fontFamily: "Avenir-Light",
     },
     textInput: {
       fontSize: 20,
       width: 290,
       color: colors.text,
       textAlign: "left",
-      fontFamily: "Avenir",
+      fontFamily: "Avenir-Light",
     },
     errorText: {
       color: colors.destructive,
       fontSize: 14,
       textAlign: "left",
       width: 300,
-      fontFamily: "Avenir",
+      fontFamily: "Avenir-Medium",
     },
     shadow: {
       shadowColor: colors.black,
@@ -141,15 +151,32 @@ export const SchemeProvider = ({ children }) => {
         width: 0,
         height: 10,
       },
-      shadowOpacity: 0.3,
-      shadowRadius: 15,
-      elevation: 20,
+      shadowOpacity: 0.2,
+      shadowRadius: 10,
+      elevation: 10,
     },
   });
 
+  const measurements = useRef({
+    item: {
+      width: Dimensions.get("screen").width * 0.9,
+      height: 48,
+      margin: 8,
+    },
+  }).current;
+
+  if (!fontsLoaded) return <AppLoading />;
+
   return (
     <SchemeContext.Provider
-      value={{ colors, globalStyles, theme, themeSetting, setThemeSetting }}
+      value={{
+        colors,
+        globalStyles,
+        theme,
+        themeSetting,
+        setThemeSetting,
+        measurements,
+      }}
     >
       {children}
     </SchemeContext.Provider>

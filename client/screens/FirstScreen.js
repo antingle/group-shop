@@ -7,7 +7,7 @@ import {
   LayoutAnimation,
   Pressable,
   TextInput,
-  StatusBar,
+  Platform,
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Logo from "../components/Logo.js";
@@ -83,7 +83,8 @@ function FirstScreen({ navigation }) {
     setNameError(null);
     setEmailError(null);
     setPasswordError(null);
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (Platform.OS != "android")
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
 
   const validateForm = () => {
@@ -156,9 +157,8 @@ function FirstScreen({ navigation }) {
     logo: {
       textAlign: "center",
       fontSize: 48,
-      fontWeight: "900",
       color: colors.theme,
-      fontFamily: "Avenir-Heavy",
+      fontFamily: "Avenir-Black",
     },
     title: {
       textAlign: "center",
@@ -180,12 +180,12 @@ function FirstScreen({ navigation }) {
       padding: 12,
       fontSize: 14,
       color: colors.caption,
-      fontFamily: "Avenir",
+      fontFamily: "Avenir-Light",
     },
     guestText: {
       fontSize: 18,
       color: colors.primary,
-      fontFamily: "Avenir",
+      fontFamily: "Avenir-Medium",
     },
     gradient: {
       height: Dimensions.get("window").height,
@@ -202,7 +202,7 @@ function FirstScreen({ navigation }) {
       fontSize: 16,
       color: colors.text,
       textDecorationLine: "none",
-      fontFamily: "Avenir",
+      fontFamily: "Avenir-Light",
     },
     bottomContainer: {
       flex: 1,
@@ -215,7 +215,6 @@ function FirstScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <ErrorMessage error={graphqlError} />
       <KeyboardAwareScrollView
         contentContainerStyle={styles.container}
         scrollEnabled={false}
@@ -223,6 +222,7 @@ function FirstScreen({ navigation }) {
         style={styles.keyboardContainer}
         keyboardOpeningTime={0}
       >
+        <ErrorMessage error={graphqlError} />
         <View style={styles.topContainer}>
           <Pressable
             style={styles.logoContainer}
@@ -268,6 +268,7 @@ function FirstScreen({ navigation }) {
               textContentType="name"
               returnKeyType="next"
               ref={nameRef}
+              blurOnSubmit={false}
               onSubmitEditing={() => emailRef.current.focus()}
             />
           </View>
@@ -287,6 +288,7 @@ function FirstScreen({ navigation }) {
             keyboardType={"email-address"}
             returnKeyType="next"
             ref={emailRef}
+            blurOnSubmit={false}
             onSubmitEditing={() => passRef.current.focus()}
           />
           <Text style={globalStyles.errorText}>{emailError}</Text>

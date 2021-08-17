@@ -27,7 +27,7 @@ export default function Item({
   onAdd,
   onChangeAdd,
 }) {
-  const { colors } = useScheme();
+  const { colors, measurements } = useScheme();
   const checkboxRef = React.useRef();
   const swipeableRef = React.useRef();
   const { authData } = useAuth();
@@ -84,8 +84,8 @@ export default function Item({
     card: {
       alignItems: "center",
       flexDirection: "row",
-      height: 48,
-      width: Dimensions.get("screen").width * 0.9,
+      height: measurements.item.height,
+      width: measurements.item.width,
       borderRadius: 24,
       paddingLeft: 20,
       backgroundColor: colors.foreground,
@@ -95,7 +95,7 @@ export default function Item({
     },
     swipeable: {
       borderRadius: 24,
-      marginBottom: 8,
+      marginBottom: measurements.item.margin,
     },
     cardText: {
       fontSize: 16,

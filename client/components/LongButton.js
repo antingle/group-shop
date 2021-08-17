@@ -6,6 +6,7 @@ import {
   View,
   ActivityIndicator,
 } from "react-native";
+import useScheme from "../hooks/useScheme";
 import AnimatedPressable from "./AnimatedPressable";
 
 export default function LongButton({
@@ -18,6 +19,7 @@ export default function LongButton({
   loading = false,
   ...props
 }) {
+  const { globalStyles } = useScheme();
   const styles = StyleSheet.create({
     buttonContainer: {
       flexDirection: "row",
@@ -46,7 +48,7 @@ export default function LongButton({
 
   return (
     <AnimatedPressable onPress={onPress} disabled={loading} {...props}>
-      <View style={styles.buttonContainer}>
+      <View style={[styles.buttonContainer, globalStyles.shadow]}>
         {!loading ? (
           <Text style={styles.buttonText}>{text}</Text>
         ) : (

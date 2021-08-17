@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import useAuth from "../hooks/useAuth.js";
@@ -50,7 +50,7 @@ export default function ListCard({
       alignItems: "center",
       justifyContent: "center",
       height: 100,
-      width: 340,
+      width: Dimensions.get("screen").width * 0.9,
       borderRadius: 24,
       backgroundColor: colors.foreground,
       marginBottom: 12,

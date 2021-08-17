@@ -4,19 +4,12 @@ import useScheme from "../hooks/useScheme";
 
 export default function TwoPicker({ onPressLeft, onPressRight }) {
   const { colors } = useScheme();
-  const first = useRef();
-  const second = useRef();
   const translateX = useRef(new Animated.Value(-45)).current;
-  const xValues = useRef({});
+  const xValues = useRef({}).current;
   const [selected, setSelected] = React.useState("left");
 
   useEffect(() => {
-    setTimeout(() => {
-      if (!first.current) return;
-      first.current.measure((x) => (xValues.current.left = x));
-      second.current.measure((x) => (xValues.current.right = x));
-      setTimeout(() => animateTo("left", 50), 50);
-    }, 100);
+    setTimeout(() => animateTo("left", 50), 100);
   }, []);
 
   const handlePress = (item) => {
@@ -29,8 +22,8 @@ export default function TwoPicker({ onPressLeft, onPressRight }) {
     let value = 0;
     setSelected(item);
 
-    if (item == "left") value = xValues.current.left + 67;
-    else if (item == "right") value = xValues.current.right + 60;
+    if (item == "left") value = xValues.left + 67;
+    else if (item == "right") value = xValues.right + 60;
 
     Animated.spring(translateX, {
       useNativeDriver: true,
@@ -82,8 +75,8 @@ export default function TwoPicker({ onPressLeft, onPressRight }) {
         />
         <Pressable
           style={styles.selection}
-          ref={first}
           hitSlop={10}
+          onLayout={(e) => (xValues.left = e.nativeEvent.layout.x)}
           onPress={() => handlePress("left")}
         >
           <Text
@@ -99,8 +92,8 @@ export default function TwoPicker({ onPressLeft, onPressRight }) {
         </Pressable>
         <Pressable
           style={styles.selection}
-          ref={second}
           hitSlop={10}
+          onLayout={(e) => (xValues.right = e.nativeEvent.layout.x)}
           onPress={() => handlePress("right")}
         >
           <Text

@@ -4,19 +4,19 @@ import useAuth from "../hooks/useAuth";
 import useScheme from "../hooks/useScheme";
 
 export default function SettingsMembersCard({ members, owner }) {
-  const { colors } = useScheme();
+  const { colors, measurements } = useScheme();
   const { authData } = useAuth();
 
   const styles = StyleSheet.create({
     card: {
-      alignItems: "center",
-      width: 340,
+      alignItems: "flex-start",
+      justifyContent: "center",
+      width: measurements.item.width,
       borderRadius: 24,
-      paddingLeft: 20,
       backgroundColor: colors.foreground,
       marginBottom: 10,
       textAlign: "left",
-      paddingBottom: 12,
+      padding: 20,
     },
     cardText: {
       fontSize: 18,
@@ -27,13 +27,6 @@ export default function SettingsMembersCard({ members, owner }) {
       fontSize: 20,
       color: colors.primary,
       fontWeight: "500",
-      marginTop: 10,
-      paddingLeft: 10,
-      width: 340,
-    },
-    touchable: {
-      borderRadius: 24,
-      marginBottom: 10,
     },
     caption: {
       marginLeft: 20,
@@ -45,7 +38,6 @@ export default function SettingsMembersCard({ members, owner }) {
       flexDirection: "row",
       width: 340,
       marginTop: 10,
-      paddingLeft: 10,
     },
   });
 
