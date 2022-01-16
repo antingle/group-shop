@@ -36,7 +36,7 @@ export default function Header({
       justifyContent: "space-between",
       flexDirection: "row",
       marginBottom: 16,
-      marginTop: StatusBar.currentHeight,
+      marginTop: StatusBar.currentHeight + 5,
     },
     title: {
       textAlign: "center",

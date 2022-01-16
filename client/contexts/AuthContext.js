@@ -113,7 +113,7 @@ export const AuthProvider = ({ children, setToken }) => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Guess what??",
-        body: "Ma balls are thicc",
+        body: "Hi :)",
         data: { data: "goes here" },
       },
       trigger: { seconds: 2 },

@@ -1,13 +1,8 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState, useRef } from "react";
 import { Dimensions, StyleSheet, useColorScheme } from "react-native";
-import {
-  getStorageData,
-  removeStorageData,
-  setStorageData,
-} from "../other/storage";
+import { getStorageData, setStorageData } from "../other/storage";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
-import { useRef } from "react/cjs/react.development";
 
 export const SchemeContext = createContext();
 
