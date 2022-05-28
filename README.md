@@ -4,5 +4,7 @@
 
 In progress towards creating a realtime group shopping list app with React Native to be deployed on iOS and Android.
 
-<img src="images/appmockuplight.png" alt="List Demo" width="500">
-<img src="images/appmockupdark.png" alt="List Demo Dark" width="500">
+<p style="float: left;">
+<img src="images/appmockuplight.png" alt="List Demo" width="300">
+<img src="images/appmockupdark.png" alt="List Demo Dark" width="300">
+</p>
