@@ -1,6 +1,6 @@
 ![Group Shop](images/gslogolong-bg.png)
 # Group Shop Mobile App
-[Landing Page](https://www.groupshop.us)
+[Landing Page](https://group-shop-website.vercel.app)
 
 In progress towards creating a realtime group shopping list app with React Native to be deployed on iOS and Android.
 
